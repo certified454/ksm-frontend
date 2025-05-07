@@ -1,0 +1,52 @@
+{
+  "expo": {
+    "name": "KISMET",
+    "slug": "ksm",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/iconorg.png",
+    "scheme": "ksm",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "icon": "./assets/images/iconorg.png",
+      "package": "com.kismet.ksm",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/android.png",
+        "resizeMode": "contain"
+      },
+      "edgeToEdgeEnabled": true
+    },
+    
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/iconorg.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/android.png",
+          "dark": {
+            "image": "./assets/images/white.png"
+          },
+          "imageWidth": 200
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "58da29c8-2b3a-497c-a2cc-c8e9aabcb7cb"
+      }
+    }
+  }
+}
