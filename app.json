@@ -1,39 +1,53 @@
 {
   "expo": {
-    "name": "KISMET",
+    "name": "kismet",
     "slug": "ksm",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/iconorg.png",
+    "icon": "./assets/images/logo.png",
+    "splash": {
+      "image": "./assets/images/logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#4B0082"
+    },
+    "backgroundColor": "#4B0082",
     "scheme": "ksm",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "kismet",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "icon": "./assets/icons/light.png"
     },
     "android": {
-      "icon": "./assets/images/iconorg.png",
-      "package": "com.kismet.ksm",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/android.png",
-        "resizeMode": "contain"
+        "foregroundImage": "./assets/icons/adaptive-icon.png",
+        "monochromeImage": "./assets/icons/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.naimah.ksm"
     },
-    
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/iconorg.png"
+      "favicon": "./assets/images/adaptive-icon.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/android.png",
+          "image": "./assets/icons/splash-icon-dark.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#4B0082",
           "dark": {
-            "image": "./assets/images/white.png"
+            "image": "./assets/icons/splah-icon-light.png",
+            "resizeMode": "contain",
+            "backgroundColor": "#ffffff"
           },
           "imageWidth": 200
         }

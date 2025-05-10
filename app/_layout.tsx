@@ -1,8 +1,9 @@
 import { Stack, useRouter, useSegments } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { View } from "react-native";
+import * as SplashScreen from "expo-splash-screen";
 
 import SafeScreen from "../components/safescreen";
 import { useAuthStore } from "../store/authStore";
@@ -10,9 +11,13 @@ import { useAuthStore } from "../store/authStore";
 SplashScreen.preventAutoHideAsync()
   .then(result => console.log(`SplashScreen.preventAutoHideAsync successed: ${result}`))
   .catch(console.warn);
+// SplashScreen.setOptions({
+//   duration: 4000,
+//   fade: true,
+// });
 
 export default function RootLayout() {
-  const [isAppReady, setIsAppReady] = useState(false);
+  const [appIsReady, setAppIsReady] = useState(false);
   const router = useRouter();
   const segments = useSegments();
 
@@ -21,36 +26,33 @@ export default function RootLayout() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    async function prepareApp() {
+    async function prepare() {
       try {
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        await new Promise(resolve => setTimeout(resolve, 2000));
         console.log("SplashScreen hidden");
-      } catch (error) {
-        console.warn("Error hiding SplashScreen:", error);
+      } catch (e) {
+        console.warn("Error hiding SplashScreen:", e);
       } finally {
-        setIsAppReady(true);
-        console.log("App is now ready");
+        setAppIsReady(true);
       }
     }
-    prepareApp();
+    prepare();
   }, []);
 
-  const onLayoutRootView = useCallback(async() => {
-    if (isAppReady) {
-      await SplashScreen.hideAsync();
+  const onLayoutRootView = useCallback(() => {
+    if (appIsReady) {
+       SplashScreen.hideAsync();
       console.log("SplashScreen hidden");
     }
-  }, [isAppReady]);
-
-  if (!isAppReady) {
-    return null;
-  }
+  }, [appIsReady]);
   
   useEffect(() => {
     const initialize = async () => {
     await checkAuth();
     setIsLoading(false);
-    setMounted(true);}
+    setMounted(true);
+  };
+    initialize();
   }, []);
 
   useEffect(() => {
@@ -66,13 +68,19 @@ export default function RootLayout() {
     }
   }, [user, token, segments, mounted, isLoading]);
 
+  if(!appIsReady) {
+    return null;
+  }
+
   return (
     <SafeAreaProvider>
       <SafeScreen>
+      <View onLayout={onLayoutRootView}>
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(auth)" />
           <Stack.Screen name="(tabs)" />
         </Stack>
+      </View>
       </SafeScreen>
       <StatusBar style="dark" />
     </SafeAreaProvider>
