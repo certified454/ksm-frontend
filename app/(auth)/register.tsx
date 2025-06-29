@@ -102,7 +102,7 @@ export default function Register() {
                     fontSize: 18,
                     color: "#4B0082",
                     fontWeight: "bold",
-                    marginLeft: 7,
+                    marginLeft: 5,
                   },
                 ]}
               >
@@ -112,7 +112,7 @@ export default function Register() {
             <Text
               style={[
                 styles.fonttext,
-                { fontSize: 18, color: "#000", marginLeft: 10 },
+                { fontSize: 18, color: "#000", marginLeft: 8 },
               ]}
             >
               ||

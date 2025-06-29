@@ -11,6 +11,7 @@ import {
   View,
 } from 'react-native';
 
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { router } from "expo-router";
 import styles from "../../assets/styles/register";
@@ -89,6 +90,16 @@ export default function Verify() {
         <View style={styles.card}>
           <Text style={[styles.text, { marginTop: 80 }]}>Verify Account</Text>
         </View>
+         <View
+            style={[styles.card, { position: "absolute", top: 20, left: 20 }]} >
+            <TouchableOpacity onPress={() => router.back()}>
+            <Ionicons
+              name="arrow-back-circle-sharp"
+              size={35}
+              color="#4B0082"
+              style={[styles.text, { marginTop: 10, fontSize: 40 }]}/>
+            </TouchableOpacity>
+          </View>
 
         <View style={[styles.card, { marginTop: 80 }]}>
             <Text style={styles.textinput}>Email</Text>
@@ -132,7 +143,7 @@ export default function Verify() {
                 onPress= {handleVerifyAccount} disabled={isLoading}
               >
                 {isLoading ? (
-                  <ActivityIndicator size="small" color="ffffff" />
+                  <ActivityIndicator size="small" color="#ffffff" />
                 ) : (
                   <Text style={styles.fonttext}> Verify Account</Text>
                 )}

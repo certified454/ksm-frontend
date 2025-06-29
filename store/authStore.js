@@ -78,8 +78,8 @@ export const useAuthStore = create((set) => ({
       router.push({
         pathname: "/(auth)/login",
         params: { email: data.user.email },
-        console: "Verification code sent",
       });
+      
 
       await AsyncStorage.setItem("user", JSON.stringify(data.user));
       await AsyncStorage.setItem("token", data.token);
@@ -98,7 +98,7 @@ export const useAuthStore = create((set) => ({
     }
   },
 
-  newVerificationCode: async (email, ) => {
+  newVerificationCode: async (email ) => {
     if (!email) {
       alert("Please provide your email address");
       return {
@@ -157,31 +157,19 @@ export const useAuthStore = create((set) => ({
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Something went wrong");
-      };
-
-      try{
-
-        if (!data.user.isVerified) {
-          set ({ isLoading: false });
-          Alert.alert(
-            "Failed",
-            "Your accosunt is not verified. Please check your email for the verification code."
-          );
-          console.log("account not verified")
-          //redirect to verification page
+        if (data.message === "Account is not verified"){
+          alert("Failed", "Account is not verified, please check your email for verification code");
           router.push({
             pathname: "/(auth)/verify",
-            params: { email: data.user.email },
+            params: { email },
           });
+          set({ isLoading: false });
+          return {
+            success: false,
+            error: data.message,
+          };
         }
-      } catch (error) {
-        console.log("Error checking auth:", error);
-        set({ isLoading: false });
-        return {
-          success: false,
-          error: error.message,
-        };
+        throw new Error(data.message || "Something went wrong");
       };
 
       Alert.alert("Success", "Your Longin on Kismet is Sucessfull");
@@ -190,6 +178,9 @@ export const useAuthStore = create((set) => ({
 
       set({ token: data.token, user: data.user, isLoading: false });
 
+      router.push({
+        pathname: "/(tabs)",
+      })
       return {
         success: true,
         message: "Login Successful",

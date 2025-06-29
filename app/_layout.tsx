@@ -1,10 +1,7 @@
-import { Stack, useRouter, useSegments } from "expo-router";
+import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useState } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-
 import SafeScreen from "../components/safescreen";
-import { useAuthStore } from "../store/authStore";
 
 // SplashScreen.preventAutoHideAsync()
 //   .then(result => console.log(`SplashScreen.preventAutoHideAsync successed: ${result}`))
@@ -16,13 +13,7 @@ import { useAuthStore } from "../store/authStore";
 
 export default function RootLayout() {
   // const [appIsReady, setAppIsReady] = useState(false);
-  const router = useRouter();
-  const segments = useSegments();
-
-  const { checkAuth, user, token } = useAuthStore();
-  const [mounted, setMounted] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-
+  
   // useEffect(() => {
   //   async function prepare() {
   //     try {
@@ -43,28 +34,7 @@ export default function RootLayout() {
   //     console.log("SplashScreen hidden");
   //   }
   // }, [appIsReady]);
-  
-  useEffect(() => {
-    const initialize = async () => {
-    await checkAuth();
-    setIsLoading(false);
-    setMounted(true);
-  };
-    initialize();
-  }, []);
 
-  useEffect(() => {
-    if (!mounted || isLoading) return;
-
-    const inAuthScreen = segments[0] === "(auth)";
-    const isSignedIn = user && token;
-
-    if (!isSignedIn && !inAuthScreen) {
-      router.replace("/(auth)/login");
-    } else if (isSignedIn && inAuthScreen) {
-      router.replace("/(tabs)");
-    }
-  }, [user, token, segments, mounted, isLoading]);
 
   // if(!appIsReady) {
   //   return null;
