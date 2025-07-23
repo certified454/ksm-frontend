@@ -1,6 +1,21 @@
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
+  header: {
+    width: "100%",
+    height: 60,
+    backgroundColor: "#eeeeee",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 3,
+  },
+  headerText: {
+    fontSize: 25,
+    fontWeight: "bold",
+    color: "#000000",
+    fontFamily: "serif",
+  },
   container: {
     backgroundClip: "#eeeeee",
     flex: 1,
@@ -13,8 +28,8 @@ const styles = StyleSheet.create({
     marginTop:10,
   },
   profile: {
-    width:120,
-    height: 120,
+    width:50,
+    height: 50,
     borderColor: "#4b0082",
     borderRadius: 100,
     borderWidth: 0.5,

@@ -1,6 +1,47 @@
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
+  container: {
+    paddingInline: 10,
+    width: "100%",
+  },
+  header: {
+    width: 340,
+    height: 60,
+    flexDirection: "row",
+    alignItems: "center",
+    right: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#cccccc",
+  },
+  profileImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: "#4B0082",
+    objectFit: "contain",
+    left : 5,
+  },
+  username: {
+    fontSize: 20,
+    color: "#000000",
+    fontFamily: "serif",
+    left: 12
+  },
+  postImage: {
+    width: 340,
+    height: 320,
+    borderRadius: 5,
+    right: 12,
+  },
+  caption: {
+    fontSize: 18,
+    color: "#000000",
+    fontFamily: "serif",
+    top: 3,
+    paddingHorizontal: 10,
+  },
   searchcontaiiner: {
     flex: 1,
     flexDirection: "row",
@@ -20,7 +61,7 @@ const styles = StyleSheet.create({
   },
   card:{   
     width: "auto",
-    height: 'auto',
+    height: 290,
     borderRadius: 10,
     alignItems: 'center',
   },
@@ -41,7 +82,8 @@ const styles = StyleSheet.create({
     marginInline: 3,
     overflow: "hidden",
     flex: 1,
-    flexDirection: "row"
+    flexDirection: "row",
+    top: 4,
   },
   imagecard:{
     width: 300,
@@ -78,7 +120,7 @@ const styles = StyleSheet.create({
     fontFamily: "serif",
     fontWeight: "bold",
     right: 100,
-    paddingTop: 10
+    top: 12
   },
   matchlogo:{
     width: 65,

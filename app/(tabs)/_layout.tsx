@@ -25,7 +25,7 @@ export default function Tabslayout() {
             borderTopLeftRadius: 30,
             borderTopRightRadius: 30,
             position: "absolute",
-            bottom: 4,
+            bottom: 2.5,
             height: 60,
           },
           tabBarActiveTintColor: "#f2f2f2",

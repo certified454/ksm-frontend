@@ -17,89 +17,83 @@ import { useAuthStore } from "../../store/authStore";
 import { API_URL } from "../../store/postStore";
 
 export default function Index() {
-  const [description, setDescription] = useState<string>("");
-  const [location, setLocation] = useState<string>("");
-  const [file, setFile] = useState<any>(null);
-  const [filePreview, setFilePreview] = useState<string | null>(null);
+  const [caption, setcaption] = useState<string>("");
+  const [image, setImage] = useState<any>(null);
+  const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [isLoading, setLoading] = useState<boolean>(false);
 
   const {token} = useAuthStore();
   const router = useRouter();
 
   //handle document picking logic
-  const pickFile = async () => {
+  const pickImage = async () => {
     try {
       if (Platform.OS !== "web") {
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (status !== "granted") {
-          Alert.alert("Permission Denied", "You need to grant camera roll permission to upload file")
+          Alert.alert("Permission Denied", "You need to grant camera roll permission to upload image")
           return
         }
       }
      const result = await ImagePicker.launchImageLibraryAsync({
-       mediaTypes: ImagePicker.MediaTypeOptions.All,
-       aspect: [4, 3],
-       allowsEditing: true,
-       quality: 1,
-       base64: false,
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [2, 2],
+        quality: 0.5,
+        base64: true,
      });
 
      if (!result.canceled && result.assets && result.assets.length > 0) {
         const selectedAsset = result.assets[0];
-        setFile(selectedAsset);
-        setFilePreview(selectedAsset.uri)
+        setImage(selectedAsset);
+        setImageBase64(selectedAsset.base64 ? `data:image/*;base64,${selectedAsset.base64}` : selectedAsset.uri);
      } else {
       
      }
     } catch (error) {
-      console.error("Error picking file", error);
+      console.error("Error picking image", error);
     }
   };
 
   const handleUpload = async () => {
-    if (!description.trim() || !location.trim() || !file){
+    if (!caption || !image){
       Alert.alert("Error", "All fields are required");
       return;
     }
     try {
       setLoading(true);
 
-      const formData = new FormData();
-      formData.append('description', description);
-      formData.append('location', location);
-      formData.append('file', {
-        uri: file.uri,
-        type: file.type || 'image/png',
-        name: file.fileName || `upload-${Date.now()}.${file.type.split('/')[1] || 'png'}`
-      } as any);
+      // get image extension from uri or default to jpg
+      const uriParts = image.uri.split(".");
+      const imageExtension = uriParts[uriParts.length - 1];
+      const imageType = imageExtension ? `image/${imageExtension.toLowerCase()}` : "image/jpg";
 
-      const response = await fetch(`${API_URL}/posts/register`, {
+      const imageDataUrl = `data:${imageType};base64,${image.base64}`;
+
+      const response = await fetch(`${API_URL}/post/register`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: formData,
+        body: JSON.stringify({
+          caption,
+          location,
+          image: imageDataUrl,
+        })
       })
 
       const data = await response.json();
+      if(!response.ok) throw new Error(data.message || "Failed to upload post");
 
-      if(!response.ok) {
-        throw new Error(data.message || "Something went wrong");    
-      }
+      Alert.alert("Success", "Post uploaded successfully");
 
-      Alert.alert(
-        "Success", "Uploaded succesfully"
-      );
-      setDescription("");
-      setFile(null);
-      setLocation("");
-      setFilePreview(null);
-      router.replace("/(tabs)")
-
-      return {
-        success: true,
-      };
+      setcaption("");
+      setImage(null);
+      setImageBase64(null);
+  
+      router.push("/");
+      
     } catch(error){
       console.error(error, "Error while uploading")
       const errorMessage = (error instanceof Error && error.message) ? error.message : "Something went Wrong";
@@ -110,30 +104,31 @@ export default function Index() {
   return (
     
       <View style={styles.container}> 
-        <View style={styles.profile}></View>
+
+        <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()}>
+            <Ionicons name="arrow-back-circle-sharp" size={35} color="#4B0082" />
+          </TouchableOpacity>
+          <Text style={styles.headerText}>Create Post</Text>
+          <View style={styles.profile}></View>
+        </View>
+
         <View style={styles.createcard}>
           <TextInput 
             style={[styles.inputform, {height: 100, paddingBottom: 70}]}
             placeholder="write a caption"
-            value={description}
-            onChangeText={setDescription}
+            value={caption}
+            onChangeText={setcaption}
             autoCapitalize="none"
             multiline
           />
-
-          <TextInput 
-            style={styles.inputform}
-            placeholder="enter location optional"
-            value={location}
-            onChangeText={setLocation}
-            />
         </View>
 
         <View style={styles.card}>
-          <TouchableOpacity style={styles.imagecard} onPress={pickFile}>
-            {filePreview ? (
+          <TouchableOpacity style={styles.imagecard} onPress={pickImage}>
+            {imageBase64 ? (
               <View style={styles.imagecard}>
-                <Image style={[styles.imagecard]} source={{ uri: filePreview }} />
+                <Image style={[styles.imagecard]} source={{ uri: imageBase64 }} />
               </View>
             ) : (
               <View >
@@ -152,9 +147,9 @@ export default function Index() {
             onPress={handleUpload}
             disabled={isLoading}
           > {isLoading ? (
-            <ActivityIndicator color="#ffffff" size={"small"}/>
+              <ActivityIndicator color="#ffffff" size={"small"}/>
            ) : (
-            <Text style={[styles.fonttext, { fontWeight: "bold" }]} > Upload</Text>
+              <Text style={[styles.fonttext, { fontWeight: "bold" }]} > Upload</Text>
            )}
           </TouchableOpacity>
         </View>
