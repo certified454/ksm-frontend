@@ -1,9 +1,10 @@
 import styles from "@/assets/styles/create";
+import { userProfilePictureStore } from "@/store/profileStore";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -54,6 +55,10 @@ export default function Index() {
       console.error("Error picking image", error);
     }
   };
+
+  useEffect(() => {
+    userProfilePictureStore.getState().fetchProfilePicture();
+  }, []);
 
   const handleUpload = async () => {
     if (!caption || !image){
@@ -110,7 +115,11 @@ export default function Index() {
             <Ionicons name="arrow-back-circle-sharp" size={35} color="#4B0082" />
           </TouchableOpacity>
           <Text style={styles.headerText}>Create Post</Text>
-          <View style={styles.profile}></View>
+            <Image
+              source = {{ uri: userProfilePictureStore.getState().profilePicture || "https://api.dicebear.com/9.x/miniavs/svg?seed=George&backgroundType=gradientLinear&backgroundColor=b6e3f4,c0aede,ffdfbf"}}
+              style={styles.profile}
+            />
+          
         </View>
 
         <View style={styles.createcard}>

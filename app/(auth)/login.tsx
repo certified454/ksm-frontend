@@ -1,5 +1,4 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Image } from "expo-image";
 import { Link, router } from "expo-router";
 import { useState } from "react";
 import {
@@ -34,25 +33,7 @@ export default function Index() {
     >
       <View style={styles.container}>
         <View style={styles.card}>
-          <Image
-            source={require("../../assets/images/background.png")}
-            transition={1000}
-            style={styles.image}
-          />
-          <View
-            style={[styles.card, { position: "absolute", top: 20, left: 20 }]}
-          >
-            <TouchableOpacity onPress={() => router.back()}>
-              <Ionicons
-                name="arrow-back-circle-sharp"
-                size={35}
-                color="#4B0082"
-                style={[styles.text, { marginTop: 10, fontSize: 40 }]}
-              />
-            </TouchableOpacity>
-          </View>
-
-          <Text style={[styles.text, { position: "absolute", top: 90 }]}>
+          <Text style={[styles.text, { position: "absolute", top: 90, color: "#fff", left: 85, fontSize: 30 }]}>
             Welcome Back
           </Text>
         </View>
@@ -60,11 +41,11 @@ export default function Index() {
         <View
           style={[
             styles.cardform,
-            { position: "absolute", top: 200, borderRadius: 20 },
+            { position: "absolute", top: 180, borderRadius: 20 },
           ]}
         >
           <Text style={[styles.text, { alignSelf: "center" }]}></Text>
-          <Text style={[styles.textinput, { marginTop: 20 }]}>Email</Text>
+          <Text style={[styles.textinput]}>Email</Text>
           <TextInput
             style={styles.inputform}
             placeholder="enter your email"
@@ -85,7 +66,7 @@ export default function Index() {
 
           <TouchableOpacity
             onPress={() => setShowPassword(!showPassword)}
-            style={{ position: "absolute", top: 206, right: 40 }}
+            style={{ position: "absolute", top: 185, right: 40 }}
           >
             <Ionicons
               name={showPassword ? "eye-off" : "eye"}

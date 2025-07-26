@@ -4,7 +4,6 @@ const styles = StyleSheet.create({
   header: {
     width: "100%",
     height: 60,
-    backgroundColor: "#eeeeee",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -13,7 +12,7 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 25,
     fontWeight: "bold",
-    color: "#000000",
+    color: "#4B0082",
     fontFamily: "serif",
   },
   container: {
@@ -28,12 +27,11 @@ const styles = StyleSheet.create({
     marginTop:10,
   },
   profile: {
-    width:50,
-    height: 50,
-    borderColor: "#4b0082",
+    width:60,
+    height: 60,
     borderRadius: 100,
-    borderWidth: 0.5,
-    marginTop: 20,
+    marginTop: 0,
+    borderWidth: 0.2
   },
   card:{   
     width: "93%",
@@ -51,7 +49,7 @@ const styles = StyleSheet.create({
     height: "auto",
     borderRadius: 10,
     bottom: 30,
-    marginTop: 40
+    marginTop: 80
   },
   imagecard:{
     width: "100%",

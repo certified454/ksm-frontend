@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 25,
     borderWidth: 1,
-    borderColor: "#4B0082",
+    borderColor: "#cccccc",
     objectFit: "contain",
     left : 5,
   },
@@ -138,7 +138,41 @@ const styles = StyleSheet.create({
     height: 130,
     objectFit: "contain",
     borderRadius: "100%"
-  }
+  },
+  commentSection: {
+    width: 340,
+    height: 80,
+    right:12,
+    backgroundColor: "#ffffff",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 10,
+  },
+  comment: {
+    width: "70%",
+    height: 50,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 30,
+    borderColor: "#4B0082",
+    borderWidth: 0.5,
+    left: 10,
+    paddingLeft: 13,
+    color: "#000000",
+    fontSize: 18
+  },
+  likesCounts:{
+    fontSize: 16,
+    color: "#4B0082", 
+    fontFamily: "sans-serif",
+    paddingHorizontal: 7
+  },
+  likesSection: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    
+  },
 })
 
 export default styles;

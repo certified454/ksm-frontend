@@ -1,1 +1,1 @@
-export const API_URL = "https://kismit-official.onrender.com/api"
+export const API_URL = "https://kismit-official.onrender.com/api/post?page=1&1limit=7"

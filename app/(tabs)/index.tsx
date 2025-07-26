@@ -3,10 +3,13 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { FlatList, ScrollView, Text, TextInput, View, RefreshControl } from "react-native";
+import { FlatList, RefreshControl, ScrollView, Text, TextInput, View } from "react-native";
 
 import { useAuthStore } from "@/store/authStore";
 import { API_URL } from "@/store/postStore";
+import { userProfilePictureStore } from "@/store/profileStore";
+
+
 
 export default function Index() {
   const { token } = useAuthStore();
@@ -16,6 +19,7 @@ export default function Index() {
   const [refresh, setRefreshing] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
+  const profilePicture = userProfilePictureStore((state) => state.profilePicture);
 
   const router = useRouter();
 
@@ -24,15 +28,18 @@ export default function Index() {
       if (refresh) setRefreshing(true);
       else if (pageNum === 1) setLoading(true);
 
-      const response = await fetch(`${API_URL}/post?/page=${pageNum}&limit=7`, {
+      const response = await fetch(`${API_URL}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       const data = await response.json();
+      console.log("Response OK:", response.ok);
+      console.log("Full API Response Data (after json parsing):", data);
       if (!response.ok)
         throw new Error(data.message || "Failed to fetch posts");
 
       setPosts((prev) => {
+
         if (refresh) return data.posts;
         const ids = new Set(prev.map((post) => post._id));
         const UniquePosts = data.posts.filter((post) => !ids.has(post._id));
@@ -44,8 +51,9 @@ export default function Index() {
 
       setHasMore(pageNum < data.totalPages);
       setPage(pageNum + 1);
+      
     } catch (error) {
-      console.log("Error fetching Posts", error);
+      
     } finally {
       if (refresh) setRefreshing(false);
       else setLoading(false);
@@ -54,6 +62,7 @@ export default function Index() {
 
   useEffect(() => {
     fetchPosts();
+    userProfilePictureStore.getState().fetchProfilePicture();
   }, []);
 
   const handleLoadMorePost = async () => {
@@ -62,11 +71,13 @@ export default function Index() {
     }
   };
 
-  const renderPost = ({ item }) => (
+  const renderPost = ({ item }: {item: any}) => (
+    
     <View style={styles.container}>
+      
       <View style={styles.header}>
         <Image
-          source={{ uri: item.user.profilePicture }}
+          source={{ uri: item.user.profilePicture ? item.user.profilePicture : "https://api.dicebear.com/9.x/miniavs/svg?seed=George&backgroundType=gradientLinear&backgroundColor=b6e3f4,c0aede,ffdfbf" }} // fallback image
           style={styles.profileImage}
         />
         <Text style={styles.username}>{item.user.username}</Text>
@@ -76,27 +87,18 @@ export default function Index() {
         style={styles.postImage}
         contentFit="cover"
       />
-      <View
-        style={{
-          width: 340,
-          height: "auto",
-          top: 0,
-          padding: 10,
-          right: 12,
-          backgroundColor: "#ffffff",
+      <View  style={{width: 340, height: "auto",top: 0, padding: 10, right: 12, backgroundColor: "#ffffff",
         }}
       >
+        <View style={styles.likesSection}>
+          <Text style={styles.likesCounts}> 210 Likes </Text>
+          <Text style={styles.likesCounts}> 70 comments </Text>
+        </View>
         <Text style={styles.caption}>{item.caption}</Text>
       </View>
-      <View
-        style={{
-          width: 340,
-          height: 7,
-          top: 0,
-          right: 12,
-          backgroundColor: "#dddddd",
-        }}
-      ></View>
+
+        
+      <View style={{width: 340, height: 7,top: 0, right: 12, backgroundColor: "#dddddd"}}></View>
     </View>
   );
   return (
@@ -115,17 +117,10 @@ export default function Index() {
         ]}
       >
         <View style={styles.searchcontaiiner}>
-          <Ionicons
-            name="person"
-            size={27}
-            color="#000"
-            style={{
-              left: 5,
-              backdropFilter: "blur(10px)",
-              backgroundColor: "#dddddd",
-              borderRadius: 50,
-              padding: 10,
-            }}
+
+          <Image 
+            source={{ uri: profilePicture || "https://api.dicebear.com/9.x/miniavs/svg?seed=George&backgroundType=gradientLinear&backgroundColor=b6e3f4,c0aede,ffdfbf"}}
+            style={styles.profileImage }
           />
 
           <Ionicons
@@ -589,7 +584,7 @@ export default function Index() {
       <FlatList
         data={posts}
         renderItem={renderPost}
-        keyExtractor={(item) => item._id}
+        keyExtractor={(item, index) => item._id ? item._id : `fallback ${index}`}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.container}
         onEndReached={handleLoadMorePost}

@@ -1,15 +1,17 @@
 import Inonicons from "@expo/vector-icons/Ionicons";
+import * as ImagePicker from "expo-image-picker";
 import { Link, router } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 
 import styles from "../../assets/styles/register";
@@ -20,10 +22,40 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [profilePicture, setProfilePicture] = useState<string | null>(null);
   const { isLoading, register } = useAuthStore();
 
+  const pickProfileImage = async () => {
+        try {
+          if (Platform.OS !== "web") {
+            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    
+            if (status !== "granted") {
+              Alert.alert("Permission Denied", "You need to grant camera roll permission to upload image");
+              return;
+            }
+          }
+          // Lauch the image picker
+          const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 1,
+            base64: true,
+          })
+        
+          if (!result.canceled) {
+            const base64ProfilePicture = `data:${result.assets[0].mimeType};base64,${result.assets[0].base64}`;
+            setProfilePicture(base64ProfilePicture);
+          }
+        } catch (error) {
+          console.error("Error picking image", error);
+        }
+      }
+
   const handleRegister = async () => {
-    const result = await register(username, email, password, router);
+
+    const result = await register(username, email, password, profilePicture, router);
 
     if (!result.success) Alert.alert("Failed", result.error);
   };
@@ -35,9 +67,26 @@ export default function Register() {
     >
       <View style={styles.container}>
         <View style={styles.card}>
-          <Text style={[styles.text, { marginTop: 80 }]}>
+          <Text style={[styles.text, { marginTop: 20 }]}>
             Create An Account
           </Text>
+        </View>
+
+        <View style={styles.card}>
+          <TouchableOpacity style={styles.card} onPress={pickProfileImage}>
+          {profilePicture ? (
+            <View>
+              <Image
+                source={{ uri: profilePicture || "https://api.dicebear.com/9.x/miniavs/svg?seed=George&backgroundType=gradientLinear&backgroundColor=b6e3f4,c0aede,ffdfbf" }} style={styles.profilePicture}
+              />
+            </View>
+          ): (
+            <View style={styles.profilePicturePlaceholder}>
+              <Inonicons name="person-circle" size={100} color="#4B0082" />
+              <Text style={styles.placeholderText}>Tap to select profile picture</Text>
+            </View>
+          )}
+          </TouchableOpacity>
         </View>
 
         <View style={[styles.card, { marginTop: 80 }]}>

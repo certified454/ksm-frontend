@@ -7,7 +7,7 @@ export const useAuthStore = create((set) => ({
   token: null,
   isLoading: false,
 
-  register: async (username, email, password, router) => {
+  register: async (username, email, password, profilePicture, router) => {
     set({ isLoading: true });
     try {
       const response = await fetch(
@@ -17,7 +17,7 @@ export const useAuthStore = create((set) => ({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ username, email, password }),
+          body: JSON.stringify({ username, email, password, profilePicture }),
         }
       );
 

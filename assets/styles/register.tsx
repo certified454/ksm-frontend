@@ -11,6 +11,7 @@ const styles = StyleSheet.create({
     height: 'auto',
     borderRadius: 10,
     alignItems: 'center',
+    top: 10
   },
   cardposition:{
     position: 'absolute',
@@ -33,6 +34,25 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     fontSize: 16,
     marginLeft: 29,
+  },
+  profilePicture: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginTop: 20,
+  },
+  profilePicturePlaceholder:{
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  placeholderText: {
+    color: '#4B0082',
+    fontSize: 14,
+    textAlign: 'center',
   },
   text: {
     color: '#4B0082',
