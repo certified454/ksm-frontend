@@ -27,20 +27,14 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "#000000",
     fontFamily: "serif",
-    left: 12
+    left: 12,
+    fontWeight: "bold",
   },
   postImage: {
     width: 340,
     height: 320,
     borderRadius: 5,
     right: 12,
-  },
-  caption: {
-    fontSize: 18,
-    color: "#000000",
-    fontFamily: "serif",
-    top: 3,
-    paddingHorizontal: 10,
   },
   searchcontaiiner: {
     flex: 1,
@@ -141,29 +135,49 @@ const styles = StyleSheet.create({
   },
   commentSection: {
     width: 340,
-    height: 80,
+    height: 60,
     right:12,
+    objectFit: 'contain',
     backgroundColor: "#ffffff",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: 10,
+  }, 
+  userInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    top: 10,
+    height: 'auto',
+    flex: 1,
+  },
+  createdAt: {
+    fontSize: 15,
+    top: 1,
+    left: 12,
+    color: '#888',
+  },
+  userInfoText: {
+    flex: 1,
+  },
+  caption: {
+    fontSize: 18,
+    fontFamily: "serif",
+    flexWrap: "wrap",
+    flexShrink: 1
+  },
+  commentIcons:{
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 5,
+    width: "30%",
+    right: 40,
   },
   comment: {
-    width: "70%",
-    height: 50,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 30,
-    borderColor: "#4B0082",
-    borderWidth: 0.5,
-    left: 10,
-    paddingLeft: 13,
-    color: "#000000",
-    fontSize: 18
+    color: "#4B0082"
   },
   likesCounts:{
-    fontSize: 16,
-    color: "#4B0082", 
+    fontSize: 16, 
     fontFamily: "sans-serif",
     paddingHorizontal: 7
   },

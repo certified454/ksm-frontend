@@ -1,0 +1,154 @@
+import { StyleSheet } from "react-native";
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#F5F5F5',
+    },
+    spaceBetween: {
+        top: 10
+    },
+    text: {
+        color: '#4B0082',
+        fontWeight: 'bold',
+        justifyContent: 'flex-start'
+    },
+    userdetail:{
+        flex: 1,
+        height: 'auto',
+        objectFit: 'contain'
+    },
+    userInfo: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        top: 10,
+        height: 'auto',
+        flex: 1,
+    },
+    userPost:{
+        top: 25,
+        width: 'auto',
+        minHeight: 60,
+        maxHeight: 'auto'
+    },
+    userImage: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        marginRight: 5
+    },
+    caption: {
+        fontSize: 17,
+        padding: 5,
+    },
+    userInfoText: {
+        flex: 1,
+    },
+    username: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        bottom: 2,
+        left: 7
+    },
+    createdAt: {
+        fontSize: 15,
+        bottom: 2,
+        left: 10,
+        color: '#888',
+    },
+    postImage: {
+        width: 360,
+        height: 250,
+        right: 5,
+        objectFit: 'contain',
+        top: 18
+    },
+    recordedAudioContainer: {
+        width: '100%',
+        height: 40,
+        flexDirection: 'row'
+    },
+    audioWaveformContainer: {
+        width: '100%',
+        height: 40,
+        left: 70,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 10
+    },
+    audioWaveform: {
+        width: '100%',
+        height: 40,
+        backgroundColor: '#E0E0E0',
+        borderRadius: 5,
+        marginHorizontal: 10,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    commentSection: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        top: 5
+    },
+    textInputContainer: {
+        width: '70%',
+        height: 'auto',
+        right: 20
+    },
+    comment: {
+        fontSize: 16,
+        backgroundColor: '#fff',
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+        borderRadius: 5,
+        borderWidth:0.5,
+        borderColor: '#4B0082',
+        width: '95%',
+        left: 10,
+        position: 'relative',
+        paddingLeft: 15
+    },
+    recordSection: {
+        right: 15,
+    },
+    recordButton: {
+      color: '#4B0082',  
+    },
+    sendButton: {
+      top: 3,
+      left: 6
+    },
+    commentContainer: {
+        flex:1,
+    },
+    innerCommentcontainer: {
+        minHeight: 20,
+        padding:10,
+    },
+    audio: {
+        bottom: 20,
+        left: 30,
+    },
+    commentAt: {
+        bottom: 45,
+        left: 240
+    },
+    textCommented: {
+        fontFamily: 'sarif',
+        fontSize: 17,
+        bottom: 35,
+        left: 50,
+        width: "80%",
+        backgroundColor: '#e6e6e6ff',
+        borderRadius: 5,
+        minHeight: 40,
+        minWidth: 20,
+        padding: 5
+    },
+    commenttext: {
+        fontSize: 18,
+
+    }
+});
+
+export default styles;

@@ -68,6 +68,16 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
   },
+  caption: {
+    borderWidth: 1,
+    borderColor: '#4B0082',
+    borderRadius: 10,
+    backgroundColor: "#f6f6f6",
+    padding: 10,
+    marginBottom: 0,
+    minHeight: 50,
+    maxHeight: 100,
+  },
   text: {
     fontSize: 25,
     fontFamily: "serif"

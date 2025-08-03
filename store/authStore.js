@@ -171,8 +171,6 @@ export const useAuthStore = create((set) => ({
         }
         throw new Error(data.message || "Something went wrong");
       };
-
-      Alert.alert("Success", "Your Longin on Kismet is Sucessfull");
       await AsyncStorage.setItem("user", JSON.stringify(data.user));
       await AsyncStorage.setItem("token", data.token);
 

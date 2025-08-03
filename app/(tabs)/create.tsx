@@ -18,7 +18,7 @@ import { useAuthStore } from "../../store/authStore";
 import { API_URL } from "../../store/postStore";
 
 export default function Index() {
-  const [caption, setcaption] = useState<string>("");
+  const [caption, setcaption] = useState("");
   const [image, setImage] = useState<any>(null);
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [isLoading, setLoading] = useState<boolean>(false);
@@ -61,7 +61,7 @@ export default function Index() {
   }, []);
 
   const handleUpload = async () => {
-    if (!caption || !image){
+    if (!caption.trim() || !image){
       Alert.alert("Error", "All fields are required");
       return;
     }
@@ -82,7 +82,7 @@ export default function Index() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          caption,
+          caption: caption.trim(),
           location,
           image: imageDataUrl,
         })
@@ -90,8 +90,6 @@ export default function Index() {
 
       const data = await response.json();
       if(!response.ok) throw new Error(data.message || "Failed to upload post");
-
-      Alert.alert("Success", "Post uploaded successfully");
 
       setcaption("");
       setImage(null);
@@ -111,26 +109,24 @@ export default function Index() {
       <View style={styles.container}> 
 
         <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
+          <TouchableOpacity onPress={() => router.back()}>
             <Ionicons name="arrow-back-circle-sharp" size={35} color="#4B0082" />
           </TouchableOpacity>
           <Text style={styles.headerText}>Create Post</Text>
             <Image
               source = {{ uri: userProfilePictureStore.getState().profilePicture || "https://api.dicebear.com/9.x/miniavs/svg?seed=George&backgroundType=gradientLinear&backgroundColor=b6e3f4,c0aede,ffdfbf"}}
-              style={styles.profile}
-            />
-          
+              style={styles.profile}/>    
         </View>
 
         <View style={styles.createcard}>
           <TextInput 
-            style={[styles.inputform, {height: 100, paddingBottom: 70}]}
+            style={styles.caption}
             placeholder="write a caption"
             value={caption}
             onChangeText={setcaption}
-            autoCapitalize="none"
+            editable={!isLoading}
             multiline
-          />
+            />
         </View>
 
         <View style={styles.card}>
@@ -140,7 +136,7 @@ export default function Index() {
                 <Image style={[styles.imagecard]} source={{ uri: imageBase64 }} />
               </View>
             ) : (
-              <View >
+              <View>
                 <Ionicons style={{left:"15%"}} name="camera" size={40} color={"#4B0082"} />
                 <Text style={styles.text}> Choose a file </Text>
               </View>
@@ -154,16 +150,14 @@ export default function Index() {
             style={[styles.button,  { justifyContent: "center", alignItems: "center" },
             ]}
             onPress={handleUpload}
-            disabled={isLoading}
-          > {isLoading ? (
+            disabled={isLoading}> 
+            {isLoading ? (
               <ActivityIndicator color="#ffffff" size={"small"}/>
            ) : (
-              <Text style={[styles.fonttext, { fontWeight: "bold" }]} > Upload</Text>
+              <Text style={[styles.fonttext, { fontWeight: "bold" }]}> Upload </Text>
            )}
           </TouchableOpacity>
         </View>
       </View>
-
   )
-
 }
