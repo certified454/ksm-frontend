@@ -40,10 +40,17 @@ export function formatTimeAgo(dateString) {
 }
 
 // Comments label to each post
-
 export function formatComments(count) {
-    if (count === 0) return 'no comment'
-    if (count === 1) return `${count} comment`;
-    if (count < 1000) return `${count} comments`;
-    return `${Math.floor(count / 1000)}k comments`
+    if (count === 0) return ''
+    if (count === 1) return `${count} `;
+    if (count < 1000) return `${count}`;
+    return `${Math.floor(count / 1000)}k`
+}
+
+// Like label to each post
+export function formatLikes(count) {
+    if (count === 0) return ''
+    if (count === 1) return `${count} `;
+    if (count < 1000) return `${count} `;
+    return `${Math.floor(count / 1000)}k`
 }

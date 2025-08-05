@@ -169,24 +169,24 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 5,
-    width: "30%",
-    right: 40,
-  },
-  comment: {
-    color: "#4B0082"
-  },
-  likesCounts:{
-    fontSize: 16, 
-    fontFamily: "sans-serif",
-    paddingHorizontal: 7
+    width: "40%",
+    left: 13,
   },
   likesSection: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    
+    backgroundColor: '#eeeeeeff',
+    width: '60%',
+    height: 40,
+    borderRadius: 30
   },
+  likesCounts:{
+    fontFamily: "sans-serif",
+    flexDirection: "row",
+    alignItems:'center',
+    justifyContent: 'flex-start',
+    top: 5,
+    left: 5
+  },
+
 })
 
 export default styles;

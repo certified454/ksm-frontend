@@ -39,7 +39,7 @@ export default function Index() {
      const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.All,
         allowsEditing: true,
-        aspect: [2, 2],
+        aspect: [1, 1],
         quality: 0.5,
         base64: true,
      });

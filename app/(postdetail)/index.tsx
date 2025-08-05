@@ -1,13 +1,17 @@
 import styles from '@/assets/styles/postindex';
+import Caption from '@/components/caption';
+import ViewImage from '@/components/viewImage';
 import { useAuthStore } from '@/store/authStore';
 import { API_URL } from '@/store/postStore';
 import { formatTimeAgo } from '@/store/util';
+import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
 import { Image } from 'expo-image';
+import * as MediaLabriary from 'expo-media-library';
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
@@ -20,6 +24,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import { captureRef } from 'react-native-view-shot';
 
 type Post = {
     id: string;
@@ -37,16 +42,22 @@ type Post = {
 export default function PostDetail() {
     //get a post variables
     const { token } = useAuthStore();
-    const [post, setPost ] = useState<Post | null>(null);
-    const {postId } = useLocalSearchParams();
-    const [loading, setLoading] = useState(true);
+    const [ post, setPost ] = useState<Post | null>(null);
+    const { postId } = useLocalSearchParams();
+    const [ loading, setLoading] = useState(true);
+    const [ isImageVissable, setIsImageVisile ] = useState(false);
+    const [ isModelVisible, setModelIsvisible] = useState(false);
+    const [ soundPlay, setSoundPlay ] = useState<Audio.Sound | null>(null);
+    const [ play, setPlay] = useState(false);
+    const [playingId, setPlayingId] = useState(null);
+    const imageRef = useRef<View>(null);
 
     // create a  comment variables
     const [ text, setText ] = useState('');
     const [ audio, setAudio ] = useState<Audio.Recording | null>(null)
     const [ audioUri, setAudioUri ] = useState<string | null>(null);
     const [ isRecording, setIsRecording ] = useState(false);
-    const [duration, setDuration] = useState<string | null>(null);
+    const [ duration, setDuration] = useState<string | null>(null);
     const [ submitComment, setSubmitComment ] = useState(false);
     const [ uploading, setUploading ] = useState(false);
 
@@ -54,8 +65,11 @@ export default function PostDetail() {
     const [ comments, setComments] = useState([]);
     const [ refresh, setRefreshing] = useState(false);
     const [ hasMoreComments, setHasMoreComments] = useState(true);
-    const [page, setPage ] = useState(1);
-    
+    const [ page, setPage ] = useState(1);
+
+    //like Variables
+    const [like, setLike] = useState(false);
+    const [ submitLike, setSubmitLike] = useState(false);
     // clodinary variables
     const CLOUDINARY_NAME = 'dimg4aui1'
     const UPLOAD_PRESET = 'multiplecomment';
@@ -84,6 +98,32 @@ export default function PostDetail() {
         }
     };
 
+    const onReadMore = () => {
+        setModelIsvisible(true)
+    }
+    const onCloseReadMore = () => {
+        setModelIsvisible(false)
+    }
+    const onImageView = () => {
+        setIsImageVisile(true)
+    }
+    const onCloseImageView = () => {
+        setIsImageVisile(false)
+    }
+
+    const saveImage = async () => {
+        try {
+            const imageUri = await captureRef(imageRef, {height: 450, quality:1});
+            await MediaLabriary.saveToLibraryAsync(imageUri)
+
+            if(imageUri) {
+                Alert.alert("Saved", "Image has been downloaded")
+            }
+        } catch (error) {
+            console.error('Failed')
+        }
+    }
+
     const fetchComments = async (pageNum = 1, refresh = false) => {
         try {
             if (refresh) setRefreshing(true)
@@ -92,10 +132,10 @@ export default function PostDetail() {
             const response = await fetch(`${API_URL}/post/${postId}/comments?page=${pageNum}&limi=20`,
                 { headers: {Authorization: `Bearer ${token}`}}
             );
-
+            
             const data = await response.json();
             if (!response.ok)
-                throw new Error(data.message || 'Failed to fetch comments');
+                throw new Error(data.message);
 
             const uniqueCommments = refresh || pageNum === 1
                 ? data.comments
@@ -185,15 +225,41 @@ export default function PostDetail() {
 
         console.log('Playing audio from', audioUri);
     }
-    // Function for sound duration
+
 
     const playAudioFromUrl = async (url: string) => {
-        const { sound } = await Audio.Sound.createAsync(
-            { uri: url },
-            { shouldPlay: true }
-        );
-        await sound.playAsync();
+        if (soundPlay) {
+            await soundPlay.unloadAsync();
+            setSoundPlay(null);
+            setPlay(false);
+
+        }
+        const {sound} = await Audio.Sound.createAsync(
+            {
+                uri: url
+            },
+            {
+                shouldPlay: true
+            }
+        )
+        setSoundPlay(sound);
+        setPlay(true);
+
     };
+
+    const pauseAudio = async () => {
+        if (soundPlay) {
+            await soundPlay.pauseAsync();
+            setPlay(false)
+        }
+    };
+
+    const resumeAudio = async () => {
+        if (soundPlay) {
+            await soundPlay.playAsync();
+            setPlay(true)
+        }
+    }
   
     const uploadedAudioToCloudinary = async (uri: string) => {
         setUploading(true);
@@ -288,6 +354,35 @@ export default function PostDetail() {
         }
     }
 
+    const handleSubmitLike = async () => {
+    try {
+      setSubmitLike(true)
+
+      const response = await fetch(`${API_URL}/post/${postId}/like`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            like
+          })
+        }
+      )
+      const data = await response.json();
+      if (!response.ok) {
+        console.log('Failed to like')
+        Alert.alert(data.message) 
+          throw new Error(data.message); 
+      }
+    } catch (error) {
+      console.error('Error submitting Like', error);
+      Alert.alert('Error', 'Failed to submit Like');
+        } finally {
+            setSubmitLike(false)
+        }
+    }
+
     useEffect(() => {
         getPost();
         fetchComments();
@@ -316,25 +411,43 @@ export default function PostDetail() {
                 <View style={styles.commentAt}>
                     <Text style={styles.createdAt}>{formatTimeAgo(item.createdAt)}</Text>
                 </View>
-                { item.audio && 
-                    <View>
-                        <TouchableOpacity style={styles.audio} onPress={() => playAudioFromUrl(item.audio)}>
-                        <Ionicons name='play-circle-outline' size={32} color='#4B0082' style={styles.audio} />
-                    </TouchableOpacity>
-                    </View>
-                }
-                { item.text &&
+                <>
+                    { item.audio && 
+                        <View> 
+                            { playingId !== item.id ? (
+                                <TouchableOpacity  style={styles.audio} onPress={() => {
+                                    playAudioFromUrl(item.audio);
+                                    setPlayingId(item.id);
+                                }}>
+                                    <Ionicons name='play-circle-outline' size={35} color='#4B0082' style={styles.audio} />
+                                </TouchableOpacity>
+                            ) : (
+                                <TouchableOpacity style={styles.audio} onPress={() => {
+                                    pauseAudio();
+                                    setPlayingId(null);
+                                }}>
+
+                                    <Ionicons name='pause-circle-outline' size={35} color='#4B0082' style={styles.audio} />
+                                </TouchableOpacity>
+                            )
+                            }
+                        </View>
+                    }
+                </>  
+                <>
+                    { item.text &&
                     <View style={styles.textCommented}>
                         <Text style={styles.commenttext}>{item.text}</Text>
                     </View>
-                }
+                    } 
+                </>  
             </View>
         </View>
     )
 
     return(
         <KeyboardAvoidingView behavior='padding' style={{ flex: 1 }} keyboardVerticalOffset={50}>
-            <View>
+        <View>
             <ScrollView contentContainerStyle={{ padding: 5 }}>
                 {loading ? (
                     <ActivityIndicator size={'large'} color={'#4B0082'} style={{ top: 300 }} />
@@ -360,15 +473,20 @@ export default function PostDetail() {
                                     <Text style={styles.createdAt}>{formatTimeAgo(post.createdAt)}</Text>
                                 </View>
                             </View>
-                            
+
+                            <TouchableOpacity onPress={() => setIsImageVisile(true)}>
                                 <Image
                                     source={{ uri: post.image }}
                                     style={styles.postImage}
                                     contentFit="cover"
                                 />
+                            </TouchableOpacity>
                             
-                            <View style={styles.userPost}>                             
-                                <Text style={styles.caption}>{post.caption}</Text> 
+                            
+                            <View style={styles.userPost}> 
+                                <TouchableOpacity onPress={() => setModelIsvisible(true)}>
+                                    <Text style={styles.caption} ellipsizeMode='tail' numberOfLines={2}>{post.caption}</Text>
+                                </TouchableOpacity>                            
                             </View>
                         </View>
                         <View style={styles.recordedAudioContainer}>
@@ -383,6 +501,14 @@ export default function PostDetail() {
                         </View>
                         
                         <View style={styles.commentSection}>
+                                <TouchableOpacity onPress={handleSubmitLike} disabled={submitLike}>
+                                    <Ionicons
+                                        name={like ? "heart-sharp" : "heart-outline"}
+                                        size={35}
+                                        color={like ? "#4B0082" : "#4B0082"}
+                                        style={styles.like}
+                                    />
+                                </TouchableOpacity>
                                 <View style={styles.textInputContainer}>
                                     <TextInput 
                                     style={styles.comment}
@@ -417,14 +543,14 @@ export default function PostDetail() {
                     <Text>No post found.</Text>
                 )}
             </ScrollView>
-            </View>
-
+        </View> 
             <FlatList 
                     data={comments}
                     renderItem={renderComment}
                     keyExtractor={(item) => item._id}
                     showsVerticalScrollIndicator={false}
                     onEndReached={handleLoadMoreComments}
+                    ItemSeparatorComponent={() => <View style={{ height: -4 }} />}
                     onEndReachedThreshold={0.1}
                     refreshControl={
                         <RefreshControl
@@ -433,6 +559,26 @@ export default function PostDetail() {
                         />
                     }
                 />
+            <Caption isVisible={isModelVisible} onClose={onCloseReadMore}>
+                <View style={styles.diplayIsModelVisible}>
+                    <Text style={styles.readmore}>{post?.caption}</Text>
+                    <View style={{margin:20}}>
+                    </View>
+                </View>
+            </Caption>   
+            <ViewImage isVisible={isImageVissable} onClose={onCloseImageView}>
+                <View style={styles.displayOption}>
+                    <Text style={styles.displayUsername}>{post?.user.username}</Text>
+                    <Feather style={{bottom:18}} onPress={saveImage} name="download" size={28} color="#ffffff" />
+                </View>
+                <View ref={imageRef} collapsable={false}>
+                    <Image
+                        source={{ uri: post?.image }}
+                        style={[styles.postImage, {height:450, left: 0}]}
+                        contentFit="cover"
+                    />
+                </View>
+            </ViewImage>   
        </KeyboardAvoidingView> 
     );
 }

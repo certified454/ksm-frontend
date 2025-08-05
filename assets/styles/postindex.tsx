@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     },
     postImage: {
         width: 360,
-        height: 250,
+        height: 360,
         right: 5,
         objectFit: 'contain',
         top: 18
@@ -103,10 +103,15 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         borderWidth:0.5,
         borderColor: '#4B0082',
-        width: '95%',
-        left: 10,
+        width: '80%',
+        left: 40,
         position: 'relative',
         paddingLeft: 15
+    },
+    like:{
+        top: 1,
+        left: 5,
+        color: '#4B0082'
     },
     recordSection: {
         right: 15,
@@ -119,11 +124,11 @@ const styles = StyleSheet.create({
       left: 6
     },
     commentContainer: {
+        top:5,
         flex:1,
     },
     innerCommentcontainer: {
-        minHeight: 20,
-        padding:10,
+        
     },
     audio: {
         bottom: 20,
@@ -148,7 +153,29 @@ const styles = StyleSheet.create({
     commenttext: {
         fontSize: 18,
 
-    }
+    },
+    diplayIsModelVisible: {
+        width: "95%",
+        flex:1,
+        top: 10,
+        left: 10
+    },
+    readmore: {
+        fontSize: 18
+    },
+    displayOption: {
+        flexDirection:'row',
+        justifyContent:'space-between',
+        alignItems: 'center',
+        paddingHorizontal:20
+    },
+    displayUsername: {
+        color: '#ffffff',
+        fontSize: 16,
+        left: 50,
+        bottom: 20
+    },
+    
 });
 
 export default styles;

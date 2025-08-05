@@ -90,10 +90,6 @@ export default function Index() {
         contentFit="cover"/>
      
         <View  style={{width: 340, height: "auto",top: 0, padding: 10, right: 12, backgroundColor: "#ffffff"}}>
-          <View style={styles.likesSection}>
-            <Text style={styles.likesCounts}> 210 Likes </Text>
-            <Text style={styles.likesCounts}> {formatComments(item.commentsCount)}</Text>
-          </View>
           
         </View>
 
@@ -111,17 +107,26 @@ export default function Index() {
             </View>
         </View>
       
-        <View style={styles.commentSection}>
-            <Ionicons  name="heart-outline" size={30} color="#000"
-                  style={[styles.comment, {left:18}]}/>
+        <View style={styles.commentSection}>         
+           
             <TouchableOpacity style={styles.commentIcons}onPress={() => handlePostPress(item._id)}>
-              <Ionicons  name="chatbox-outline" size={30} color="#000"
-                    style={styles.comment}/>
-              <Ionicons  name="mic-outline" size={32} color="#000"
-                    style={styles.comment}/>
+              <View style={styles. likesSection}> 
+                <View style={styles.likesCounts}>
+                  <Ionicons  name="heart-outline" size={30} color="#4B0082"/>
+                  <Text style={{fontSize:20, bottom:3}}> {formatComments(item.likesCount)}</Text>
+                </View>    
+              </View>
             </TouchableOpacity>
-            <Ionicons name="share-social-outline" size={30} color="#000"
-                style={[styles.comment, {right: 15}]}/>
+            <TouchableOpacity style={styles.commentIcons}onPress={() => handlePostPress(item._id)}>
+              <View style={[styles. likesSection, {right:40}]}> 
+                <View style={styles.likesCounts}>
+                  <Ionicons name="chatbox-outline" size={30} color="#4B0082"/>
+                  <Text style={{fontSize:20, bottom:3}}> {formatComments(item.commentsCount)}</Text>
+                </View>    
+              </View>
+            </TouchableOpacity>
+            <Ionicons name="share-social-outline" size={30} color="#4B0082"
+                style={{right: 15}}/>
         </View>
       <View style={{width: 340, height: 7,top: 0, right: 12, backgroundColor: "#dddddd"}}></View>
     </View>
