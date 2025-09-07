@@ -14,7 +14,7 @@ export default function ViewImage({isVisible, children, onClose}:Props) {
                 <View style={style.modalContainer}>
                     <View style={style.titleContainer}>
                         <Pressable onPress={onClose}>
-                            <Ionicons style={{top: 12}} name="arrow-back-circle-sharp" size={35} color={'#ffffff'}/>
+                            <Ionicons style={{top: 12}} name="arrow-back" size={30} color={'#ffffff'}/>
                         </Pressable>
                     </View>
                     {children}

@@ -13,7 +13,7 @@ export function formatTimeAgo(dateString) {
     const now = new Date();
     const seconds = Math.floor((now - date) / 1000);
 
-    if (seconds < 60) return `${seconds} seconds ago`;
+    if (seconds < 60) return 'just now'; 
     if (seconds < 3600) {
         const minutes = Math.floor(seconds / 60);
         return `${minutes} minute${minutes === 1 ? '' : 's'} ago`;
@@ -53,4 +53,30 @@ export function formatLikes(count) {
     if (count === 1) return `${count} `;
     if (count < 1000) return `${count} `;
     return `${Math.floor(count / 1000)}k`
+}
+
+//Label for followersCount
+export function formatFollowersCount(count) {
+    if (count === 0) return '';
+    if (count === 1) return `${count}`;
+    if (count < 1000) return `${count}`;
+    if (count < 1000000) return `${Math.floor(count / 1000)}k`;
+    return `${Math.floor(count / 1000000)}M`;
+}
+
+//Label for followingCount
+export function formatFollowingCount(count) {
+    if (count === 0) return '';
+    if (count === 1) return `${count}`;
+    if (count < 1000) return `${count}`;
+    if (count < 1000000) return `${Math.floor(count / 1000)}k`;
+    return `${Math.floor(count / 1000000)}M`;
+}
+
+//Label for voteCount
+export function formatVoteCount(count) {
+    if (count === 0) return '';
+    if (count === 1) return `${count}`;
+    if (count < 99) return `${count}`;
+    if (count < 100) return '99+';
 }

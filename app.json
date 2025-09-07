@@ -10,54 +10,101 @@
       "resizeMode": "contain",
       "backgroundColor": "#4B0082"
     },
-    "backgroundColor": "#4B0082",
+    "backgroundColor": "#ffffff",
     "scheme": "ksm",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "kismet",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       },
-      "icon": "./assets/icons/light.png"
+      "icon": "./assets/images/logo.png"
     },
     "android": {
+      "intentFilters":[ {
+        "action": "VIEW",
+        "data": [
+          {
+            "scheme": "https",
+            "host": "*.kismetapp.page.link",
+            "pathPrefix": "/post/"
+          },
+          {
+            "scheme": "http",
+            "host": "kismit-official.onrender.com",
+            "pathPrefix": "/post/"
+          },
+          {
+            "scheme": "kismet",
+            "host": "*",
+            "pathPrefix": "/"
+          }
+        ],
+        "category": [
+          "BROWSABLE",
+          "DEFAULT"
+        ]
+      }],
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icons/adaptive-icon.png",
-        "monochromeImage": "./assets/icons/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/logo.png",
+        "monochromeImage": "./assets/images/logo.png",
+        "backgroundColor": "#4B0082"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.naimah.ksm"
+      "package": "com.naimah.ksm",
+      "googleServicesFile": "./google-services.json",
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ]
     },
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/adaptive-icon.png"
+      "favicon": "./assets/images/logo.png"
     },
     "plugins": [
-         [
+      [
         "expo-av",
         {
           "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/logo.png",
+          "color": "#4B0082",
+          "defaultChannel": "default",
+          "enableBackgroundRemoteNotifications": false
         }
       ],
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/icons/splash-icon-dark.png",
+          "image": "./assets/images/logo.png",
           "resizeMode": "contain",
           "backgroundColor": "#4B0082",
           "dark": {
-            "image": "./assets/icons/splah-icon-light.png",
+            "image": "./assets/images/logo.png",
             "resizeMode": "contain",
-            "backgroundColor": "#ffffff"
+            "backgroundColor": "#4B0082"
           },
           "imageWidth": 200
         }
-      ]
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-8384657725659992~8125518869"
+        }
+      ],
+      "expo-video",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true
@@ -67,6 +114,9 @@
       "eas": {
         "projectId": "58da29c8-2b3a-497c-a2cc-c8e9aabcb7cb"
       }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/58da29c8-2b3a-497c-a2cc-c8e9aabcb7cb"
     }
   }
 }

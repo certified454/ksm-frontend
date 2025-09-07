@@ -35,11 +35,10 @@ export default function Register() {
               return;
             }
           }
-          // Lauch the image picker
           const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
-            aspect: [1, 1],
+            aspect: [4, 2],
             quality: 1,
             base64: true,
           })
@@ -61,13 +60,10 @@ export default function Register() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
       <View style={styles.container}>
         <View style={styles.card}>
-          <Text style={[styles.text, { marginTop: 20 }]}>
+          <Text style={[styles.createText,]}>
             Create An Account
           </Text>
         </View>
@@ -89,7 +85,7 @@ export default function Register() {
           </TouchableOpacity>
         </View>
 
-        <View style={[styles.card, { marginTop: 80 }]}>
+        <View style={styles.cardItem}>
           <Text style={styles.textinput}>Username</Text>
           <TextInput
             style={styles.inputform}
@@ -98,7 +94,7 @@ export default function Register() {
             onChangeText={setUsername}
           />
 
-          <Text style={[styles.textinput, { marginTop: 20 }]}>Email</Text>
+          <Text style={styles.textinputItem}>Email</Text>
           <TextInput
             style={styles.inputform}
             placeholder="Enter your email"
@@ -106,8 +102,8 @@ export default function Register() {
             onChangeText={setEmail}
           />
 
-          <Text style={[styles.textinput, { marginTop: 20 }]}>Password</Text>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Text style={styles.textinputItem}>Password</Text>
+          <View style={styles.textInputView}>
             <TextInput
               style={styles.inputform}
               placeholder="Enter your password"
@@ -117,7 +113,7 @@ export default function Register() {
             />
             <TouchableOpacity
               onPress={() => setShowPassword(!showPassword)}
-              style={{ position: "absolute", right: 20 }}
+              style={styles.passwordContainer}
             >
               <Inonicons
                 name={showPassword ? "eye-off" : "eye"}
@@ -135,49 +131,23 @@ export default function Register() {
             {isLoading ? (
               <ActivityIndicator size="small" color="#ffffff" />
             ) : (
-              <Text style={[styles.fonttext]}>Register</Text>
+              <Text style={styles.fonttext}>Register</Text>
             )}
           </TouchableOpacity>
 
-          <View style={[styles.card, { flexDirection: "row", marginTop: 50 }]}>
-            <Text style={[styles.fonttext, { fontSize: 18, color: "#000" }]}>
+          <View style={styles.cardItems}>
+            <Text style={styles.fontText}>
               Already have an account?
             </Text>
-            <Link href="/(auth)/login">
-              <Text
-                style={[
-                  styles.fonttext,
-                  {
-                    fontSize: 18,
-                    color: "#4B0082",
-                    fontWeight: "bold",
-                    marginLeft: 5,
-                  },
-                ]}
-              >
+            <Link href="/(auth)">
+              <Text style={styles.login}>
                 Login
               </Text>
             </Link>
-            <Text
-              style={[
-                styles.fonttext,
-                { fontSize: 18, color: "#000", marginLeft: 8 },
-              ]}
-            >
+            <Text style={styles.sepration}>
               ||
             </Text>
-            <Link
-              href="/(auth)/verify"
-              style={[
-                styles.fonttext,
-                {
-                  fontSize: 18,
-                  color: "#4B0082",
-                  fontWeight: "bold",
-                  marginLeft: 10,
-                },
-              ]}
-            >
+            <Link href="/(auth)/verify" style={styles.login}>
               Verify
             </Link>
           </View>

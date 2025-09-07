@@ -23,7 +23,7 @@ export default function Index() {
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [isLoading, setLoading] = useState<boolean>(false);
 
-  const {token} = useAuthStore();
+  const {token, user} = useAuthStore();
   const router = useRouter();
 
   //handle document picking logic
@@ -40,7 +40,7 @@ export default function Index() {
         mediaTypes: ImagePicker.MediaTypeOptions.All,
         allowsEditing: true,
         aspect: [1, 1],
-        quality: 0.5,
+        quality: 1,
         base64: true,
      });
 
@@ -83,7 +83,6 @@ export default function Index() {
         },
         body: JSON.stringify({
           caption: caption.trim(),
-          location,
           image: imageDataUrl,
         })
       })
@@ -105,16 +104,14 @@ export default function Index() {
   }
 
   return (
-    
-      <View style={styles.container}> 
-
+      <View style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()}>
-            <Ionicons name="arrow-back-circle-sharp" size={35} color="#4B0082" />
+            <Ionicons name="arrow-back" size={35} color="#4B0082" />
           </TouchableOpacity>
           <Text style={styles.headerText}>Create Post</Text>
             <Image
-              source = {{ uri: userProfilePictureStore.getState().profilePicture || "https://api.dicebear.com/9.x/miniavs/svg?seed=George&backgroundType=gradientLinear&backgroundColor=b6e3f4,c0aede,ffdfbf"}}
+              source = {{ uri: user.profilePicture || "https://api.dicebear.com/9.x/miniavs/svg?seed=George&backgroundType=gradientLinear&backgroundColor=b6e3f4,c0aede,ffdfbf"}}
               style={styles.profile}/>    
         </View>
 

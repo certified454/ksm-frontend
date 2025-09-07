@@ -1,53 +1,47 @@
+import SafeScreen from "@/components/safescreen";
+import { NotificationProvider } from "@/context/NotificationContext";
+import * as Notifications from 'expo-notifications';
 import { Stack } from "expo-router";
+import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from "expo-status-bar";
+import { useEffect, useState } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import SafeScreen from "../components/safescreen";
 
-// SplashScreen.preventAutoHideAsync()
-//   .then(result => console.log(`SplashScreen.preventAutoHideAsync successed: ${result}`))
-//   .catch(console.warn);
-// SplashScreen.setOptions({
-//   duration: 4000,
-//   fade: true,
-// });
+
+SplashScreen.preventAutoHideAsync();
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+    shouldShowBanner: true,
+    shouldShowList: true  
+  })
+})
 
 export default function RootLayout() {
-  // const [appIsReady, setAppIsReady] = useState(false);
-  
-  // useEffect(() => {
-  //   async function prepare() {
-  //     try {
-  //       await new Promise(resolve => setTimeout(resolve, 2000));
-  //       console.log("SplashScreen hidden");
-  //     } catch (e) {
-  //       console.warn("Error hiding SplashScreen:", e);
-  //     } finally {
-  //       setAppIsReady(true);
-  //     }
-  //   }
-  //   prepare();
-  // }, []);
-
-  // const onLayoutRootView = useCallback(() => {
-  //   if (appIsReady) {
-  //      SplashScreen.hideAsync();
-  //     console.log("SplashScreen hidden");
-  //   }
-  // }, [appIsReady]);
-
-
-  // if(!appIsReady) {
-  //   return null;
-  // }
+   const [loaded] = useState(true)
+  useEffect(() => {
+    if(loaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded]);
 
   return (
     <SafeAreaProvider>
-      <SafeScreen>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(auth)" />
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="(postdetail)" />
-        </Stack>
+        <SafeScreen>
+          <NotificationProvider>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="(auth)" />
+              <Stack.Screen name="(tabs)" />
+              <Stack.Screen name="(postdetail)" />
+              <Stack.Screen name="(profile)" />
+              <Stack.Screen name="(menu)" />
+              <Stack.Screen name="(videos)" />
+              <Stack.Screen name="(challenge)" />
+            </Stack>
+        </NotificationProvider>
       </SafeScreen>
       <StatusBar style="dark" />
     </SafeAreaProvider>

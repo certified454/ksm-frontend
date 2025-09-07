@@ -1,6 +1,17 @@
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "#fff",
+    flex: 1,
+    justifyContent: "center",
+    paddingTop: 20,
+    alignItems: "center",
+    position: "absolute",
+    width: "100%",
+    height: "auto",
+  
+  },
   header: {
     width: "100%",
     height: 60,
@@ -15,17 +26,6 @@ const styles = StyleSheet.create({
     color: "#4B0082",
     fontFamily: "serif",
   },
-  container: {
-    backgroundClip: "#eeeeee",
-    flex: 1,
-    justifyContent: "center",
-    top: 20,
-    alignItems: "center",
-    position: "absolute",
-    width: "100%",
-    height: "auto",
-    marginTop:10,
-  },
   profile: {
     width:60,
     height: 60,
@@ -33,21 +33,24 @@ const styles = StyleSheet.create({
     marginTop: 0,
     borderWidth: 0.2
   },
-  card:{   
+  card: {   
     width: "93%",
     height: 250,
-    borderRadius: 10,
+    borderRadius: 5,
     backgroundColor: "#ffffff",
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3, 
     alignItems: 'center',
-    right: 2,
     overflow: "hidden",
     justifyContent: "center",
-    bottom: 20
+    bottom: 10
   },
   createcard: {
     width: "93%",
     height: "auto",
-    borderRadius: 10,
+    borderRadius: 5,
     bottom: 30,
     marginTop: 80
   },
@@ -71,8 +74,8 @@ const styles = StyleSheet.create({
   caption: {
     borderWidth: 1,
     borderColor: '#4B0082',
-    borderRadius: 10,
-    backgroundColor: "#f6f6f6",
+    borderRadius: 5,
+    backgroundColor: "#fff",
     padding: 10,
     marginBottom: 0,
     minHeight: 50,

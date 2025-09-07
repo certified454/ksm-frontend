@@ -6,6 +6,7 @@ export const useAuthStore = create((set) => ({
   user: null,
   token: null,
   isLoading: false,
+  isAuthenticated: true,
 
   register: async (username, email, password, profilePicture, router) => {
     set({ isLoading: true });
@@ -76,7 +77,7 @@ export const useAuthStore = create((set) => ({
       Alert.alert("Success", "Your account has been verified successfully! you can now login");
 
       router.push({
-        pathname: "/(auth)/login",
+        pathname: "/(auth)",
         params: { email: data.user.email },
       });
       
@@ -155,10 +156,9 @@ export const useAuthStore = create((set) => ({
       );
 
       const data = await response.json();
-
       if (!response.ok) {
         if (data.message === "Account is not verified"){
-          alert("Failed", "Account is not verified, please check your email for verification code");
+          Alert.alert("Failed", "Account is not verified, please check your email for verification code");
           router.push({
             pathname: "/(auth)/verify",
             params: { email },
@@ -175,7 +175,6 @@ export const useAuthStore = create((set) => ({
       await AsyncStorage.setItem("token", data.token);
 
       set({ token: data.token, user: data.user, isLoading: false });
-
       router.push({
         pathname: "/(tabs)",
       })
@@ -201,7 +200,9 @@ export const useAuthStore = create((set) => ({
 
       set({ token, user });
     } catch (error) {
-      console.log("Error checking auth:", error);
+      console.log("Auth check failed", error);
+    } finally {
+      set({ isAuthenticated: false });
     }
   },
 

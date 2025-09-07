@@ -1,27 +1,92 @@
 import styles from "@/assets/styles/index";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import { Image } from "expo-image";
-import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
-import { FlatList, RefreshControl, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
-
+import Search from "@/components/search";
 import { useAuthStore } from "@/store/authStore";
 import { API_URL } from "@/store/postStore";
 import { userProfilePictureStore } from "@/store/profileStore";
 import { formatComments, formatTimeAgo } from "@/store/util";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import * as FileSystem from 'expo-file-system';
+import { Image } from "expo-image";
+import { useRouter } from "expo-router";
+import debounce from "lodash.debounce";
+import React, { useCallback, useEffect, useState } from "react";
+import { Alert, FlatList, RefreshControl, ScrollView, Share, Text, TextInput, TouchableOpacity, View } from "react-native";
+// import { AppOpenAd, TestIds } from 'react-native-google-mobile-ads';
+import io from "socket.io-client";
 
+type Post = {
+  _id: string;
+  user: {
+    username: string;
+    profilePicture?: string;
+  };
+  image: string;
+  caption: string;
+  createdAt: string;
+  likesCount: number;
+  commentsCount: number;
+};
 export default function Index() {
-  const { token } = useAuthStore();
-  const [posts, setPosts] = useState([]);
+  const { token, user } = useAuthStore();
+  const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
   const [refresh, setRefreshing] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
   const profilePicture = userProfilePictureStore((state) => state.profilePicture);
+  const [ searchVisible, setSearchVisible ] = useState(false);
+
+  //search variable
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [query, setQuery] = useState("");
+  const [searchLoading, setSearchLoading] = useState(false);
+
+  const [fixtures, setFixtures] = useState<any[]>([]);
 
   const router = useRouter();
+  // const adUnitId = __DEV__ ? TestIds.APP_OPEN : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
+  // const appOpenAd = AppOpenAd.createForAdRequest(adUnitId, {
+  //   keywords: ['gaming', 'programming'],
+  // });
+  // appOpenAd.load();
+  // appOpenAd.show();
 
+  const getUpcomingFixtures = async () => {
+    try {
+      const response = await fetch(`${API_URL}/sports/fixtures`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "Failed to fetch upcoming features");
+      setFixtures(data.data);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  const handleSharePost = async (post: Post) => {
+          const imageUri = post.image;
+          const localPath = FileSystem.documentDirectory + 'shared-image.jpg';
+          const downloadImage = FileSystem.createDownloadResumable( imageUri, localPath);
+          const downloadResult = await downloadImage.downloadAsync();
+
+          if (!downloadResult || !downloadResult.uri) {
+              Alert.alert('Error', 'Failed to download image for sharing.');
+              return;
+          }
+          const message = `${post.user.username}\n${post.user.profilePicture}\n${post.caption}\n\nOpen in app: ksm://post/${post._id}`;
+          const shareOptions = {
+              title: 'Share Post',
+              message,
+              url: downloadResult.uri,
+              type: 'image/jpeg',
+          };
+  
+          await Share.share(shareOptions);
+    }
   const fetchPosts = async (pageNum = 1, refresh = false) => {
     try {
       if (refresh) setRefreshing(true);
@@ -35,8 +100,6 @@ export default function Index() {
       if (!response.ok)
         throw new Error(data.message || "Failed to fetch posts");
 
-      // Count the number of comments for each post and if the post has comments return no comments
-
       const uniquePosts = refresh || pageNum === 1
         ? data.posts
         : Array.from(new Set([...posts, ...data.posts].map((post) => post._id))).map((id) =>
@@ -47,7 +110,7 @@ export default function Index() {
 
       setHasMore(pageNum < data.totalPages);
       setPage(pageNum);
-      
+      setLoading(false);
     } catch (error) {
       
     } finally {
@@ -55,10 +118,72 @@ export default function Index() {
       else setLoading(false);
     }
   };
+  const SearchUsers = async (query: any, token: any) => {
+    setSearchLoading(true);
+    setSearchVisible(true);
+    try {
+      const response = await fetch(`${API_URL}/search?q=${encodeURIComponent(query)}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      })
+      const data = await response.json();
+      if(!response.ok) throw new Error(data.message || "Failed to search users");
+      setSearchResults(data);
+    } catch (error) {
 
+    } finally {
+        setSearchLoading(false);
+    }
+  }
+  const debounceSearch = useCallback(
+    debounce((text: string) => {
+      SearchUsers(text, token)
+    }, 1000 ),
+    [ token]
+  )
   useEffect(() => {
     fetchPosts();
+    getUpcomingFixtures();
+    const socket = io('https://kismit-official.onrender.com/');
+
+    socket.on('new post created', (newPost) => {
+      setPosts((posts) => {
+        const exits = posts.some(post => post._id === newPost._id);
+        return exits ? posts :
+        [newPost, ...posts]
+      });
+    });
+
+   socket.on('new like created', ({postId, userId, liked}) =>{
+      setPosts((posts) => {
+        return posts.map(post => {
+          if (post._id === postId) {
+            const updatedLikesCount = liked ? post.likesCount + 1 : post.likesCount - 1;
+            return { ...post, likesCount: updatedLikesCount };
+          }
+          return post;
+        });
+      });
+   })
+
+    socket.on('new comment created', (newComment) => {
+      setPosts((posts) => {
+        return posts.map(post => {
+          if (post._id === newComment.postId) {
+            return { ...post, commentsCount: post.commentsCount + 1 };
+          }
+          return post;
+        });
+      });
+    });
     userProfilePictureStore.getState().fetchProfilePicture();
+
+    return () => {
+      socket.disconnect();
+      };
   }, []);
 
   const handleLoadMorePost = async () => {
@@ -70,16 +195,28 @@ export default function Index() {
     router.push({ pathname: "/(postdetail)", params: { postId: id } });
   }
 
+  const handleProfilePress = () => {
+    router.push({pathname: "/(menu)"});
+  }
+  const handleSearchClose = () => {
+    setSearchVisible(false);
+  }
+  const handleprofilePicturePress = async (id: string) => {
+      router.push({ pathname: '/(profile)', params: { userId: id }})
+  }
+
   const renderPost = ({ item }: {item:any}) => (
     
     <View style={styles.container}>
-      
       <View style={styles.header}>
-        <Image
-          source={{ uri: item.user.profilePicture ? item.user.profilePicture : "https://api.dicebear.com/9.x/miniavs/svg?seed=George&backgroundType=gradientLinear&backgroundColor=b6e3f4,c0aede,ffdfbf" }}
+        <TouchableOpacity onPress={() =>handleprofilePicturePress(item.user?._id)}>
+          <Image
+          source={{ uri: item.user?.profilePicture ? item.user.profilePicture : "https://api.dicebear.com/9.x/miniavs/svg?seed=George&backgroundType=gradientLinear&backgroundColor=b6e3f4,c0aede,ffdfbf" }}
           style={styles.profileImage}/>
+
+        </TouchableOpacity>
          <View style={styles.userInfoText}>
-            <Text style={styles.username}>{item.user.username}</Text>
+            <Text style={styles.username}>{item.user?.username}</Text>
             <Text style={styles.createdAt}>{formatTimeAgo(item.createdAt)}</Text>
           </View>
       </View>
@@ -109,82 +246,80 @@ export default function Index() {
       
         <View style={styles.commentSection}>         
            
-            <TouchableOpacity style={styles.commentIcons}onPress={() => handlePostPress(item._id)}>
+            <TouchableOpacity style={styles.commentIcons} onPress={() => handlePostPress(item._id)}>
               <View style={styles. likesSection}> 
                 <View style={styles.likesCounts}>
-                  <Ionicons  name="heart-outline" size={30} color="#4B0082"/>
-                  <Text style={{fontSize:20, bottom:3}}> {formatComments(item.likesCount)}</Text>
+                  <Ionicons  name="heart-outline" size={25} color="#4B0082"/>
+                  <Text style={{fontSize:20}}> {formatComments(item.likesCount)}</Text>
                 </View>    
               </View>
             </TouchableOpacity>
             <TouchableOpacity style={styles.commentIcons}onPress={() => handlePostPress(item._id)}>
               <View style={[styles. likesSection, {right:40}]}> 
                 <View style={styles.likesCounts}>
-                  <Ionicons name="chatbox-outline" size={30} color="#4B0082"/>
-                  <Text style={{fontSize:20, bottom:3}}> {formatComments(item.commentsCount)}</Text>
+                  <Ionicons name="chatbox-outline" size={24} color="#4B0082"/>
+                  <Text style={{fontSize:20}}> {formatComments(item.commentsCount)}</Text>
                 </View>    
               </View>
             </TouchableOpacity>
-            <Ionicons name="share-social-outline" size={30} color="#4B0082"
-                style={{right: 15}}/>
+           
+            <TouchableOpacity style={styles.likesCounts}onPress={() => handleSharePost(item)}>
+                <Ionicons name="share-social" size={34} color="#4B0082" style={styles.share}/>
+            </TouchableOpacity>
+           
         </View>
-      <View style={{width: 340, height: 7,top: 0, right: 12, backgroundColor: "#dddddd"}}></View>
+      <View style={{width: 340, height: 7,top: 0, right: 12, backgroundColor: "#eeeeeeff"}}></View>
     </View>
   );
+  const renderSearch = ({ item }: {item:any}) => (
+     <TouchableOpacity onPress={() => handleprofilePicturePress(item._id)} style={styles.userContainer}>
+            <View style={styles.containerClick}>
+                <Image style={styles.image} contentFit='cover' source={{ uri: item.profilePicture}}/>
+                <Text style={styles.text1}>{item.username}</Text>
+            </View>
+            <View style={styles.containerHobbies}>
+               <Text style={styles.text2}>{item.hobbies}</Text>
+            </View>
+    </TouchableOpacity>
+  );
+  
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: "#eeeeee",
-        marginTop: 0,
-        paddingTop: 0,
-      }}
-    >
+    <View  style={styles.containerItem}>
       <View
         style={[
           styles.card,
-          { position: "relative", top: 12, zIndex: 1, paddingVertical: 0 },
+          { zIndex: 1, paddingVertical: 0 },
         ]}
       >
         <View style={styles.searchcontaiiner}>
-
-          <Image 
-            source={{ uri: profilePicture || "https://api.dicebear.com/9.x/miniavs/svg?seed=George&backgroundType=gradientLinear&backgroundColor=b6e3f4,c0aede,ffdfbf"}}
-            style={styles.profileImage }
+          <TouchableOpacity onPress={handleProfilePress}>
+            <Image 
+              source={{ uri: profilePicture || "https://api.dicebear.com/9.x/miniavs/svg?seed=George&backgroundType=gradientLinear&backgroundColor=b6e3f4,c0aede,ffdfbf"}}
+              style={styles.profileImage }
+            />
+          </TouchableOpacity>
+          <Ionicons name="notifications" size={27} color="#000" style={styles.notification}
           />
-
-          <Ionicons
-            name="notifications"
-            size={27}
-            color="#000"
-            style={{
-              left: 17,
-              backdropFilter: "blur(10px)",
-              backgroundColor: "#dddddd",
-              borderRadius: 50,
-              padding: 10,
-            }}
-          />
-
-          <TextInput
-            style={styles.searchContainer}
+          <TextInput style={styles.textInput} 
             placeholder="Search"
-            placeholderTextColor="#4B0082"
-            value={search}
-            onChangeText={setSearch}
+            value={query}
+            editable={!searchLoading}
+            multiline
+            onChangeText={(text) => {setQuery(text); debounceSearch(text)} }
           />
-          <Ionicons
-            name="search"
-            size={27}
-            color="#4B0082"
-            style={{
-              backdropFilter: "blur(10px)",
-              borderRadius: 50,
-              padding: 10,
-              position: "absolute",
-              right: 12,
-            }}
-          />
+          {searchLoading ? (
+            <></>
+          ): (
+             <View style={styles.searchContainer}>
+                <View style={styles.searchBar}>
+                <TouchableOpacity  onPress={() => {SearchUsers(query, token), setSearchVisible(true)}} style={styles.searchBar}>
+                  <Ionicons name="search" size={30} color="#4B0082" style={styles.search}
+                  />
+                </TouchableOpacity>
+
+                </View>
+             </View>   
+          )}
         </View>
 
         <Text style={styles.generaltext}>Hot Match</Text>
@@ -194,262 +329,30 @@ export default function Index() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{
             justifyContent: "center",
-            position: "static",
             width: "auto",
-            paddingBottom: 3,
+            height: 125,
+            top: 25,
+            alignSelf: "center",
             alignItems: "center",
           }}
         >
-          <View style={styles.match}>
-            <Image
-              source={{
-                uri: "https://th.bing.com/th/id/OIF.7XZOcxC98s3wGrpqtsdiGw?cb=iwc2&rs=1&pid=ImgDetMain",
-              }}
-              style={styles.imagecard}
-            />
-            <View style={styles.matchlogo}>
-              <Image
-                source={{
-                  uri: "https://th.bing.com/th/id/OIP.Yhx1VBJ4TC52WU9Mk8zrUQHaEK?cb=iwc2&rs=1&pid=ImgDetMain",
-                }}
-                style={styles.teamlogo}
-              />
-            </View>
-
-            <View style={[styles.matchlogo, { left: 210 }]}>
-              <Image
-                source={{
-                  uri: "https://th.bing.com/th/id/OIP.k4TxdjJE9m1j7E9cOvOCJgHaFj?cb=iwc2&rs=1&pid=ImgDetMain",
-                }}
-                style={[styles.teamlogo, { width: 100, height: 100 }]}
-              />
-            </View>
-            <View style={styles.textcontainer}>
-              <Text style={[styles.league, { left: "40%", top: 5 }]}>
-                Football
-              </Text>
-              <Text
-                style={[
-                  styles.league,
-                  { color: "#dddddd", right: 10, fontSize: 13, top: 12 },
-                ]}
-              >
-                Spain-Laliga
-              </Text>
-            </View>
-            <Text
-              style={[
-                styles.text,
-                { top: 70, left: "50%", fontSize: 16, fontFamily: "san" },
-              ]}
-            >
-              Today
-            </Text>
-            <Text
-              style={[
-                styles.text,
-                {
-                  top: 63,
-                  left: "65%",
-                  fontWeight: 700,
-                  fontSize: 28,
-                  fontFamily: "san",
-                },
-              ]}
-            >
-              |
-            </Text>
-            <Text
-              style={[
-                styles.text,
-                { top: 70, left: "70%", fontSize: 16, fontFamily: "san" },
-              ]}
-            >
-              20:00
-            </Text>
-            <Ionicons
-              name="flash"
-              size={23}
-              color="#ffde21"
-              style={{
-                top: 3,
-                left: 3,
-                backdropFilter: "blur(10px)",
-                position: "absolute",
-              }}
-            />
-          </View>
-
-          <View style={styles.match}>
-            <Image
-              source={{
-                uri: "https://th.bing.com/th/id/OIF.7XZOcxC98s3wGrpqtsdiGw?cb=iwc2&rs=1&pid=ImgDetMain",
-              }}
-              style={styles.imagecard}
-            />
-            <View style={styles.matchlogo}>
-              <Image
-                source={{
-                  uri: "https://th.bing.com/th/id/OIP.Yhx1VBJ4TC52WU9Mk8zrUQHaEK?cb=iwc2&rs=1&pid=ImgDetMain",
-                }}
-                style={styles.teamlogo}
-              />
-            </View>
-
-            <View style={[styles.matchlogo, { left: 210 }]}>
-              <Image
-                source={{
-                  uri: "https://th.bing.com/th/id/OIP.k4TxdjJE9m1j7E9cOvOCJgHaFj?cb=iwc2&rs=1&pid=ImgDetMain",
-                }}
-                style={[styles.teamlogo, { width: 100, height: 100 }]}
-              />
-            </View>
-            <View style={styles.textcontainer}>
-              <Text style={[styles.league, { left: "40%", top: 5 }]}>
-                Football
-              </Text>
-              <Text
-                style={[
-                  styles.league,
-                  { color: "#dddddd", right: 10, fontSize: 13, top: 12 },
-                ]}
-              >
-                Spain-Laliga
-              </Text>
-            </View>
-            <Text
-              style={[
-                styles.text,
-                { top: 70, left: "50%", fontSize: 16, fontFamily: "san" },
-              ]}
-            >
-              Today
-            </Text>
-            <Text
-              style={[
-                styles.text,
-                {
-                  top: 63,
-                  left: "65%",
-                  fontWeight: 700,
-                  fontSize: 28,
-                  fontFamily: "san",
-                },
-              ]}
-            >
-              |
-            </Text>
-            <Text
-              style={[
-                styles.text,
-                { top: 70, left: "70%", fontSize: 16, fontFamily: "san" },
-              ]}
-            >
-              20:00
-            </Text>
-            <Ionicons
-              name="flash"
-              size={23}
-              color="#dddddd"
-              style={{
-                top: 3,
-                left: 3,
-                backdropFilter: "blur(10px)",
-                position: "absolute",
-              }}
-            />
-          </View>
-
-          <View style={styles.match}>
-            <Image
-              source={{
-                uri: "https://th.bing.com/th/id/OIF.7XZOcxC98s3wGrpqtsdiGw?cb=iwc2&rs=1&pid=ImgDetMain",
-              }}
-              style={styles.imagecard}
-            />
-            <View style={styles.matchlogo}>
-              <Image
-                source={{
-                  uri: "https://th.bing.com/th/id/OIP.Yhx1VBJ4TC52WU9Mk8zrUQHaEK?cb=iwc2&rs=1&pid=ImgDetMain",
-                }}
-                style={styles.teamlogo}
-              />
-            </View>
-
-            <View style={[styles.matchlogo, { left: 210 }]}>
-              <Image
-                source={{
-                  uri: "https://th.bing.com/th/id/OIP.k4TxdjJE9m1j7E9cOvOCJgHaFj?cb=iwc2&rs=1&pid=ImgDetMain",
-                }}
-                style={[styles.teamlogo, { width: 100, height: 100 }]}
-              />
-            </View>
-            <View style={styles.textcontainer}>
-              <Text style={[styles.league, { left: "40%", top: 5 }]}>
-                Football
-              </Text>
-              <Text
-                style={[
-                  styles.league,
-                  { color: "#dddddd", right: 10, fontSize: 13, top: 12 },
-                ]}
-              >
-                Spain-Laliga
-              </Text>
-            </View>
-            <Text
-              style={[
-                styles.text,
-                { top: 70, left: "50%", fontSize: 16, fontFamily: "san" },
-              ]}
-            >
-              Today
-            </Text>
-            <Text
-              style={[
-                styles.text,
-                {
-                  top: 63,
-                  left: "65%",
-                  fontWeight: 700,
-                  fontSize: 28,
-                  fontFamily: "san",
-                },
-              ]}
-            >
-              |
-            </Text>
-            <Text
-              style={[
-                styles.text,
-                { top: 70, left: "70%", fontSize: 16, fontFamily: "san" },
-              ]}
-            >
-              20:00
-            </Text>
-            <Ionicons
-              name="flash"
-              size={23}
-              color="#ffde21"
-              style={{
-                top: 3,
-                left: 3,
-                backdropFilter: "blur(10px)",
-                position: "absolute",
-              }}
-            />
-          </View>
-
+       
+        
+              {fixtures.map((fixture) => (
+                    <View key={fixture.id} style={styles.match}>
+                      <Text style={{ fontWeight: "bold", fontSize: 16, color: '#fff' }}>{fixture.name}</Text>
+                      <Text style={{ color: "#888" }}>{fixture.result_info}</Text>
+                      <Text style={{ color: "#4B0082" }}>
+                        {new Date(fixture.starting_at).toLocaleString()}
+                      </Text>
+                      <Text style={{ color: "#aaa" }}>{fixture.short_code}</Text>
+                      <Text style={{ color: "#aaa" }}> {fixture.sub_type}</Text>
+                      <Text style={{ color: "#aaa" }}> {fixture.type}</Text>
+                    </View>
+                ))}  
+               
         </ScrollView>
-        <View
-          style={{
-            width: "100%",
-            height: 8,
-            position: "absolute",
-            backgroundColor: "#cccccc",
-            top: 269,
-          }}
-        ></View>
+        <View style={styles.sepration}></View>
       </View>
 
       <FlatList
@@ -466,6 +369,48 @@ export default function Index() {
           />
         }
       />
+      <Search isVisible={searchVisible} onClose={handleSearchClose}>
+        <TextInput 
+                placeholder="Search"
+                value={query}
+                editable={!searchLoading}
+                multiline
+                style={styles.searchTextInput}
+                onChangeText={(text) => {setQuery(text); debounceSearch(text)} }
+          />
+          {searchLoading ? (
+              <View>
+                <Text>Searching....</Text>
+              </View>
+          ): (
+             <View style={styles.searchContainer}>
+                <View style={styles.searchBar}>
+                <TouchableOpacity  onPress={() => {SearchUsers(query, token), setSearchVisible(true)}} style={styles.searchBar}>
+                  <Ionicons name="search" size={30} color="#4B0082" style={styles.search}
+                  />
+                </TouchableOpacity>
+
+                </View>
+             </View>   
+          )}
+          {searchLoading ? (
+            <></>
+          ) : searchResults.length > 0 ? (
+              <FlatList
+                data={searchResults}
+                renderItem={renderSearch}
+                keyExtractor={(item) => item._id}
+                contentContainerStyle={styles.container}
+                refreshControl={<RefreshControl 
+                  refreshing={refresh}
+                  onRefresh={() =>  fetchPosts(1, true)}
+                  />}
+              />
+          ) : (
+            <Text style={{ textAlign: 'center', marginTop: 20 }}>No user found</Text>
+          )}
+    </Search>
+      
     </View>
   );
 }

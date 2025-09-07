@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F5F5F5',
+        backgroundColor: '#ffffff',
     },
     spaceBetween: {
         top: 10
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     createdAt: {
         fontSize: 15,
         bottom: 2,
-        left: 10,
+        left: 6,
         color: '#888',
     },
     postImage: {
@@ -99,7 +99,6 @@ const styles = StyleSheet.create({
     comment: {
         fontSize: 16,
         backgroundColor: '#fff',
-        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
         borderRadius: 5,
         borderWidth:0.5,
         borderColor: '#4B0082',
@@ -117,22 +116,28 @@ const styles = StyleSheet.create({
         right: 15,
     },
     recordButton: {
-      color: '#4B0082',  
+      color: '#4B0082',
+      right:7  
     },
     sendButton: {
       top: 3,
-      left: 6
+      right: 7
     },
     commentContainer: {
         top:5,
         flex:1,
+        left: 12,
     },
-    innerCommentcontainer: {
-        
+    itemContainer: {
+        borderRadius: 5,
+        width: '80%',
+        left: 45,
+        bottom: 35
     },
     audio: {
-        bottom: 20,
-        left: 30,
+        paddingLeft: 2,
+        borderRadius:5,
+        backgroundColor: '#f8f8f8',
     },
     commentAt: {
         bottom: 45,
@@ -144,7 +149,7 @@ const styles = StyleSheet.create({
         bottom: 35,
         left: 50,
         width: "80%",
-        backgroundColor: '#e6e6e6ff',
+        backgroundColor: '#f8f8f8',
         borderRadius: 5,
         minHeight: 40,
         minWidth: 20,
@@ -152,7 +157,7 @@ const styles = StyleSheet.create({
     },
     commenttext: {
         fontSize: 18,
-
+        left: 2
     },
     diplayIsModelVisible: {
         width: "95%",

@@ -94,7 +94,7 @@ export default function Verify() {
             style={[styles.card, { position: "absolute", top: 20, left: 20 }]} >
             <TouchableOpacity onPress={() => router.back()}>
             <Ionicons
-              name="arrow-back-circle-sharp"
+              name="arrow-back"
               size={35}
               color="#4B0082"
               style={[styles.text, { marginTop: 10, fontSize: 40 }]}/>
@@ -111,12 +111,12 @@ export default function Verify() {
             />
 
             <TextInput
-                style={[styles.inputform, { marginTop: 20, borderColor: '#f8f8f8', backgroundColor: '#f8f8f8'}]}
-                placeholder="Enter your verification code"
+                style={styles.inputForm}
+                placeholder="Enter verification code"
                 value={code}
                 onChangeText={setCode}
                 />
-            <Inonicons name="pencil-sharp" size={25} color={"#4B0082"} style={{position: 'absolute', top: 105, right: 36}}/>
+            <Inonicons name="pencil-sharp" size={25} color={"#4B0082"} style={{position: 'absolute', top: 115, right: 90}}/>
             
             <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 20}}>
               <TouchableOpacity
@@ -127,7 +127,7 @@ export default function Verify() {
                     </Text>
                   ) : (
                     <Text style={[styles.textinput, { color: "#4B0082" }]}>
-                      Resend code
+                      Request a new code
                     </Text>
                   )}
                 </TouchableOpacity>

@@ -15,7 +15,7 @@ export default function Caption({isVisible, children, onClose}: Props) {
                     <View style={style.titleContainer}>
                         <Text style={style.title}> Read more</Text>
                         <Pressable onPress={onClose}>
-                            <Ionicons name="close-circle-outline" size={35} color={'#fff'}/>
+                            <Ionicons name="close" size={25} color={'#4B0082'}/>
                         </Pressable>
                     </View>
                     {children}
@@ -26,26 +26,24 @@ export default function Caption({isVisible, children, onClose}: Props) {
 }
  const style = StyleSheet.create({
      modalContent: {
+        flex: 1,
         height: 'auto',
         width: '100%',
         borderTopRightRadius: 18,
         borderTopLeftRadius: 18,
         position: 'absolute',
         bottom: 0,
-        backgroundColor: '#fff'
     },
     titleContainer: {
         height: 45,
-        backgroundColor: '#4B0082',
-        borderTopRightRadius: 10,
-        borderTopLeftRadius: 10,
         paddingHorizontal: 20,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
+        backgroundColor: '#eee'
     },
     title: {
-        color: '#fff',
+        color: '#000',
         fontSize: 18,
         fontStyle: 'italic',
         fontWeight: 'bold'

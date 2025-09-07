@@ -11,7 +11,7 @@ import * as FileSystem from 'expo-file-system';
 import { Image } from 'expo-image';
 import * as MediaLabriary from 'expo-media-library';
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
@@ -25,17 +25,31 @@ import {
     View
 } from 'react-native';
 import { captureRef } from 'react-native-view-shot';
+import io from 'socket.io-client';
 
 type Post = {
     id: string;
     profilePicture: string; 
     user: {
-        id: string;
+        _id: string;
         username: string;
         profilePicture?: string;
     };
     image: string;
     caption: string;
+    createdAt: string;
+};
+
+type Comment = {
+    _id: string;
+    postId: string;
+    user: {
+        id: string;
+        username: string;
+        profilePicture?: string;
+    };
+    text: string;
+    audio: string;
     createdAt: string;
 };
 
@@ -52,6 +66,7 @@ export default function PostDetail() {
     const [playingId, setPlayingId] = useState(null);
     const imageRef = useRef<View>(null);
 
+
     // create a  comment variables
     const [ text, setText ] = useState('');
     const [ audio, setAudio ] = useState<Audio.Recording | null>(null)
@@ -62,17 +77,19 @@ export default function PostDetail() {
     const [ uploading, setUploading ] = useState(false);
 
     //fetch comments vairables
-    const [ comments, setComments] = useState([]);
+    const [ comments, setComments] = useState<Comment[]>([]);
     const [ refresh, setRefreshing] = useState(false);
     const [ hasMoreComments, setHasMoreComments] = useState(true);
     const [ page, setPage ] = useState(1);
 
     //like Variables
     const [like, setLike] = useState(false);
-    const [ submitLike, setSubmitLike] = useState(false);
+    const [ submitLike, setSubmitLike ] = useState(false);
+
     // clodinary variables
     const CLOUDINARY_NAME = 'dimg4aui1'
     const UPLOAD_PRESET = 'multiplecomment';
+    const REWARD_AD_UNIT_ID = 'ca-app-pub-8384657725659992/9550281176'
 
     const getPost = async () => {
         try {
@@ -89,6 +106,7 @@ export default function PostDetail() {
             if (!response.ok) 
                 throw new Error(data.message || 'Failed to fetch post');
             setPost(data.post);
+            setLike(data.liked)
             setLoading(false);
         } catch (error) {
             console.error('Error fetching post:', error);
@@ -97,15 +115,8 @@ export default function PostDetail() {
         setLoading(false);
         }
     };
-
-    const onReadMore = () => {
-        setModelIsvisible(true)
-    }
     const onCloseReadMore = () => {
         setModelIsvisible(false)
-    }
-    const onImageView = () => {
-        setIsImageVisile(true)
     }
     const onCloseImageView = () => {
         setIsImageVisile(false)
@@ -225,8 +236,6 @@ export default function PostDetail() {
 
         console.log('Playing audio from', audioUri);
     }
-
-
     const playAudioFromUrl = async (url: string) => {
         if (soundPlay) {
             await soundPlay.unloadAsync();
@@ -309,6 +318,7 @@ export default function PostDetail() {
             
              setSubmitComment(true);
              let audioUrl = null;
+             let watchedAd = false;
     
             if (audioUri) {
                 console.log('Uploading audio to Cloudinary...');
@@ -333,7 +343,8 @@ export default function PostDetail() {
                 },
                 body: JSON.stringify({
                     text: text.trim(),
-                    audio: audioUrl
+                    audio: audioUrl,
+                    // watchedAd: watchedAd
                 })
             })
     
@@ -355,37 +366,42 @@ export default function PostDetail() {
     }
 
     const handleSubmitLike = async () => {
-    try {
-      setSubmitLike(true)
-
-      const response = await fetch(`${API_URL}/post/${postId}/like`, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            like
-          })
-        }
-      )
-      const data = await response.json();
-      if (!response.ok) {
-        console.log('Failed to like')
-        Alert.alert(data.message) 
-          throw new Error(data.message); 
-      }
-    } catch (error) {
-      console.error('Error submitting Like', error);
-      Alert.alert('Error', 'Failed to submit Like');
-        } finally {
-            setSubmitLike(false)
+        setSubmitLike(true)
+        try {
+            const response = await fetch(`${API_URL}/post/${postId}/like`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ like: !like })
+            })
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message || 'Failed to like post');
+            setLike(!like);
+            setSubmitLike(false);
+        } catch (error) {
+            console.error('Error liking post:', error);
+            Alert.alert('Error', 'Failed to like post');
         }
     }
 
     useEffect(() => {
         getPost();
         fetchComments();
+        const socket = io('https://kismit-official.onrender.com/');
+
+        socket.on('new comment created', (newComment) => {
+        setComments((comments) => {
+            const exits = comments.some(comment => comment._id === newComment._id);
+            return exits ? comments :
+            [newComment, ...comments]
+            });
+        });
+
+        return () => {
+            socket.disconnect();
+        };
     }, [])
     
     useEffect(() => {
@@ -398,20 +414,23 @@ export default function PostDetail() {
         }
     }, [audio])
 
+    const handleprofilePicturePress = async (id: string) => {
+        router.push({ pathname: '/(profile)', params: {userId: id} });
+      }
+
     const renderComment = ({ item}: {item: any }) => (
         <View style={styles.commentContainer}>
-            <View style={styles.innerCommentcontainer}>
                 <Image
-                    source={{ uri: item.user.profilePicture ? item.user.profilePicture : "https://api.dicebear.com/9.x/miniavs/svg?seed=George&backgroundType=gradientLinear&backgroundColor=b6e3f4,c0aede,ffdfbf" }}
+                    source={{ uri: item.user?.profilePicture ? item.user?.profilePicture : "https://api.dicebear.com/9.x/miniavs/svg?seed=George&backgroundType=gradientLinear&backgroundColor=b6e3f4,c0aede,ffdfbf" }}
                     style={[styles.userImage, {width: 40, height: 40}]}/>
 
                 <View style={styles.userInfoText}>
-                    <Text style={[styles.username, {fontSize: 16, bottom: 30, left: 50}]}>{item.user.username}</Text>
+                    <Text style={[styles.username, {fontSize: 16, bottom: 30, left: 50}]}>{item.user?.username}</Text>
                 </View>
                 <View style={styles.commentAt}>
                     <Text style={styles.createdAt}>{formatTimeAgo(item.createdAt)}</Text>
                 </View>
-                <>
+                <View style={styles.itemContainer}>
                     { item.audio && 
                         <View> 
                             { playingId !== item.id ? (
@@ -433,20 +452,19 @@ export default function PostDetail() {
                             }
                         </View>
                     }
-                </>  
-                <>
+                </View>  
+                <View>
                     { item.text &&
                     <View style={styles.textCommented}>
                         <Text style={styles.commenttext}>{item.text}</Text>
                     </View>
                     } 
-                </>  
-            </View>
+                </View>  
         </View>
     )
 
     return(
-        <KeyboardAvoidingView behavior='padding' style={{ flex: 1 }} keyboardVerticalOffset={50}>
+        <KeyboardAvoidingView behavior='padding' style={{ flex: 1, backgroundColor: '#ffffff' }} keyboardVerticalOffset={50}>
         <View>
             <ScrollView contentContainerStyle={{ padding: 5 }}>
                 {loading ? (
@@ -456,7 +474,7 @@ export default function PostDetail() {
                         <View style={styles.userdetail}>
                             <TouchableOpacity onPress={ () => router.back()}>
                                 <Ionicons
-                                    name="arrow-back-circle-sharp"
+                                    name="arrow-back"
                                     size={37}
                                     color="#4B0082"
                                     style={styles.text}
@@ -464,10 +482,12 @@ export default function PostDetail() {
 
                             </TouchableOpacity>
                             <View style={styles.userInfo}>
-                                <Image
-                                    source={{ uri: post.user.profilePicture|| 'https://via.placeholder.com/50' }}
-                                    style={styles.userImage}
-                                />
+                                <TouchableOpacity onPress={() => handleprofilePicturePress(post.user._id)} >
+                                    <Image
+                                        source={{ uri: post.user.profilePicture|| 'https://via.placeholder.com/50' }}
+                                        style={styles.userImage}
+                                    />
+                                </TouchableOpacity>
                                 <View style={styles.userInfoText}>
                                     <Text style={styles.username}>{post.user.username}</Text>
                                     <Text style={styles.createdAt}>{formatTimeAgo(post.createdAt)}</Text>
@@ -501,22 +521,22 @@ export default function PostDetail() {
                         </View>
                         
                         <View style={styles.commentSection}>
-                                <TouchableOpacity onPress={handleSubmitLike} disabled={submitLike}>
+                                <TouchableOpacity onPress={() => { setLike(!like); handleSubmitLike() } }>
                                     <Ionicons
-                                        name={like ? "heart-sharp" : "heart-outline"}
-                                        size={35}
-                                        color={like ? "#4B0082" : "#4B0082"}
+                                        name={like ? 'heart' : 'heart-outline'}
+                                        size={32}
+                                        color={like ? '#4B0082' : '#4B0082'}
                                         style={styles.like}
                                     />
                                 </TouchableOpacity>
                                 <View style={styles.textInputContainer}>
                                     <TextInput 
-                                    style={styles.comment}
-                                    placeholder='Add a comment...'
-                                    value={text}
-                                    onChangeText={setText}
-                                    editable={!isRecording}
-                                    multiline
+                                        style={styles.comment}
+                                        placeholder='Add a comment...'
+                                        value={text}
+                                        onChangeText={setText}
+                                        editable={!isRecording}
+                                        multiline
                                     />
                                 </View>
                                <TouchableOpacity
@@ -529,18 +549,18 @@ export default function PostDetail() {
                                </TouchableOpacity>
                                
                                 <TouchableOpacity
-                                onPress={handleCommentSubmit} disabled={submitComment}
-                                >
-                                <Ionicons size={32} color={submitComment ? '#4B0082' : '#4B0082'} 
-                                name={submitComment ? 'send' : 'send-outline'}
-                                style={styles.sendButton}
-                                />                 
-                            </TouchableOpacity>
+                                    onPress={handleCommentSubmit} disabled={submitComment}
+                                    >
+                                    <Ionicons size={32} color={submitComment ? '#4B0082' : '#4B0082'} 
+                                    name={submitComment ? 'send' : 'send-outline'}
+                                    style={styles.sendButton}
+                                    />                 
+                                </TouchableOpacity>
                           
                         </View>
                     </View>
                 ) : (
-                    <Text>No post found.</Text>
+                    <ActivityIndicator size={'large'} color={'#4B0082'} style={{top: 300}}></ActivityIndicator>
                 )}
             </ScrollView>
         </View> 
@@ -569,7 +589,7 @@ export default function PostDetail() {
             <ViewImage isVisible={isImageVissable} onClose={onCloseImageView}>
                 <View style={styles.displayOption}>
                     <Text style={styles.displayUsername}>{post?.user.username}</Text>
-                    <Feather style={{bottom:18}} onPress={saveImage} name="download" size={28} color="#ffffff" />
+                    <Feather style={{bottom: 21}} onPress={saveImage} name="download" size={25} color="#ffffff" />
                 </View>
                 <View ref={imageRef} collapsable={false}>
                     <Image
@@ -578,7 +598,7 @@ export default function PostDetail() {
                         contentFit="cover"
                     />
                 </View>
-            </ViewImage>   
+            </ViewImage>
        </KeyboardAvoidingView> 
     );
 }

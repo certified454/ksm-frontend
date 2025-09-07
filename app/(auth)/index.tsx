@@ -33,18 +33,12 @@ export default function Index() {
     >
       <View style={styles.container}>
         <View style={styles.card}>
-          <Text style={[styles.text, { position: "absolute", top: 90, color: "#fff", left: 85, fontSize: 30 }]}>
+          <Text style={styles.textWelcome}>
             Welcome Back
           </Text>
         </View>
 
-        <View
-          style={[
-            styles.cardform,
-            { position: "absolute", top: 180, borderRadius: 20 },
-          ]}
-        >
-          <Text style={[styles.text, { alignSelf: "center" }]}></Text>
+        <View style={styles.cardformContainer}>
           <Text style={[styles.textinput]}>Email</Text>
           <TextInput
             style={styles.inputform}
@@ -55,7 +49,7 @@ export default function Index() {
             keyboardType="email-address"
           />
 
-          <Text style={[styles.textinput, { marginTop: 20 }]}>Password</Text>
+          <Text style={styles.textinputItem}>Password</Text>
           <TextInput
             style={styles.inputform}
             placeholder="enter your password"
@@ -66,7 +60,7 @@ export default function Index() {
 
           <TouchableOpacity
             onPress={() => setShowPassword(!showPassword)}
-            style={{ position: "absolute", top: 185, right: 40 }}
+            style={styles.eyeicon}
           >
             <Ionicons
               name={showPassword ? "eye-off" : "eye"}
@@ -75,51 +69,26 @@ export default function Index() {
             />
           </TouchableOpacity>
 
-          <Text
-            style={[
-              styles.fonttext,
-              { color: "#4B0082", fontSize: 15, marginTop: 20, left: 195 },
-            ]}
-          >
+          <Text style={styles.fontText}>
             forgoten password?
           </Text>
 
           <View style={styles.card}>
-            <TouchableOpacity
-              style={[
-                styles.button,
-                { justifyContent: "center", alignItems: "center" },
-              ]}
-              onPress={handleLogin}
-              disabled={isLoading}
-            >
+            <TouchableOpacity style={styles.buttonInside} onPress={handleLogin} disabled={isLoading}>
               {isLoading ? (
                 <ActivityIndicator color="#ffffff" size={"small"} />
               ) : (
-                <Text style={[styles.fonttext, { fontWeight: "bold" }]}>
+                <Text style={[styles.login]}>
                   Login
                 </Text>
               )}
             </TouchableOpacity>
 
-            <View
-              style={[styles.card, { flexDirection: "row", marginTop: 50 }]}
-            >
-              <Text style={[styles.fonttext, { fontSize: 18, color: "#000" }]}>
+            <View style={styles.cardView}>
+              <Text style={styles.accountText}>
                 Don't have an account?
               </Text>
-              <Link
-                href="/(auth)/register"
-                style={[
-                  styles.fonttext,
-                  {
-                    fontSize: 18,
-                    color: "#4B0082",
-                    fontWeight: "bold",
-                    marginLeft: 7,
-                  },
-                ]}
-              >
+              <Link href="/(auth)/register" style={styles.register}>
                 Register
               </Link>
             </View>

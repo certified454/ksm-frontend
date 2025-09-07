@@ -1,6 +1,12 @@
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
+  containerItem: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+    marginTop: 0,
+    paddingTop: 0,
+  },
   container: {
     paddingInline: 10,
     width: "100%",
@@ -11,8 +17,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     right: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#cccccc",
+ 
   },
   profileImage: {
     width: 50,
@@ -41,26 +46,23 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     width: "100%",
-    height: 60,
+    position: 'absolute',
+    top: 5
   },
   searchContainer: {
-    width: "57%",
-    height: 50,
-    backgroundColor: "#ffffff",
-    borderRadius: 26,
-    paddingLeft: 20,
-    left: 50,
-    fontSize: 16,
-    fontFamily: "sans-serif",
+    width: "15%",
+    height:'100%',
+    position: 'absolute',
+    right: 2
   },
   card:{   
     width: "auto",
-    height: 290,
+    height: 230,
     borderRadius: 10,
     alignItems: 'center',
   },
   postcard: {
-    width: "100%",
+    width: "90%",
     height: 400,
     backgroundColor: "#ffffff",
     borderRadius: 10,
@@ -68,8 +70,8 @@ const styles = StyleSheet.create({
     marginTop: 10
   },
   match: {
-    width: 300,
-    height: 170,
+    width: 250,
+    height: '100%',
     backgroundColor: "#4B0082",
     marginLeft: 5,
     borderRadius: 5,
@@ -79,11 +81,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     top: 4,
   },
-  imagecard:{
-    width: 300,
-    height: 190,
-    borderRadius: 5,
-  },
+ 
   textcontainer: {
     width: "100%",
     height: 30,
@@ -114,11 +112,11 @@ const styles = StyleSheet.create({
     fontFamily: "serif",
     fontWeight: "bold",
     right: 100,
-    top: 12
+    top: 60
   },
   matchlogo:{
-    width: 65,
-    maxHeight: 65,
+    width: 45,
+    maxHeight: 45,
     position: "absolute",
     top: 50,
     left: 27,
@@ -128,10 +126,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   teamlogo: {
-    width: 130,
-    height: 130,
+    width: 80,
+    height: 80,
     objectFit: "contain",
     borderRadius: "100%"
+  },
+  sepration: {
+    width: "100%",
+    height: 8,
+    position: "absolute",
+    backgroundColor: "#cccccc",
+    top: 220,
   },
   commentSection: {
     width: 340,
@@ -161,7 +166,6 @@ const styles = StyleSheet.create({
   },
   caption: {
     fontSize: 18,
-    fontFamily: "serif",
     flexWrap: "wrap",
     flexShrink: 1
   },
@@ -176,17 +180,91 @@ const styles = StyleSheet.create({
     backgroundColor: '#eeeeeeff',
     width: '60%',
     height: 40,
-    borderRadius: 30
+    borderRadius: 30,
   },
   likesCounts:{
     fontFamily: "sans-serif",
     flexDirection: "row",
-    alignItems:'center',
-    justifyContent: 'flex-start',
-    top: 5,
-    left: 5
+    top: 7.5,
+    left: 7
   },
-
+  notification: {
+    left: 17,
+    backgroundColor: "#eeeeee85",
+    borderRadius: 50,
+    padding: 10,
+  },
+  searchBar: {
+    flex: 1,
+    height: '100%'
+  },
+  textInput: {
+    width: '60%',
+    height: '100%',
+    backgroundColor: '#eeeeee85',
+    borderRadius: 30,
+    paddingLeft: 15,
+    minHeight: 10,
+    maxHeight: 50,
+    fontSize: 18,
+    left: 40
+  },
+  search: {
+    backdropFilter: "blur(10px)",
+    top: 7,
+    position: "absolute"
+  },
+    text1: {
+        fontWeight: 'bold',
+        fontSize: 18,
+        left: 10
+    },
+    text2: {
+        fontSize: 16,
+    },
+    userContainer: {
+        width: '100%',
+        height: 70,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        borderBottomColor: '#cccccc',
+        borderBottomWidth: 1
+    },
+    containerHobbies: {
+        width: '50%',
+        height: '100%',
+        top: "39%",
+        alignItems: 'center',
+    },
+    containerClick: {
+        width: '35%',
+        height: "100%",
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    image: {
+        width: 60,
+        height: 60,
+        borderRadius: 100
+    },
+    cancel: {
+        position: 'relative',
+        right: 55,
+    },
+    searchTextInput: {
+        width: '90%',
+        height: '100%',
+        backgroundColor: '#eeeeee85',
+        borderRadius: 20,
+        paddingLeft: 15,
+        minHeight: 10,
+        maxHeight: 50,
+        fontSize: 18
+    },
+    share: {
+      right: 16,
+      bottom: 4
+    }
 })
-
 export default styles;

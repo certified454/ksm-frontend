@@ -12,8 +12,8 @@ export default function AuthLayout() {
   return (
     <SafeAreaProvider>
       <SafeScreen>
-        <Stack screenOptions={{animation: pathname.startsWith("/(auth)") ? "default" : "none",}}>
-          <Stack.Screen name="login" options={{ headerShown: false }} />
+        <Stack >
+          <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="register" options={{ headerShown: false }} />
           <Stack.Screen name="verify" options={{ headerShown: false }} />
         </Stack>
