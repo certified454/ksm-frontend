@@ -5,13 +5,12 @@ import { API_URL } from "@/store/postStore";
 import { userProfilePictureStore } from "@/store/profileStore";
 import { formatComments, formatTimeAgo } from "@/store/util";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import * as FileSystem from 'expo-file-system';
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import debounce from "lodash.debounce";
-import React, { useCallback, useEffect, useState } from "react";
-import { Alert, FlatList, RefreshControl, ScrollView, Share, Text, TextInput, TouchableOpacity, View } from "react-native";
-// import { AppOpenAd, TestIds } from 'react-native-google-mobile-ads';
+import { debounce } from "lodash";
+import React, { use, useCallback, useEffect, useState } from "react";
+import { FlatList, RefreshControl, ScrollView, Share, Text, TextInput, TouchableOpacity, View } from "react-native";
+
 import io from "socket.io-client";
 
 type Post = {
@@ -22,10 +21,34 @@ type Post = {
   };
   image: string;
   caption: string;
+  tags: {name: string}[];
+  mentions: {_id: string; username: string; profilePicture?: string}[];
   createdAt: string;
   likesCount: number;
   commentsCount: number;
 };
+function parseCaption(
+  caption: string,
+  tags: {name: string}[],
+  mentions: {_id: string; username: string}[]
+) {
+  const tagSet = new Set(tags.map(t => `#${t.name}`));
+  const mentionSet = new Set(mentions.map(m => `@${m.username}`));
+  const words = caption.match(/(@\w+|#\w+|\S+|\s+)/g) || [];
+
+  return words.map((word, idx) => {
+    if (tagSet.has(word)) {
+      const tag = tags.find(t => `#${t.name}` === word);
+      return { type: 'tag', text: tag?.name, key:`tag-${tag?.name}-${idx}` };
+    }
+    if (mentionSet.has(word)) {
+      const mention = mentions.find(m => `@${m.username}` === word);
+      console.log("mention", mention, mention?.username);
+      return { type: 'mention', text: mention?.username, id: mention?._id, key:`mention-${mention?.username}-${idx}` };
+    }
+    return { type: 'text', text: word, key: `text-${word}-${idx}` };
+  });
+}
 export default function Index() {
   const { token, user } = useAuthStore();
   const [posts, setPosts] = useState<Post[]>([]);
@@ -44,12 +67,6 @@ export default function Index() {
   const [fixtures, setFixtures] = useState<any[]>([]);
 
   const router = useRouter();
-  // const adUnitId = __DEV__ ? TestIds.APP_OPEN : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
-  // const appOpenAd = AppOpenAd.createForAdRequest(adUnitId, {
-  //   keywords: ['gaming', 'programming'],
-  // });
-  // appOpenAd.load();
-  // appOpenAd.show();
 
   const getUpcomingFixtures = async () => {
     try {
@@ -68,20 +85,10 @@ export default function Index() {
     }
   }
   const handleSharePost = async (post: Post) => {
-          const imageUri = post.image;
-          const localPath = FileSystem.documentDirectory + 'shared-image.jpg';
-          const downloadImage = FileSystem.createDownloadResumable( imageUri, localPath);
-          const downloadResult = await downloadImage.downloadAsync();
-
-          if (!downloadResult || !downloadResult.uri) {
-              Alert.alert('Error', 'Failed to download image for sharing.');
-              return;
-          }
-          const message = `${post.user.username}\n${post.user.profilePicture}\n${post.caption}\n\nOpen in app: ksm://post/${post._id}`;
+          const message = `username : ${post.user.username}\ncomment : ${post.commentsCount}\nlikes : ${post.likesCount}\ncaption : ${post.caption}\nimage : ${post.image}`;
           const shareOptions = {
               title: 'Share Post',
               message,
-              url: downloadResult.uri,
               type: 'image/jpeg',
           };
   
@@ -95,7 +102,7 @@ export default function Index() {
       const response = await fetch(`${API_URL}/post?page=${pageNum}&limit=10`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
+      //extract tags and mentions from caption
       const data = await response.json();
       if (!response.ok)
         throw new Error(data.message || "Failed to fetch posts");
@@ -190,11 +197,9 @@ export default function Index() {
     if (hasMore && !loading && !refresh)
       await fetchPosts(page + 1)
   };
-
   const handlePostPress = async (id: string) => {
     router.push({ pathname: "/(postdetail)", params: { postId: id } });
   }
-
   const handleProfilePress = () => {
     router.push({pathname: "/(menu)"});
   }
@@ -204,7 +209,13 @@ export default function Index() {
   const handleprofilePicturePress = async (id: string) => {
       router.push({ pathname: '/(profile)', params: { userId: id }})
   }
+  const handleTagPress = (tagName: string) => {
+  router.push({ pathname: "/(tag)", params: { tag: tagName } });
+};
 
+const handleMentionPress = (userId: string) => {
+  router.push({ pathname: "/(profile)", params: { userId } });
+};
   const renderPost = ({ item }: {item:any}) => (
     
     <View style={styles.container}>
@@ -231,17 +242,36 @@ export default function Index() {
         </View>
 
         <View style={{backgroundColor: "#ffffff", width: 340, right: 12}}>
-            <View style={{ flex: 1, marginRight: 10, width: 300, left: 20 }}>
-              <TouchableOpacity onPress={() => handlePostPress(item._id)}>
-                <Text
-                  style={styles.caption}
-                  numberOfLines={3}
-                  ellipsizeMode="tail"
-                  >
-                  {item.caption}
-                </Text>
-              </TouchableOpacity>
-            </View>
+
+          <View style={{ flex: 1, marginRight: 10, width: 300, left: 20 }}>
+            <Text style={styles.caption}>
+              {parseCaption(item.caption, item.tags, item.mentions).map((part) => {
+                if (part.type === 'tag') {
+                  return (
+                    <Text
+                      key={part.key}
+                      style={{ color: "#4B0082", fontWeight: "bold" }}
+                      onPress={() => handleTagPress(part.text)}
+                    >
+                      #{part.text}
+                    </Text>
+                  );
+                }
+                if (part.type === 'mention') {
+                  return (
+                    <Text
+                      key={part.key}
+                      style={{ color: "#00824B", fontWeight: "bold" }}
+                      onPress={() => handleMentionPress(part.id)}
+                    >
+                      @{part.text}
+                    </Text>
+                  );
+                }
+                return <Text key={part.key}>{part.text}</Text>;
+              })}
+            </Text>
+          </View>
         </View>
       
         <View style={styles.commentSection}>         
@@ -282,7 +312,6 @@ export default function Index() {
             </View>
     </TouchableOpacity>
   );
-  
   return (
     <View  style={styles.containerItem}>
       <View

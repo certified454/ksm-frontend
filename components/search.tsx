@@ -32,13 +32,14 @@ export default function Search({isVisible, children, onClose}:Props) {
 const style = StyleSheet.create({
     modalContainer: {
         flex: 1,
+        top: 30,
         height: '100%',
         width: '100%',
         position: "absolute",
     },
     titleContainer: {
         height: '5%',
-        paddingLeft: 10,
+        paddingLeft: 20,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: "space-between"
@@ -51,7 +52,7 @@ const style = StyleSheet.create({
         right: 28    },
     childrenContainer: {
         flex: 1,
-        top: 90,
+        top: 110,
         alignItems: 'center',
         gap: 40
     }, 

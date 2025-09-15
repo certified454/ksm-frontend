@@ -8,6 +8,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#ffffff'
     },
+    containers: {
+        width: '100%',
+        minHeight: 800,
+        padding: 0,
+        overflow: 'hidden',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#ffffff'
+    },
     itemsContainer: {
         width: 360,
         height: 'auto',
@@ -161,8 +170,7 @@ const styles = StyleSheet.create({
     },
     usersMainContainer: {
         width: '100%',
-        height: 'auto',
-        top: 0,
+        height: '100%',
         gap: 10,
         padding: 7
     },
@@ -175,7 +183,10 @@ const styles = StyleSheet.create({
     userPredictContainer: {
         width: '100%',
         height: 'auto',
-        backgroundColor: '#f8f8f8',
+        backgroundColor: 'rgba(76, 0, 130, 0.07)',
+        borderRadius: 5,
+        justifyContent: 'center',
+        alignItems: 'center',
         padding: 10
     },
     userPredictInstrutions: {
@@ -215,7 +226,7 @@ const styles = StyleSheet.create({
     challengeVotes: {
         width: '100%',
         padding: 10,
-      
+        top: 70
     },
     currentTime: {
         width: '40%',
@@ -249,6 +260,13 @@ const styles = StyleSheet.create({
         padding: 10,
         marginVertical: 5,
         borderRadius: 8,
+        alignItems: 'baseline',
+    },
+    poolBlurContainer: {
+        padding: 10,
+        marginVertical: 5,
+        borderRadius: 10,
+        width: '100%',
         alignItems: 'baseline',
     },
     pools: {
@@ -400,6 +418,16 @@ const styles = StyleSheet.create({
         top: 20,
         borderTopStartRadius: 5
     },
+    upcomingChallenge: {
+        backgroundColor: 'rgba(76, 0, 130, 0.56)',
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
+        left: 253,
+        width: '22%',
+        top: 20,
+        borderTopStartRadius: 5
+    },
     voteButtonContainer: {
         width: '70%',
         height: 45,
@@ -441,14 +469,59 @@ const styles = StyleSheet.create({
         color: '#ffffff',
         fontWeight: 'bold'
     },
+    voteContainer: {
+        width: '100%',
+        height: 'auto',
+        padding: 10,
+    },
     votes: {
         width: '100%',
-        height: 80,
-        padding: 10,
+        minHeight: 'auto',
+        maxHeight: 100,
+        paddingTop: 10,
         bottom: 20,
-        backgroundColor: '#e70b0bff',
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
         flexDirection: 'row',
-        justifyContent: 'space-around',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    userItems: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: 5,
+        borderRadius: 5,
+        marginBottom: 6,
+        width: '100%'
+    },
+    userItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 5
+    },
+    itemProfilePicture: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        marginRight: 10
+    },
+    createdAT: {
+        fontSize: 12,
+        color: '#555',
+    },
+    voteTextContainer: {
+        width: '90%',
+        backgroundColor: '#f0f0f0',
+        height: 'auto',
+        left: 30,
+        bottom: 10,
+        borderRadius: 5
+    },
+    voteText: {
+        fontSize: 14,
+        color: '#000',
+        padding: 10
     }
 });
 

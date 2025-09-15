@@ -35,9 +35,10 @@ const style = StyleSheet.create({
     modalContainer: {
         flex: 1,
         height: '100%',
+        top: 30,
         width: '100%',
         position: "absolute",
-        backgroundColor: '#f9f9f9'
+        backgroundColor: '#fff'
     },
     titleContainer: {
         height: '5%',
@@ -55,7 +56,7 @@ const style = StyleSheet.create({
     },
     childrenContainer: {
         flex: 1,
-        top: 90,
+        top: 120,
         alignItems: 'center',
         gap: 40
     }

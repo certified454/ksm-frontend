@@ -75,8 +75,8 @@ export function formatFollowingCount(count) {
 
 //Label for voteCount
 export function formatVoteCount(count) {
-    if (count === 0) return '';
-    if (count === 1) return `${count}`;
-    if (count < 99) return `${count}`;
-    if (count < 100) return '99+';
+    if (count === 0) return 'entry';
+    if (count === 1) return `${count} entry`;
+    if (count < 99) return `${count} entries`;
+    if (count < 100) return '99+ entries';
 }

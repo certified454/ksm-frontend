@@ -1,13 +1,13 @@
 import { useAuthStore } from "@/store/authStore";
 import { API_URL } from "@/store/postStore";
-import { formatVoteCount } from "@/store/util";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { BlurView } from 'expo-blur';
 import { Image } from "expo-image";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, FlatList, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, FlatList, Platform, RefreshControl, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import io from "socket.io-client";
 import styles from "../../assets/styles/challenge";
 import TimePickerModal from "../../components/setTime";
@@ -30,6 +30,15 @@ type Challenge = {
     voteCount: number,
     time: Date;
 };
+function isChallengeActive(startDate: Date | string, endDate: Date | string): 'upcoming' | 'active' | 'ended' {
+    const now = new Date();
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (now < start) return 'upcoming';
+    if (now > end) return 'ended';
+    return 'active';
+}
 
 export default function Challenge(){
 
@@ -43,6 +52,7 @@ export default function Challenge(){
     const [startDate, setStartDate] = useState<Date>(new Date());
     const [showStartDate, setShowStartDate] = useState(false);
     const [endDate, setEndDate] = useState<Date>(new Date());
+    
     const [showEndDate, setShowEndDate] = useState(false);
 
     //challenge details variables
@@ -51,16 +61,14 @@ export default function Challenge(){
     const [refresh, setRefreshing] = useState(false);
 
     const [challenges, setChallenges] = useState<Challenge[]>([]);
-    const [challenge, setChallenge] = useState<Challenge | null>(null);
     const [hasMore, setHasMore] = useState(true);
     const [page, setPage] = useState(1);
+    const { challengeId } = useLocalSearchParams();
 
     //loading variables
     const [isUploading, setIsUploading] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [isVoting, setIsVoting] = useState(false);
     const {token, user} = useAuthStore();
-    
     const [poolInput, setPoolInput] = useState('');
     const [pools, setPools] = useState<string[]>([]);
 
@@ -165,7 +173,6 @@ export default function Challenge(){
             else setIsLoading(false);
         }
     };
-
     useEffect(() => {
         fetchChallenge();
         const socket = io('https://kismit-official.onrender.com/');
@@ -180,110 +187,120 @@ export default function Challenge(){
         socket.disconnect();
         };
     }, []);
-    
-    const renderChallenge = ({ item }: { item: Challenge }) => (
-        <View style={styles.challengeItems}>
-            { user.isOwner ? (
-                <>
-                    <ScrollView>
-                        <View style={styles.challengeDetailsContainer}>
-                            <TouchableOpacity onPress={() => handleChallengePress(item._id)} style={styles.checkItOutButton}>
-                                <Text style={styles.checkItOutText}>Check it out</Text>
-                            </TouchableOpacity>
-                            <Image style={styles.backgrounImage} source={{uri: 'https://avatars.mds.yandex.net/i?id=e70cd60a4cf4c5faccd2e56342e46e0ef6dc5bfb-10651780-images-thumbs&n=13'}}/>
-                            <View style={styles.challengeDetails}>
-                                <Text style={styles.adminText}>{item.title}</Text>
-                                <Text style={styles.detailText} ellipsizeMode="tail" numberOfLines={3}>{item.description}</Text>
-                                <View style={styles.challengeitems}>
-                                    <View style={styles.startDate}>
-                                        <Text style={styles.itemTime}>Start: </Text>
-                                        <Text style={styles.currentTimeText}>{new Date(item.startDate).toLocaleDateString()}</Text>
-                                    </View>
-                                    <View style={styles.endDate}>
-                                        <Text style={styles.itemTime}>End: </Text>
-                                        <Text style={styles.currentTimeText}>{new Date(item.endDate).toLocaleDateString()}</Text>
-                                    </View>
-                                </View>
-                                <View>
-                                <TouchableOpacity style={styles.creator} onPress={() => handleprofilePicturePress(item.user._id)}>
-                                    <Image source={{ uri: item.user.profilePicture }} style={styles.profilePicture} />
-                                    <Text style={styles.username}>{item.user.username}</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={styles.icon}>
-                                    <Ionicons name="chatbox-outline" size={35} color='#4B0082'/>
-                                    <Text style={styles.voteCount}>{formatVoteCount(item.voteCount)}</Text>
-                                </TouchableOpacity>
-                                { item.isChallengeActive ? (
-                                    <View style={styles.activeChallenge}>
-                                        <Text style={styles.textActive}>Active</Text>
-                                        <Ionicons name="checkmark-circle" size={24} color='white'/>
-                                    </View>
-                                ): (
-                                    <View style={styles.endedChallenge}>
-                                        <Text style={styles.textActive}>ended</Text>
-                                        <MaterialIcons name="cancel" size={24} color="#ff5050ff" />
-                                    </View>
-                                )}
-                                </View>
-                            </View>
-                            <View style={styles.challengeItemQuestion}>
-                            </View>
-                        </View>
-                    </ScrollView>
-                </>
 
-            ):(
-                <>
-                    <ScrollView>
-                        <View style={styles.challengeDetailsContainer}>
-                            <TouchableOpacity onPress={() => handleChallengePress(item._id)} style={styles.checkItOutButton}>
-                                <Text style={styles.checkItOutText}>Check it out</Text>
-                            </TouchableOpacity>
-                            <Image style={styles.backgrounImage} source={{uri: 'https://avatars.mds.yandex.net/i?id=e70cd60a4cf4c5faccd2e56342e46e0ef6dc5bfb-10651780-images-thumbs&n=13'}}/>
-                            <View style={styles.challengeDetails}>
-                                <Text style={styles.adminText}>{item.title}</Text>
-                                <Text style={styles.detailText} ellipsizeMode="tail" numberOfLines={3}>{item.description}</Text>
-                                <View style={styles.challengeitems}>
-                                    <View style={styles.startDate}>
-                                        <Text style={styles.itemTime}>Start: </Text>
-                                        <Text style={styles.currentTimeText}>{new Date(item.startDate).toLocaleDateString()}</Text>
-                                    </View>
-                                    <View style={styles.endDate}>
-                                        <Text style={styles.itemTime}>End: </Text>
-                                        <Text style={styles.currentTimeText}>{new Date(item.endDate).toLocaleDateString()}</Text>
-                                    </View>
-                                </View>
-                                <View>
-                                <TouchableOpacity style={styles.creator} onPress={() => handleprofilePicturePress(item.user._id)}>
-                                    <Image source={{ uri: item.user.profilePicture }} style={styles.profilePicture} />
-                                    <Text style={styles.username}>{item.user.username}</Text>
+    const renderChallenge = ({ item }: { item: Challenge }) => {
+        const status = isChallengeActive(item.startDate, item.endDate);
+        return (
+            <View style={styles.challengeItems}>
+                { user.isOwner ? (
+                    <>
+                        <ScrollView>
+                            <View style={styles.challengeDetailsContainer}>
+                                <TouchableOpacity onPress={() => handleChallengePress(item._id)} style={styles.checkItOutButton}>
+                                    <Text style={styles.checkItOutText}>Check it out</Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.icon}>
-                                    <Ionicons name="chatbox-outline" size={35} color='#4B0082'/>
-                                    <Text style={styles.voteCount}>{formatVoteCount(item.voteCount)}</Text>
-                                </TouchableOpacity>
-                                { item.isChallengeActive ? (
-                                    <View style={styles.activeChallenge}>
-                                        <Text style={styles.textActive}>Active</Text>
-                                        <Ionicons name="checkmark-circle" size={24} color='white'/>
+                                <Image style={styles.backgrounImage} source={{uri: 'https://avatars.mds.yandex.net/i?id=e70cd60a4cf4c5faccd2e56342e46e0ef6dc5bfb-10651780-images-thumbs&n=13'}}/>
+                                <BlurView tint="light" intensity={70} style={styles.challengeDetails}>
+                                    <Text style={styles.adminText}>{item.title}</Text>
+                                    <Text style={styles.detailText} ellipsizeMode="tail" numberOfLines={3}>{item.description}</Text>
+                                    <View style={styles.challengeitems}>
+                                        <View style={styles.startDate}>
+                                            <Text style={styles.itemTime}>Start: </Text>
+                                            <Text style={styles.currentTimeText}>{new Date(item.startDate).toLocaleDateString()}</Text>
+                                        </View>
+                                        <View style={styles.endDate}>
+                                            <Text style={styles.itemTime}>End: </Text>
+                                            <Text style={styles.currentTimeText}>{new Date(item.endDate).toLocaleDateString()}</Text>
+                                        </View>
                                     </View>
-                                ): (
-                                    <View style={styles.endedChallenge}>
-                                        <Text style={styles.textActive}>ended</Text>
-                                        <MaterialIcons name="cancel" size={24} color="#ff5050ff" />
+                                    <View>
+                                    <TouchableOpacity style={styles.creator} onPress={() => handleprofilePicturePress(item.user._id)}>
+                                        <Image source={{ uri: item.user.profilePicture }} style={styles.profilePicture} />
+                                        <Text style={styles.username}>{item.user.username}</Text>
+                                    </TouchableOpacity>
+                                   
+                                    {status === "active" && (
+                                            <View style={styles.activeChallenge}>
+                                                <Text style={styles.textActive}>Active</Text>
+                                                <Ionicons name="checkmark-circle" size={24} color='white'/>
+                                            </View>
+                                        )}
+                                        {status === "upcoming" && (
+                                            <View style={styles.upcomingChallenge}>
+                                                <Text style={styles.textActive}>Upcoming</Text>
+                                                <MaterialIcons name="schedule" size={24} color="white" />
+                                            </View>
+                                        )}
+                                        {status === "ended" && (
+                                            <View style={styles.endedChallenge}>
+                                                <Text style={styles.textActive}>Ended</Text>
+                                                <Ionicons name="close-circle-sharp" size={24} color="white" />
+                                            </View>
+                                        )}
                                     </View>
-                                )}
+                                </BlurView>
+                                <View style={styles.challengeItemQuestion}>
                                 </View>
                             </View>
-                            <View style={styles.challengeItemQuestion}>
-                            </View>
-                        </View>
-                    </ScrollView>
-                </>
+                        </ScrollView>
+                    </>
 
-            )}
-        </View>
-    );
+                ):(
+                    <>
+                        <ScrollView>
+                            <View style={styles.challengeDetailsContainer}>
+                                <TouchableOpacity onPress={() => handleChallengePress(item._id)} style={styles.checkItOutButton}>
+                                    <Text style={styles.checkItOutText}>Check it out</Text>
+                                </TouchableOpacity>
+                                <Image style={styles.backgrounImage} source={{uri: 'https://avatars.mds.yandex.net/i?id=e70cd60a4cf4c5faccd2e56342e46e0ef6dc5bfb-10651780-images-thumbs&n=13'}}/>
+                                <BlurView tint="light" intensity={70} style={styles.challengeDetails}>
+                                    <Text style={styles.adminText}>{item.title}</Text>
+                                    <Text style={styles.detailText} ellipsizeMode="tail" numberOfLines={3}>{item.description}</Text>
+                                    <View style={styles.challengeitems}>
+                                        <View style={styles.startDate}>
+                                            <Text style={styles.itemTime}>Start: </Text>
+                                            <Text style={styles.currentTimeText}>{new Date(item.startDate).toLocaleDateString()}</Text>
+                                        </View>
+                                        <View style={styles.endDate}>
+                                            <Text style={styles.itemTime}>End: </Text>
+                                            <Text style={styles.currentTimeText}>{new Date(item.endDate).toLocaleDateString()}</Text>
+                                        </View>
+                                    </View>
+                                    <View>
+                                    <TouchableOpacity style={styles.creator} onPress={() => handleprofilePicturePress(item.user._id)}>
+                                        <Image source={{ uri: item.user.profilePicture }} style={styles.profilePicture} />
+                                        <Text style={styles.username}>{item.user.username}</Text>
+                                    </TouchableOpacity>
+                                    {status === "active" && (
+                                            <View style={styles.activeChallenge}>
+                                                <Text style={styles.textActive}>Active</Text>
+                                                <Ionicons name="checkmark-circle" size={24} color='white'/>
+                                            </View>
+                                        )}
+                                        {status === "upcoming" && (
+                                            <View style={styles.upcomingChallenge}>
+                                                <Text style={styles.textActive}>Upcoming</Text>
+                                                <MaterialIcons name="schedule" size={24} color="white" />
+                                            </View>
+                                        )}
+                                        {status === "ended" && (
+                                            <View style={styles.endedChallenge}>
+                                                <Text style={styles.textActive}>Ended</Text>
+                                                <Ionicons name="close-circle-sharp" size={24} color="white" />
+                                            </View>
+                                        )}
+                                    </View>
+                                </BlurView>
+                                <View style={styles.challengeItemQuestion}>
+                                </View>
+                            </View>
+                        </ScrollView>
+                    </>
+
+                )}
+            </View>
+        );
+    };
     return(
         <View style={styles.container}>
             {isLoading ? (
@@ -295,15 +312,24 @@ export default function Challenge(){
                                 <Image source={{ uri: user.profilePicture }} style={styles.profilePicture} />
                                 <Text style={styles.username}>{user.username}</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => onTimePickerOpen()} style={styles.create}>
-                                <Ionicons name="add-circle-outline" size={40} color="#4B0082" />
-                            </TouchableOpacity>
+                            <BlurView tint='light' intensity={50} style={styles.create}>
+                                <TouchableOpacity onPress={() => onTimePickerOpen()}>
+                                    <Ionicons name="add-circle-outline" size={40} color="#4B0082" />
+                                </TouchableOpacity>
+                                
+                            </BlurView>
                     </View>
                     <FlatList
                         data={challenges}
                         renderItem={renderChallenge}
                         keyExtractor={(item: Challenge) => item._id}
                         showsVerticalScrollIndicator={false}
+                        refreshControl={
+                            <RefreshControl 
+                                refreshing={refresh} 
+                                onRefresh={() => fetchChallenge(1, true)} 
+                            />
+                        }
                     />
                 </>
             ):(
@@ -323,6 +349,12 @@ export default function Challenge(){
                         renderItem={renderChallenge}
                         keyExtractor={(item: Challenge) => item._id}
                         showsVerticalScrollIndicator={false}
+                        refreshControl={
+                            <RefreshControl 
+                                refreshing={refresh} 
+                                onRefresh={() => fetchChallenge(1, true)} 
+                            />
+                        }
                     />
                 </>
             )}

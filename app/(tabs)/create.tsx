@@ -19,6 +19,8 @@ import { API_URL } from "../../store/postStore";
 
 export default function Index() {
   const [caption, setcaption] = useState("");
+  const [tags, setTags] = useState("");
+  const [mentions, setMentions] = useState("");
   const [image, setImage] = useState<any>(null);
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [isLoading, setLoading] = useState<boolean>(false);
@@ -83,7 +85,7 @@ export default function Index() {
         },
         body: JSON.stringify({
           caption: caption.trim(),
-          image: imageDataUrl,
+          image: imageDataUrl
         })
       })
 

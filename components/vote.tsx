@@ -16,7 +16,7 @@ export default function UpdateUserProfile({isVisible, children, onClose}:Props) 
                         <View style={style.titleContainer}>
                              <Pressable onPress={onClose} style={style.press}>
                                 <Ionicons style={{top: 0}} name="arrow-back" size={30} color={'#4B0082'}/>
-                                <Text style={{ left:15, fontSize: 20, fontWeight: 'bold'}}>Votes</Text>
+                                <Text style={style.titleText}>Votes</Text>
                             </Pressable>
                         </View>
                     </View>
@@ -27,21 +27,21 @@ export default function UpdateUserProfile({isVisible, children, onClose}:Props) 
             </View>
         </KeyboardAvoidingView>
     )
-}
-
-
+};
 
 const style = StyleSheet.create({
     modalContainer: {
         flex: 1,
+        top: 15,
         height: '100%',
         width: '100%',
         position: "absolute",
-        backgroundColor: '#f9f9f9'
+        backgroundColor: '#fff'
     },
     titleContainer: {
         height: '5%',
         paddingLeft: 10,
+        top: 10,
         flexDirection: 'row',
         paddingHorizontal: 20,
         alignItems: 'center',
@@ -55,8 +55,13 @@ const style = StyleSheet.create({
     },
     childrenContainer: {
         flex: 1,
-        top: 90,
+        top: 0,
         alignItems: 'center',
         gap: 40
-    }
+    },
+    titleText: { 
+        left: 15,
+        fontSize: 20, 
+        fontWeight: 'bold'
+    },
 })

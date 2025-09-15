@@ -7,7 +7,7 @@ import { formatTimeAgo } from '@/store/util';
 import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Audio } from 'expo-av';
-import * as FileSystem from 'expo-file-system';
+
 import { Image } from 'expo-image';
 import * as MediaLabriary from 'expo-media-library';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -89,7 +89,7 @@ export default function PostDetail() {
     // clodinary variables
     const CLOUDINARY_NAME = 'dimg4aui1'
     const UPLOAD_PRESET = 'multiplecomment';
-    const REWARD_AD_UNIT_ID = 'ca-app-pub-8384657725659992/9550281176'
+ 
 
     const getPost = async () => {
         try {
@@ -273,26 +273,22 @@ export default function PostDetail() {
     const uploadedAudioToCloudinary = async (uri: string) => {
         setUploading(true);
         try {
-            const base64Audio = await FileSystem.readAsStringAsync(uri, {
-                encoding: FileSystem.EncodingType.Base64,
-            });
-    
             const formData = new FormData();
-            formData.append('file', `data:audio/m4a;base64,${base64Audio}`);
+            formData.append('file', {
+                uri: uri,
+                type: 'audio/m4a',
+                name: 'audio.m4a'
+            } as any);
             formData.append('upload_preset', UPLOAD_PRESET);
-            console.log('Uploading audio to Cloudinary...', formData);
-    
+            
             try {
                 const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_NAME}/auto/upload`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
                     body: formData,
                 })
     
                 const data = await response.json();
-                    
+                console.log('Cloudinary response:', data);
                 if (!response.ok) {
                     throw new Error(data.message || "Failed to upload audio to cloudinary")
                 }
@@ -318,7 +314,6 @@ export default function PostDetail() {
             
              setSubmitComment(true);
              let audioUrl = null;
-             let watchedAd = false;
     
             if (audioUri) {
                 console.log('Uploading audio to Cloudinary...');
@@ -344,7 +339,6 @@ export default function PostDetail() {
                 body: JSON.stringify({
                     text: text.trim(),
                     audio: audioUrl,
-                    // watchedAd: watchedAd
                 })
             })
     
