@@ -17,6 +17,7 @@ import {
     Alert,
     FlatList,
     KeyboardAvoidingView,
+    Platform,
     RefreshControl,
     ScrollView,
     Text,
@@ -286,9 +287,7 @@ export default function PostDetail() {
                     method: 'POST',
                     body: formData,
                 })
-    
                 const data = await response.json();
-                console.log('Cloudinary response:', data);
                 if (!response.ok) {
                     throw new Error(data.message || "Failed to upload audio to cloudinary")
                 }
@@ -316,8 +315,6 @@ export default function PostDetail() {
              let audioUrl = null;
     
             if (audioUri) {
-                console.log('Uploading audio to Cloudinary...');
-                 
                 audioUrl = await uploadedAudioToCloudinary(audioUri)
     
                 if (!audioUrl) {
@@ -347,7 +344,6 @@ export default function PostDetail() {
                 Alert.alert(data.message)
                 throw new Error(data.message); 
             };
-            
         } catch (error) {
             console.error('Error submitting comment', error);
             Alert.alert('Error', 'Failed to submit comment');
@@ -458,9 +454,9 @@ export default function PostDetail() {
     )
 
     return(
-        <KeyboardAvoidingView behavior='padding' style={{ flex: 1, backgroundColor: '#ffffff' }} keyboardVerticalOffset={50}>
+        <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'padding' : 'height'} style={{ flex: 1,  backgroundColor: "#fff" }} keyboardVerticalOffset={50}>
         <View>
-            <ScrollView contentContainerStyle={{ padding: 5 }}>
+            <ScrollView contentContainerStyle={{ padding: 5 }} keyboardShouldPersistTaps='handled'>
                 {loading ? (
                     <ActivityIndicator size={'large'} color={'#4B0082'} style={{ top: 300 }} />
                 ) : post ? (
@@ -495,13 +491,6 @@ export default function PostDetail() {
                                     contentFit="cover"
                                 />
                             </TouchableOpacity>
-                            
-                            
-                            <View style={styles.userPost}> 
-                                <TouchableOpacity onPress={() => setModelIsvisible(true)}>
-                                    <Text style={styles.caption} ellipsizeMode='tail' numberOfLines={2}>{post.caption}</Text>
-                                </TouchableOpacity>                            
-                            </View>
                         </View>
                         <View style={styles.recordedAudioContainer}>
                             { audioUri && (
@@ -572,18 +561,11 @@ export default function PostDetail() {
                             onRefresh={() => fetchComments(1, true)}
                         />
                     }
-                />
-            <Caption isVisible={isModelVisible} onClose={onCloseReadMore}>
-                <View style={styles.diplayIsModelVisible}>
-                    <Text style={styles.readmore}>{post?.caption}</Text>
-                    <View style={{margin:20}}>
-                    </View>
-                </View>
-            </Caption>   
+                />  
             <ViewImage isVisible={isImageVissable} onClose={onCloseImageView}>
                 <View style={styles.displayOption}>
                     <Text style={styles.displayUsername}>{post?.user.username}</Text>
-                    <Feather style={{bottom: 21}} onPress={saveImage} name="download" size={25} color="#ffffff" />
+                    <Feather style={{bottom: 5}} onPress={saveImage} name="download" size={25} color="#ffffff" />
                 </View>
                 <View ref={imageRef} collapsable={false}>
                     <Image

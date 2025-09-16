@@ -2,11 +2,9 @@ import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: '#ffffff',
-    },
-    spaceBetween: {
-        top: 10
+        backgroundColor: '#fff',
+        height: 'auto',
+        gap: 15
     },
     text: {
         color: '#4B0082',
@@ -21,12 +19,9 @@ const styles = StyleSheet.create({
     userInfo: {
         flexDirection: 'row',
         alignItems: 'center',
-        top: 10,
-        height: 'auto',
-        flex: 1,
+        height: 'auto'
     },
     userPost:{
-        top: 25,
         width: 'auto',
         minHeight: 60,
         maxHeight: 'auto'
@@ -66,6 +61,8 @@ const styles = StyleSheet.create({
     recordedAudioContainer: {
         width: '100%',
         height: 40,
+        top: 10,
+        backgroundColor: '#fff',
         flexDirection: 'row'
     },
     audioWaveformContainer: {
@@ -75,7 +72,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 10
     },
     audioWaveform: {
         width: '100%',
@@ -88,8 +84,7 @@ const styles = StyleSheet.create({
     },
     commentSection: {
         flexDirection: 'row',
-        justifyContent: 'center',
-        top: 5
+        justifyContent: 'center'
     },
     textInputContainer: {
         width: '70%',
@@ -124,9 +119,9 @@ const styles = StyleSheet.create({
       right: 7
     },
     commentContainer: {
-        top:5,
         flex:1,
         left: 12,
+        backgroundColor: '#fff'
     },
     itemContainer: {
         borderRadius: 5,
@@ -178,7 +173,7 @@ const styles = StyleSheet.create({
         color: '#ffffff',
         fontSize: 16,
         left: 50,
-        bottom: 20
+        bottom: 5
     },
     
 });

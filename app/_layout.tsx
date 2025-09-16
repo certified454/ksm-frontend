@@ -40,6 +40,7 @@ export default function RootLayout() {
               <Stack.Screen name="(menu)" />
               <Stack.Screen name="(videos)" />
               <Stack.Screen name="(challenge)" />
+              <Stack.Screen name="(tag)" />
             </Stack>
         </NotificationProvider>
       </SafeScreen>

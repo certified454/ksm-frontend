@@ -14,7 +14,7 @@ export default function ViewImage({isVisible, children, onClose}:Props) {
                 <View style={style.modalContainer}>
                     <View style={style.titleContainer}>
                         <Pressable onPress={onClose}>
-                            <Ionicons style={{top: 12}} name="arrow-back" size={30} color={'#ffffff'}/>
+                            <Ionicons  name="arrow-back" size={30} color={'#ffffff'}/>
                         </Pressable>
                     </View>
                     {children}
@@ -37,6 +37,7 @@ const style = StyleSheet.create({
         paddingLeft: 10,
         flexDirection: 'row',
         paddingHorizontal: 20,
+        top: 30,
         alignItems: 'center',
         justifyContent: "space-between"
     }

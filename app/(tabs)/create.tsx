@@ -95,9 +95,7 @@ export default function Index() {
       setcaption("");
       setImage(null);
       setImageBase64(null);
-  
       router.push("/");
-      
     } catch(error){
       console.error(error, "Error while uploading")
       const errorMessage = (error instanceof Error && error.message) ? error.message : "Something went Wrong";

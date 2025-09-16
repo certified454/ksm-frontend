@@ -9,7 +9,7 @@ import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { debounce } from "lodash";
 import React, { use, useCallback, useEffect, useState } from "react";
-import { FlatList, RefreshControl, ScrollView, Share, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { FlatList, RefreshControl, ScrollView, Share, Text, TextInput, Touchable, TouchableOpacity, View } from "react-native";
 
 import io from "socket.io-client";
 
@@ -27,11 +27,8 @@ type Post = {
   likesCount: number;
   commentsCount: number;
 };
-function parseCaption(
-  caption: string,
-  tags: {name: string}[],
-  mentions: {_id: string; username: string}[]
-) {
+
+function parseCaption(caption: string, tags: {name: string}[], mentions: {_id: string; username: string}[] = []) {
   const tagSet = new Set(tags.map(t => `#${t.name}`));
   const mentionSet = new Set(mentions.map(m => `@${m.username}`));
   const words = caption.match(/(@\w+|#\w+|\S+|\s+)/g) || [];
@@ -43,7 +40,6 @@ function parseCaption(
     }
     if (mentionSet.has(word)) {
       const mention = mentions.find(m => `@${m.username}` === word);
-      console.log("mention", mention, mention?.username);
       return { type: 'mention', text: mention?.username, id: mention?._id, key:`mention-${mention?.username}-${idx}` };
     }
     return { type: 'text', text: word, key: `text-${word}-${idx}` };
@@ -65,6 +61,7 @@ export default function Index() {
   const [searchLoading, setSearchLoading] = useState(false);
 
   const [fixtures, setFixtures] = useState<any[]>([]);
+  const [expandCaptionId, setExpandCaptionId]= useState<string | null>(null);
 
   const router = useRouter();
 
@@ -102,19 +99,18 @@ export default function Index() {
       const response = await fetch(`${API_URL}/post?page=${pageNum}&limit=10`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      //extract tags and mentions from caption
       const data = await response.json();
       if (!response.ok)
         throw new Error(data.message || "Failed to fetch posts");
 
-      const uniquePosts = refresh || pageNum === 1
+      const uniquePosts = (refresh || pageNum === 1
         ? data.posts
         : Array.from(new Set([...posts, ...data.posts].map((post) => post._id))).map((id) =>
-          [...posts, ...data.posts].find((post) => post._id === id)
+            ({ ...( [...posts, ...data.posts].find((post) => post._id === id) ) })
+          )
       );
 
       setPosts(uniquePosts)
-
       setHasMore(pageNum < data.totalPages);
       setPage(pageNum);
       setLoading(false);
@@ -195,7 +191,7 @@ export default function Index() {
 
   const handleLoadMorePost = async () => {
     if (hasMore && !loading && !refresh)
-      await fetchPosts(page + 1)
+      await fetchPosts(page + 1);
   };
   const handlePostPress = async (id: string) => {
     router.push({ pathname: "/(postdetail)", params: { postId: id } });
@@ -211,95 +207,90 @@ export default function Index() {
   }
   const handleTagPress = (tagName: string) => {
   router.push({ pathname: "/(tag)", params: { tag: tagName } });
-};
+  };
 
-const handleMentionPress = (userId: string) => {
-  router.push({ pathname: "/(profile)", params: { userId } });
-};
-  const renderPost = ({ item }: {item:any}) => (
-    
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() =>handleprofilePicturePress(item.user?._id)}>
-          <Image
-          source={{ uri: item.user?.profilePicture ? item.user.profilePicture : "https://api.dicebear.com/9.x/miniavs/svg?seed=George&backgroundType=gradientLinear&backgroundColor=b6e3f4,c0aede,ffdfbf" }}
-          style={styles.profileImage}/>
+  const handleMentionPress = (userId: string) => {
+    router.push({ pathname: "/(profile)", params: { userId } });
+  };
+  const handleEditPost = (postId: string) => {
+    router.push({ pathname: "/", params: { postId } });
+  }
+  const renderPost = ({ item }: {item:any}) => (    
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() =>handleprofilePicturePress(item.user?._id)}>
+            <Image
+            source={{ uri: item.user?.profilePicture ? item.user.profilePicture : "https://api.dicebear.com/9.x/miniavs/svg?seed=George&backgroundType=gradientLinear&backgroundColor=b6e3f4,c0aede,ffdfbf" }}
+            style={styles.profileImage}/>
 
-        </TouchableOpacity>
-         <View style={styles.userInfoText}>
-            <Text style={styles.username}>{item.user?.username}</Text>
-            <Text style={styles.createdAt}>{formatTimeAgo(item.createdAt)}</Text>
-          </View>
-      </View>
-
-      <Image
-        source={{ uri: item.image }}
-        style={styles.postImage}
-        contentFit="cover"/>
-     
-        <View  style={{width: 340, height: "auto",top: 0, padding: 10, right: 12, backgroundColor: "#ffffff"}}>
+          </TouchableOpacity>
           
-        </View>
-
-        <View style={{backgroundColor: "#ffffff", width: 340, right: 12}}>
-
-          <View style={{ flex: 1, marginRight: 10, width: 300, left: 20 }}>
-            <Text style={styles.caption}>
-              {parseCaption(item.caption, item.tags, item.mentions).map((part) => {
-                if (part.type === 'tag') {
-                  return (
-                    <Text
-                      key={part.key}
-                      style={{ color: "#4B0082", fontWeight: "bold" }}
-                      onPress={() => handleTagPress(part.text)}
-                    >
-                      #{part.text}
-                    </Text>
-                  );
-                }
-                if (part.type === 'mention') {
-                  return (
-                    <Text
-                      key={part.key}
-                      style={{ color: "#00824B", fontWeight: "bold" }}
-                      onPress={() => handleMentionPress(part.id)}
-                    >
-                      @{part.text}
-                    </Text>
-                  );
-                }
-                return <Text key={part.key}>{part.text}</Text>;
-              })}
-            </Text>
+          <View style={styles.userInfoText}>
+              <Text style={styles.username}>{item.user?.username}</Text>
+              <Text style={styles.createdAt}>{formatTimeAgo(item.createdAt)}</Text>
           </View>
+          <View>
+            <Ionicons name="ellipsis-vertical" size={24} color="#000"  onLongPress={() => handleEditPost(item._id)}/>
+          </View>
+          <TouchableOpacity onPress={() => {handleEditPost(item._id)}}>
+            <Ionicons name="ellipsis-vertical" size={24} color="#000" />
+          </TouchableOpacity>
         </View>
-      
-        <View style={styles.commentSection}>         
-           
-            <TouchableOpacity style={styles.commentIcons} onPress={() => handlePostPress(item._id)}>
-              <View style={styles. likesSection}> 
-                <View style={styles.likesCounts}>
-                  <Ionicons  name="heart-outline" size={25} color="#4B0082"/>
-                  <Text style={{fontSize:20}}> {formatComments(item.likesCount)}</Text>
-                </View>    
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.commentIcons}onPress={() => handlePostPress(item._id)}>
-              <View style={[styles. likesSection, {right:40}]}> 
-                <View style={styles.likesCounts}>
-                  <Ionicons name="chatbox-outline" size={24} color="#4B0082"/>
-                  <Text style={{fontSize:20}}> {formatComments(item.commentsCount)}</Text>
-                </View>    
-              </View>
-            </TouchableOpacity>
-           
-            <TouchableOpacity style={styles.likesCounts}onPress={() => handleSharePost(item)}>
-                <Ionicons name="share-social" size={34} color="#4B0082" style={styles.share}/>
-            </TouchableOpacity>
-           
-        </View>
-      <View style={{width: 340, height: 7,top: 0, right: 12, backgroundColor: "#eeeeeeff"}}></View>
-    </View>
+
+        <Image
+          source={{ uri: item.image }}
+          style={styles.postImage}
+          contentFit="cover"/>
+
+          <TouchableOpacity onPress={() => setExpandCaptionId(expandCaptionId === item._id ? null: item._id )} activeOpacity={0.8} style={styles.tagContainer}>
+            <View style={styles.captionContainer}>
+              <Text style={styles.caption} numberOfLines={expandCaptionId === item._id ? undefined : 3} ellipsizeMode={expandCaptionId === item._id ? undefined : "tail"}>
+                {parseCaption(item.caption, item.tags, item.mentions).map((part) => {
+                  if (part.type === 'tag' && part.text) {
+                    return (
+                      <Text key={part.key} style={styles.tag} onPress={() => handleTagPress(part.text!)}>
+                        #{part.text}
+                      </Text>
+                    );
+                  }
+                  if (part.type === 'mention') {
+                    return (
+                      <Text key={part.key} style={styles.mention} onPress={() => handleMentionPress(part.id!)}>
+                        @{part.text}
+                      </Text>
+                    );
+                  }
+                  return <Text key={part.key}>{part.text}</Text>;
+                })}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        
+          <View style={styles.commentSection}>         
+              <TouchableOpacity style={styles.commentIcons} onPress={() => handlePostPress(item._id)}>
+                <View style={styles. likesSection}> 
+                  <View style={styles.likesCounts}>
+                    <Ionicons  name="heart-outline" size={25} color="#4B0082"/>
+                    <Text style={{fontSize:20}}> {formatComments(item.likesCount)}</Text>
+                  </View>    
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.commentIcons}onPress={() => handlePostPress(item._id)}>
+                <View style={[styles. likesSection, {right:40}]}> 
+                  <View style={styles.likesCounts}>
+                    <Ionicons name="chatbox-outline" size={24} color="#4B0082"/>
+                    <Text style={{fontSize:20}}> {formatComments(item.commentsCount)}</Text>
+                  </View>    
+                </View>
+              </TouchableOpacity>
+            
+              <TouchableOpacity style={styles.likesCounts}onPress={() => handleSharePost(item)}>
+                  <Ionicons name="share-social" size={34} color="#4B0082" style={styles.share}/>
+              </TouchableOpacity>
+            
+          </View>
+        <View style={styles.seprationLine}></View>
+      </View>
   );
   const renderSearch = ({ item }: {item:any}) => (
      <TouchableOpacity onPress={() => handleprofilePicturePress(item._id)} style={styles.userContainer}>

@@ -138,10 +138,38 @@ const styles = StyleSheet.create({
     backgroundColor: "#cccccc",
     top: 220,
   },
+  tagContainer: {
+    width: 340, 
+    height: "auto",
+    top: 0, 
+    padding: 10, 
+    backgroundColor: "#ffffff"
+  },
+  captionContainer: { 
+    flex: 1, 
+    marginRight: 10, 
+    width: 300,
+  },
+  tag: { 
+    color: "#4B0082", 
+    fontWeight: "bold" 
+  },
+  mention: {
+    color: "#4B0082", 
+    fontWeight: "bold"
+  },
+  seprationLine: {
+    width: 340, 
+    height: 7,
+    bottom: 15, 
+    right: 12, 
+    backgroundColor: "#eeeeeeff"
+  },
   commentSection: {
     width: 340,
     height: 60,
     right:12,
+    bottom: 10,
     objectFit: 'contain',
     backgroundColor: "#ffffff",
     flexDirection: "row",
