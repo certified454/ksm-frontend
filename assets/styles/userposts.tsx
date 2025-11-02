@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
     userProfileContainer: {
         width: '100%',
         height: 200,
-        alignItems: 'center',
+        alignItems: 'center'
     },
     userProfile: {
         width: '100%',
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
         color: '#ffffff',
         fontSize: 16,
         left: 50,
-        bottom: 20
+        bottom: 5
     },
     postImage: {
         width: 360,
@@ -308,6 +308,7 @@ const styles = StyleSheet.create({
     userTextPlaceHolder: {
         fontSize: 17,
         color: '#000000a6',
-    }
+    },
+    
 })
 export default styles;

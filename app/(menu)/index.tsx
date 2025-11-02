@@ -3,8 +3,10 @@ import { useAuthStore } from "@/store/authStore";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
+import * as Linking from 'expo-linking';
 import { router } from "expo-router";
 import { Alert, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Menu() {
     const { logout, user } = useAuthStore();
@@ -30,12 +32,12 @@ export default function Menu() {
         router.push({ pathname: '/(challenge)' })
     }
     return (
-      
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
             <View style={styles.container}>
                 <View style={styles.innerContainer}>
                     <View style={styles.userContainer}>
                         <Ionicons name={"arrow-back"} color={'#4B0082'} size={35} onPress={() => router.back()} style={{left:3}}/>
-                        <Text style={styles.menuTitle}>Menu</Text>
+                        <Text style={styles.menuTitle}>Menu{}</Text>
                         <View style={styles.userprofile}>
                             <View style={styles.userInfo}>
                                 <TouchableOpacity onPress={() => handleprofilePicturePress(user?.id)}>
@@ -49,9 +51,12 @@ export default function Menu() {
                     <View style={ styles.item}>
                         <TouchableOpacity onPress={() => handleFollowersPress(user?.id)} style={styles.onpress}>
                             <View style={styles.itemContainer}>
-                                <View>
+                                <View style={styles.itemslists}>
                                     <Ionicons style={styles.itemslist} name={'person-add'} color={'#4B0082'} size={24}/>
-                                    <Text style={[styles.text, { left: 50}]}>Followers</Text>
+                                    
+                                </View>
+                                <View style={styles.itemslists}>
+                                    <Text style={styles.text}>Followers{}</Text>
                                 </View>
                             </View>
                         </TouchableOpacity>
@@ -107,11 +112,11 @@ export default function Menu() {
                     </View>
 
                     <View style={ [styles.item, { bottom: 10 }]}>
-                        <TouchableOpacity style={styles.onpress}>
+                        <TouchableOpacity style={styles.onpress} onPress={() => Linking.openURL('https://www.youtube.com/@kismetKSM')}>
                             <View style={styles.itemContainer}>
                                 <View >
-                                    <MaterialIcons style={styles.itemslist}name="help" size={29} color={'#4B0082'} />
-                                    <Text style={[styles.text, { left: 67 }]}>help</Text>
+                                    <MaterialIcons style={styles.itemslist}name="slideshow" size={29} color={'#4B0082'} />
+                                    <Text style={[styles.text, { left: 50 }]}>Highlights</Text>
                                 </View>
                             </View>
                         </TouchableOpacity>
@@ -119,8 +124,8 @@ export default function Menu() {
                         <TouchableOpacity style={styles.onpress}>
                             <View style={styles.itemContainer}>
                                 <View>
-                                    <Ionicons style={styles.itemslist} name={'settings'} color={'#4B0082'} size={24}/>
-                                    <Text style={[styles.text, { left: 52 }]}>Settings</Text>
+                                    <MaterialIcons style={styles.itemslist}name="help" size={29} color={'#4B0082'} />
+                                    <Text style={[styles.text, { left: 67 }]}>Help</Text>
                                 </View>
                             </View>
                         </TouchableOpacity>
@@ -135,5 +140,6 @@ export default function Menu() {
                     </View>
                 </View>
             </View>
+        </SafeAreaView>
     );
 }

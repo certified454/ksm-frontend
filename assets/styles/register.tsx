@@ -1,10 +1,16 @@
-import { StyleSheet } from "react-native";
+import { Dimensions, StyleSheet } from "react-native";
+const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1, 
+    backgroundColor: "#fff"
+  },
   container: {
     flex: 1,
     backgroundColor: "#fff",
-
+    gap: 10,
+    alignItems: 'center',
   },
   card:{   
     width: "auto",
@@ -14,21 +20,15 @@ const styles = StyleSheet.create({
     top: 10
   },
   cardItem:{   
-    width: "auto",
-    height: 'auto',
     borderRadius: 10,
     alignItems: 'center',
-    top: 10,
-    marginTop: 80
+    marginTop: screenHeight * 0.08,
   },
-  cardItems:{   
-    width: "auto",
-    height: 'auto',
-    borderRadius: 10,
+  cardItems: {  
+    width: screenWidth - 40, 
+    flexDirection: "row",
     alignItems: 'center',
-    top: 10,
-    flexDirection: "row", 
-    marginTop: 50,
+    justifyContent: 'center',
     gap: 10
   },
   textInputView: { 
@@ -58,14 +58,14 @@ const styles = StyleSheet.create({
   textinput: {
     color: '#000',
     alignSelf: 'flex-start',
-    fontSize: 16,
-    marginLeft: 29,
+    fontSize: screenWidth / 40 * 1.8,
+    marginLeft: screenWidth / 40 * 1,
   },
   textinputItem: {
     color: '#000',
     alignSelf: 'flex-start',
-    fontSize: 16,
-    marginLeft: 29,
+    fontSize: screenWidth / 40 * 1.8,
+    marginLeft: screenWidth / 40 * 1,
     marginTop: 20,
   },
   profilePicture: {
@@ -75,8 +75,8 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   profilePicturePlaceholder:{
-    width: 100,
-    height: 100,
+    width: screenWidth / 3 * 1.5,
+    height: screenHeight / 11 * 1.5,
     borderRadius: 50,
     justifyContent: 'center',
     alignItems: 'center',
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
   },
   placeholderText: {
     color: '#4B0082',
-    fontSize: 14,
+    fontSize: screenWidth / 40 * 1.8,
     textAlign: 'center',
   },
   text: {
@@ -95,26 +95,39 @@ const styles = StyleSheet.create({
   },
   createText: {
     color: '#4B0082',
-    fontSize: 25,
+    fontSize: screenWidth / 40 * 2.5,
     fontWeight: 'bold',
     fontFamily: 'serif',
-    marginTop: 20 
+    marginTop: 10, 
+  },
+  inputForm: {
+    marginTop: 15,
+    borderBottomWidth: 1,
+    width: screenWidth - 150,
+    fontSize: screenWidth / 40 * 1.8
+  },
+  pen: {
+    bottom: screenHeight * 0.03,
+    right: screenWidth * 0.15,
+    alignSelf: 'flex-end',
   },
   fonttext:{
     color: '#fff',
-    fontSize: 21,
+    fontSize: screenWidth / 40 * 1.9,
+    fontWeight: "bold",
+    textAlign: 'center',
   },
-  login:{
-    fontSize: 18,
-    color: "#4B0082",
-    fontWeight: "bold",                   
+  login: {
+    fontSize: screenWidth / 40 * 1.8,
+    fontWeight: "bold",
+    color: '#4B0082'
   },
   fontText:{
-    fontSize: 18, 
+    fontSize: screenWidth / 40 * 1.8, 
     color: "#000" 
   },
   sepration: { 
-    fontSize: 18, 
+    fontSize: screenWidth / 40 * 1.8, 
     color: "#000"
   },
   image: {
@@ -125,31 +138,23 @@ const styles = StyleSheet.create({
   inputform: {
     margin: 7,
     height: 45,
-    width: '85%',
+    width: screenWidth / 40 * 35,
+    color: '#000',
     borderColor: '#4B0082',
     borderWidth: 1,
-    backgroundColor: '#fff',
+    backgroundColor: 'transparent',
     borderRadius: 5,
     padding: 10,
-  },
-  inputForm: {
-    margin: 7,
-    height: 45,
-    width: '50%',
-    borderBottomWidth: 2,
-    paddingLeft: 10,
-    marginTop: 20, 
-    borderColor: '#4B0082',
   },
   button:{
     backgroundColor: '#4B0082',
     color: '#fff',
-    width: '85%',
-    height: 'auto',
-    textAlign: 'center',
-    padding: 10,
+    width: screenWidth / 40 * 35,
+    height: screenHeight / 18,
+    alignItems: 'center',
+    justifyContent: 'center',
     borderRadius: 5,
-    marginTop: 70,
+    marginTop: 50,
   },
   buttontext: {
     color: '#fff',

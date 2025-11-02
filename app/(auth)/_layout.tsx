@@ -12,10 +12,12 @@ export default function AuthLayout() {
   return (
     <SafeAreaProvider>
       <SafeScreen>
-        <Stack >
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="register" options={{ headerShown: false }} />
-          <Stack.Screen name="verify" options={{ headerShown: false }} />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="index"/>
+          <Stack.Screen name="register"/>
+          <Stack.Screen name="verify" />
+          <Stack.Screen name="forgotten-password"/>
+          <Stack.Screen name="reset-password/[token]"/>
         </Stack>
       </SafeScreen>
       <StatusBar style="dark" />

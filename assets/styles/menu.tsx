@@ -1,4 +1,6 @@
-import { StyleSheet } from "react-native";
+import { Dimensions, StyleSheet } from "react-native";
+const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
+
 
 export const styles = StyleSheet.create({
     container: {
@@ -54,14 +56,13 @@ export const styles = StyleSheet.create({
         elevation: 5,
     },
     itemContainer: {
-        height: 80,
+        height: screenHeight / 10,
         width: "45%",
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between'
+        alignSelf: 'center',
+        justifyContent: 'center',
     },
     menuTitle: {
-        fontSize: 24,
+        fontSize: screenWidth / 40 * 2.3,
         fontWeight: 'bold',
         color: 'black',
         right: 30
@@ -82,7 +83,7 @@ export const styles = StyleSheet.create({
         height: 60,
         borderRadius: 60,
         position: 'absolute',
-        top:-32,
+        marginTop:-32,
         left: -30
     },
     username: {
@@ -94,13 +95,12 @@ export const styles = StyleSheet.create({
         left: 67,
         bottom: 3
     },
-    textitem: {
-        fontSize: 17,
-        left: 40,
-        color: '#4B0082'
-    },
     text: {
-        fontSize: 18
+        fontSize: screenWidth / 40 * 1.6,
+        width: '100%',
+        textAlign: 'center',
+        fontWeight: '500',
+        color: '#000',
     },
     logout: {
         height: 50,

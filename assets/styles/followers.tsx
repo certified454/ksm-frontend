@@ -1,4 +1,5 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
+const { width: screenWidth } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
     flatList: {
@@ -17,19 +18,17 @@ const styles = StyleSheet.create({
     text: {
         fontWeight: 'bold',
         fontSize: 20,
-
     },
     container: {
         width: '100%',
-        height: 'auto',
-        top: 10,
+        minHeight: 60,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center'
     },
     containerClick: {
         width: '100%',
-        height: 70,
+        minHeight: 60,
         gap: 10,
         margin: 2,
         paddingLeft: 10,
@@ -39,8 +38,8 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1
     },
     image: {
-        width: 60,
-        height: 60,
+        width: screenWidth * 0.15,
+        height: screenWidth * 0.15,
         borderRadius: 100
     },
     cancel: {

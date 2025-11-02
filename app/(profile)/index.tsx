@@ -12,8 +12,9 @@ import { Image } from "expo-image";
 import * as MediaLabriary from 'expo-media-library';
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Alert, FlatList, Linking, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, FlatList, KeyboardAvoidingView, Linking, Platform, Text, TextInput, TouchableOpacity, View } from "react-native";
 import RNPickerSelect from 'react-native-picker-select';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { captureRef } from 'react-native-view-shot';
 import { io } from "socket.io-client";
 import UpdateUserProfile from '../../components/updateProfile';
@@ -168,6 +169,16 @@ export default function Index() {
     const onCloseUpdateProfile = () => {
         setIsUpdateUserProfileVisible(false);
     };
+    const onEditProfilePress = () => {
+        setIsUpdateUserProfileVisible(true);
+        setUsername(user?.username || '');
+        setBio(user?.bio || '');
+        setfullName(user?.fullName || '');
+        setPhone(user?.phone || '');
+        setLocation(user?.location || '');
+        setGender(user?.gender || '');
+        setHobbies(user?.hobbies || []);
+    }
     const handleUpdateProfile = async () => {
         setIsUpdating(true);
         try {
@@ -193,9 +204,10 @@ export default function Index() {
             if (!response.ok) throw new Error(data.message || 'Failed to update profile');
             Alert.alert('Success', 'Profile updated successfully');
         } catch (error) {
-            Alert.alert('Updating failed', 'Failed to update profile. Please try again later.');
+            console.error('Error updating profile:', error);
+            Alert.alert('Error', 'Failed to update profile. Please try again later.');
         } finally {
-            setIsUpdating(false)
+            setIsUpdating(false);
         }
     };
     const handleFollow = async () => {
@@ -247,23 +259,6 @@ export default function Index() {
     const handleFollowedUsersPress = async (id: string) => {
       router.push({ pathname: '/(menu)/following', params: { userId: id}})
     };
-    const getUpdatedFcmToken = async () => {
-        if(!expoPushToken || !user?._id) return;
-            const response = await fetch(`${API_URL}/user/profile/${userId}/expoPushToken`, {
-              method: 'POST',
-              headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({ expoPushToken })
-            });
-            if (!response.ok) {
-              throw new Error('Failed to update FCM token');
-            }
-    };
-    const displayUserDetails = () => {
-        setIsModalVisible(true);
-    };
     const onCloseDisplayUserDetails = () => {
         setIsModalVisible(false);
     };
@@ -271,7 +266,6 @@ export default function Index() {
         getUserById();
         fetchUserData();
         fetchUserAnalysis();
-        getUpdatedFcmToken();
         const socket = io('https://kismit-official.onrender.com/');
 
         socket.on('userProfileUpdated', ({userId, updatedFields}) => {
@@ -330,270 +324,273 @@ export default function Index() {
     );
 
     return (
-         <View style={styles.container}>
-            <View style={styles.containerItems}>
-                { isLoading ? (
-                    <ActivityIndicator  size={'large'} color={'#4B0082'} style={{top: 150}}/>
-                ): user ? (
-                    <View style={styles.userProfileContainer}>
-                        <TouchableOpacity onPress={onImageView}style={styles.userProfile}>
-                            <Image source={{ uri: user.profilePicture}} contentFit="cover" style={styles.image}/>
-                        </TouchableOpacity>
-                        <View style={styles.userDetailsContainer}>    
-                            <View style={styles.itemProp}>
-                                <Text style={styles.itemPropTextUsername}>{user.username}/
-                                    <Text style={styles.itemPropTextGender}>{user.gender}</Text>
-                                </Text>
-                               
-                                { user && currentUser?.id === user._id? (
-                                    <View style={styles.editAccountButtonContainer}>
-                                        <TouchableOpacity onPress={() => {setIsUpdateUserProfileVisible(true)}} style={styles.editAccount}>
-                                            <Text style={styles.editProfileText }>edit profile</Text>
-                                           <MaterialCommunityIcons name="account-edit" size={26} color="black"
-                                                style={styles.icon}
-                                            />
-                                        </TouchableOpacity>
-                                        {/* <TouchableOpacity onPress={getUpdatedFcmToken }><Text>get expoPushToken</Text></TouchableOpacity> */}
-                                    </View>
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+            <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
+                <View style={styles.container}>
+                    <View style={styles.containerItems}>
+                        { isLoading ? (
+                            <ActivityIndicator  size={'large'} color={'#4B0082'} style={{top: 150}}/>
+                        ): user ? (
+                            <View style={styles.userProfileContainer}>
+                                <TouchableOpacity onPress={onImageView}style={styles.userProfile}>
+                                    <Image source={{ uri: user.profilePicture}} contentFit="cover" style={styles.image}/>
+                                </TouchableOpacity>
+                                <View style={styles.userDetailsContainer}>    
+                                    <View style={styles.itemProp}>
+                                        <Text style={styles.itemPropTextUsername}>{user.username}/
+                                            <Text style={styles.itemPropTextGender}>{user.gender}</Text>
+                                        </Text>
+                                    
+                                        { user && currentUser?.id === user._id? (
+                                            <View style={styles.editAccountButtonContainer}>
+                                                <TouchableOpacity onPress={() => {onEditProfilePress()}} style={styles.editAccount}>
+                                                    <Text style={styles.editProfileText }>edit profile</Text>
+                                                <MaterialCommunityIcons name="account-edit" size={26} color="black"
+                                                        style={styles.icon}
+                                                    />
+                                                </TouchableOpacity>
+                                            </View>
 
-                                ): (
-                                    <View style={styles.followButtonContainer}>
-                                        <TouchableOpacity onPress={() => {setFollow(!follow), handleFollow(), getUpdatedFcmToken()}} style={[styles.followUser, {backgroundColor: follow? '#e8e8e8' : '#4B0082'}]}>
-                                            <Ionicons
-                                                name={follow? 'checkmark-sharp' : 'add'}
-                                                size={24}
-                                                style={[styles.icon, {color: follow? '#4B0082' : '#ffffff'}]}
-                                            />
-                                            <Text style={[styles.itemTitleText, {color: follow?  '#4B0082' : '#ffffff'}]}>{follow ? 'following' : 'follow'}</Text>
-                                        </TouchableOpacity>
+                                        ): (
+                                            <View style={styles.followButtonContainer}>
+                                                <TouchableOpacity onPress={() => {setFollow(!follow), handleFollow()}} style={[styles.followUser, {backgroundColor: follow? '#e8e8e8' : '#4B0082'}]}>
+                                                    <Ionicons
+                                                        name={follow? 'checkmark-sharp' : 'add'}
+                                                        size={24}
+                                                        style={[styles.icon, {color: follow? '#4B0082' : '#ffffff'}]}
+                                                    />
+                                                    <Text style={[styles.itemTitleText, {color: follow?  '#4B0082' : '#ffffff'}]}>{follow ? 'following' : 'follow'}</Text>
+                                                </TouchableOpacity>
+                                            </View>
+                                        )}
                                     </View>
-                                )}
-                            </View>
-                            <View style={styles.itemCall}>
-                                <TouchableOpacity onPress={() => handleFollowedUsersPress(user?._id)} style={styles.itemInnerContainer}>
-                                    <Text style={styles.itemCallText}>{formatFollowingCount(user.followingCount)}</Text>
-                                    <Text style={styles.itemTitleText}>following</Text>
-                                </TouchableOpacity>
-                                <View style={styles.seprateItem}></View>
-                                <TouchableOpacity onPress={() => handleFollowersPress(user?._id)} style={styles.itemInnerContainer}>
-                                    <Text style={styles.itemCallText}>{formatFollowingCount(user.followersCount)}</Text>
-                                    <Text style={styles.itemTitleText}>followers</Text>
-                                </TouchableOpacity>
-                                <View style={styles.seprateItem}></View>
-                                <View style={styles.itemInnerContainer}>
-                                    <TouchableOpacity onPress={() => handleCallPress(user?.phone)} style={styles.call}>
-                                        <Ionicons name="call" size={22} style={styles.icon}/>
-                                        <Text style={styles.callText}>contact</Text>
+                                    <View style={styles.itemCall}>
+                                        <TouchableOpacity onPress={() => handleFollowedUsersPress(user?._id)} style={styles.itemInnerContainer}>
+                                            <Text style={styles.itemCallText}>{formatFollowingCount(user.followingCount)}</Text>
+                                            <Text style={styles.itemTitleText}>following</Text>
+                                        </TouchableOpacity>
+                                        <View style={styles.seprateItem}></View>
+                                        <TouchableOpacity onPress={() => handleFollowersPress(user?._id)} style={styles.itemInnerContainer}>
+                                            <Text style={styles.itemCallText}>{formatFollowingCount(user.followersCount)}</Text>
+                                            <Text style={styles.itemTitleText}>followers</Text>
+                                        </TouchableOpacity>
+                                        <View style={styles.seprateItem}></View>
+                                        <View style={styles.itemInnerContainer}>
+                                            <TouchableOpacity onPress={() => handleCallPress(user?.phone)} style={styles.call}>
+                                                <Ionicons name="call" size={22} style={styles.icon}/>
+                                                <Text style={styles.callText}>contact</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </View>
+                                    <View style={styles.itemLocation}>
+                                        <View style={styles.itemLocationContainer}>
+                                            <Text style={styles.itemLocationText}>{user.hobbies}</Text>
+                                        </View>
+                                        <View style={styles.seprateItem}></View>
+                                        <View style={styles.itemInnerContainer}>
+                                            <Text style={styles.itemLocationText}>{user.location}</Text>
+                                        </View>
+                                    </View>
+                                    <TouchableOpacity onPress={() => setIsModalVisible(true)} style={styles.itemBio}>
+                                            <Text style={styles.itemBioText} numberOfLines={5} ellipsizeMode="tail">{user.bio}</Text>
                                     </TouchableOpacity>
                                 </View>
                             </View>
-                            <View style={styles.itemLocation}>
-                                <View style={styles.itemLocationContainer}>
-                                    <Text style={styles.itemLocationText}>{user.hobbies}</Text>
-                                </View>
-                                <View style={styles.seprateItem}></View>
-                                <View style={styles.itemInnerContainer}>
-                                    <Text style={styles.itemLocationText}>{user.location}</Text>
-                                </View>
+                        ):(
+                            <View>
+                                <Text></Text>
                             </View>
-                            <TouchableOpacity onPress={() => setIsModalVisible(true)} style={styles.itemBio}>
-                                    <Text style={styles.itemBioText} numberOfLines={5} ellipsizeMode="tail">{user.bio}</Text>
-                            </TouchableOpacity>
-                        </View>
+                        )}
                     </View>
-                ):(
-                    <View>
-                        <Text></Text>
+                    
+                    <View style={styles.itemTitle}>
+                        <TouchableOpacity
+                            onPress={() => setActiveTab('posts')} style={[styles.itemTitleContainer, activeTab === 'posts' && { backgroundColor: '#4B0082' }]}>
+                            <Text style={[styles.itemTitleText, activeTab === 'posts' && { color: '#fff', fontWeight: 'bold' }]}>
+                                Posts
+                            </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => setActiveTab('analysis')} style={[styles.itemTitleContainer, activeTab === 'analysis' && { backgroundColor: '#4B0082' }]}>
+                            <Text style={[styles.itemTitleText, activeTab === 'analysis' && { color: '#fff', fontWeight: 'bold' }]}>
+                                Analysis
+                            </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => setActiveTab('challenges')} style={[styles.itemTitleContainer, activeTab === 'challenges' && { backgroundColor: '#4B0082' }]}>
+                            <Text style={[styles.itemTitleText, activeTab === 'challenges' && { color: '#fff', fontWeight: 'bold' }]}>
+                                Challanges
+                            </Text>
+                        </TouchableOpacity>
                     </View>
-                )}
-            </View>
-            
-            <View style={styles.itemTitle}>
-                <TouchableOpacity
-                    onPress={() => setActiveTab('posts')} style={[styles.itemTitleContainer, activeTab === 'posts' && { backgroundColor: '#4B0082' }]}>
-                    <Text style={[styles.itemTitleText, activeTab === 'posts' && { color: '#fff', fontWeight: 'bold' }]}>
-                        Posts
-                    </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    onPress={() => setActiveTab('analysis')} style={[styles.itemTitleContainer, activeTab === 'analysis' && { backgroundColor: '#4B0082' }]}>
-                    <Text style={[styles.itemTitleText, activeTab === 'analysis' && { color: '#fff', fontWeight: 'bold' }]}>
-                        Analysis
-                    </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    onPress={() => setActiveTab('challenges')} style={[styles.itemTitleContainer, activeTab === 'challenges' && { backgroundColor: '#4B0082' }]}>
-                    <Text style={[styles.itemTitleText, activeTab === 'challenges' && { color: '#fff', fontWeight: 'bold' }]}>
-                        Challanges
-                    </Text>
-                </TouchableOpacity>
-            </View>
-            <View style={styles.flatListContainer}>
-                <FlatList
-                    data={
-                        activeTab === 'posts'
-                        ? posts
-                        : activeTab === 'analysis'
-                        ? analysis
-                        : activeTab === 'challenges'
-                        ? null
-                        : null
-                    }
-                    renderItem={
-                        activeTab === 'posts' 
-                        ? renderUserPost
-                        : activeTab === 'analysis'
-                        ? renderUserAnalysis || <Text>No analysis yet</Text>
-                        : activeTab === 'challenges'
-                        ? renderUserCHallanges || <Text>No challanges yet</Text>
-                        : null
-                    }
-                    keyExtractor={(item, index) => `${item._id || item.id || index}}`}
-                    showsVerticalScrollIndicator={false}
-                    numColumns={3}
-                    contentContainerStyle={{padding: 0}}
-                />
-            </View>
+                    <View style={styles.flatListContainer}>
+                        <FlatList
+                            data={
+                                activeTab === 'posts'
+                                ? posts
+                                : activeTab === 'analysis'
+                                ? analysis
+                                : activeTab === 'challenges'
+                                ? null
+                                : null
+                            }
+                            renderItem={
+                                activeTab === 'posts' 
+                                ? renderUserPost
+                                : activeTab === 'analysis'
+                                ? renderUserAnalysis || <Text>No analysis yet</Text>
+                                : activeTab === 'challenges'
+                                ? renderUserCHallanges || <Text>No challanges yet</Text>
+                                : null
+                            }
+                            keyExtractor={(item, index) => `${item._id || item.id || index}}`}
+                            showsVerticalScrollIndicator={false}
+                            numColumns={3}
+                            contentContainerStyle={{padding: 0}}
+                        />
+                    </View>
 
-            <ViewImage isVisible={isImageVissable} onClose={onCloseImageView}>
-                <View style={styles.displayOption}>
-                    <Text style={styles.displayUsername}>{user?.username}</Text>
-                    <Feather style={{bottom: 21}} onPress={saveImage} name="download" size={25} color="#ffffff" />
+                    <ViewImage isVisible={isImageVissable} onClose={onCloseImageView}>
+                        <View style={styles.displayOption}>
+                            <Text style={styles.displayUsername}>{user?.username}</Text>
+                            <Feather style={{bottom: 5}} onPress={saveImage} name="download" size={25} color="#ffffff" />
+                        </View>
+                        <View ref={imageRef} collapsable={false}>
+                            <Image
+                                source={{ uri: user?.profilePicture }}
+                                style={[styles.postImage, {height:450, left: 0}]}
+                                contentFit="cover"
+                            />
+                        </View>
+                    </ViewImage> 
+                    <UpdateUserProfile isVisible={isUpdateUserProfileVisible} onClose={onCloseUpdateProfile}>
+                        <View style={styles.updateContainer}>
+                            <Text style={styles.updateText}>username</Text>
+                            <View style={styles.updateInputContainer}>
+                                <TextInput
+                                    style={styles.textInput}
+                                    value={username}
+                                    onChangeText={setUsername}
+                                    multiline
+                                    editable={!isUpdating}
+                                />
+                            </View>
+                        </View>
+                        <View style={styles.updateContainer}>
+                            <Text style={styles.updateText}>Bio</Text>
+                            <View style={styles.updateInputContainer}>
+                                <TextInput
+                                    style={styles.textInput}
+                                    value={bio}
+                                    onChangeText={setBio}
+                                    placeholder="enter bio"
+                                    multiline
+                                    editable={!isUpdating}
+                                />
+                            </View>
+                        </View>
+                        <View style={styles.updateContainer}>
+                            <Text style={styles.updateText}>Phone Number</Text>
+                            <View style={styles.updateInputContainer}>
+                                <TextInput
+                                    style={styles.textInput}
+                                    value={phone}
+                                    onChangeText={setPhone}
+                                    placeholder="enter your contact"
+                                    keyboardType="phone-pad"
+                                    editable={!isUpdating}
+                                />
+                            </View>
+                        </View>
+                        <View style={styles.updateContainer}>
+                            <Text style={styles.updateText}>Full Name</Text>
+                            <View style={styles.updateInputContainer}>
+                                <TextInput
+                                    style={styles.textInput}
+                                    value={fullName}
+                                    onChangeText={setfullName}
+                                    placeholder="enter your first and last name"
+                                    multiline
+                                    editable={!isUpdating}
+                                />
+                            </View>
+                        </View>
+                        <View style={styles.updateContainer}>
+                            <Text style={styles.updateText}>Location</Text>
+                            <View style={styles.updateInputContainer}>
+                                <RNPickerSelect
+                                    value={location}
+                                    onValueChange={(value) => setLocation(value)}
+                                    placeholder={{ label: 'Select your location', value: null }}
+                                    items={locationOptions}
+                                    style={{inputAndroid: { color: '#000', bottom: 7 }}}
+                                />
+                            </View>
+                        </View>
+                        <View style={styles.updateContainer}>
+                            <Text style={styles.updateText}>Gender</Text>
+                            <View style={styles.updateInputContainer}>
+                                <RNPickerSelect
+                                    value={gender}
+                                    onValueChange={(value) => setGender(value)}
+                                    placeholder={{ label: 'Select your gender', value: null }}
+                                    items={genderOptions}
+                                    style={{inputAndroid: { color: '#000', bottom: 7 }}}
+                                />
+                            </View>
+                        </View>
+                        <View style={styles.updateContainer}>
+                            <Text style={styles.updateText}>Hobbie</Text>
+                            <View style={styles.updateInputContainer}>
+                                <RNPickerSelect
+                                    value={hobbies}
+                                    onValueChange={(value) => setHobbies(value)}
+                                    placeholder={{ label: 'Select your hobbie', value: null }}
+                                    items={hobbiesOptions}
+                                    style={{inputAndroid: { color: '#000', bottom: 7 }}}
+                                />
+                            </View>
+                        </View>
+                        <View style={styles.warinigContainer}>
+                            <Text style={styles.warning}>WARNING: 
+                                <Text style={styles.notice}> Username can olny be edited after each 20 days. Ensure your username is correct to avoid restriction of changing</Text>
+                            </Text>
+                        </View>
+                        <TouchableOpacity style={styles.updateOpacityContainer} onPress={() =>  handleUpdateProfile()}>
+                            {isUpdating ? (
+                                <ActivityIndicator size={'small'} color={'#ffff'}>
+                                </ActivityIndicator>
+                            ) : (
+                                <Text style={styles.text}>Submit</Text>
+                            )}
+                        </TouchableOpacity>
+                    </UpdateUserProfile>
+                    
+                    <UserDetailPage isVisible={isModalVisible} onClose={onCloseDisplayUserDetails}>
+                        <View style={styles.userInfo}>
+                            <View style={styles.userProfilePicture}>
+                                <Image source={{ uri: user?.profilePicture }} style={styles.image} contentFit="cover" />
+                            </View>
+                            <View style={styles.userDetailsInfo}>
+                                <Text style={styles.userText}>{user?.fullName}/
+                                    <Text style={styles.userTextGender}>{user?.gender}</Text>
+                                </Text>
+                            </View>
+                            <View style={styles.userDetailsInfoOther}>
+                                <Text style={styles.userTextPlaceHolder}>Phone Number: <Text style={styles.userTextLocation}>{user?.phone}</Text></Text>
+                                <Text style={styles.userTextPlaceHolder}>Hobby: <Text style={styles.userTextLocation}>{user?.hobbies}</Text></Text>
+                                <Text style={styles.userTextPlaceHolder}>Location: <Text style={styles.userTextLocation}>{user?.location}</Text></Text>
+                                <Text style={styles.userTextPlaceHolder}>Email: <Text style={styles.userTextLocation}>{user?.email}</Text></Text>
+                            </View>
+                            <View style={styles.userDetailsInfoOther}>
+                                <Text style={styles.userTextPlaceHolder}> </Text>
+                                <Text style={styles.userTextLocation}>{user?.bio}</Text>
+                            </View>
+                        </View>
+                    </UserDetailPage>
                 </View>
-                <View ref={imageRef} collapsable={false}>
-                    <Image
-                        source={{ uri: user?.profilePicture }}
-                        style={[styles.postImage, {height:450, left: 0}]}
-                        contentFit="cover"
-                    />
-                </View>
-            </ViewImage> 
-            <UpdateUserProfile isVisible={isUpdateUserProfileVisible} onClose={onCloseUpdateProfile}>
-                <View style={styles.updateContainer}>
-                    <Text style={styles.updateText}>username</Text>
-                    <View style={styles.updateInputContainer}>
-                        <TextInput
-                            style={styles.textInput}
-                            value={username}
-                            onChangeText={setUsername}
-                            multiline
-                            editable={!isUpdating}
-                        />
-                    </View>
-                </View>
-                <View style={styles.updateContainer}>
-                    <Text style={styles.updateText}>Bio</Text>
-                    <View style={styles.updateInputContainer}>
-                        <TextInput
-                            style={styles.textInput}
-                            value={bio}
-                            onChangeText={setBio}
-                            placeholder="enter bio"
-                            multiline
-                            editable={!isUpdating}
-                        />
-                    </View>
-                </View>
-                <View style={styles.updateContainer}>
-                    <Text style={styles.updateText}>Phone Number</Text>
-                    <View style={styles.updateInputContainer}>
-                        <TextInput
-                            style={styles.textInput}
-                            value={phone}
-                            onChangeText={setPhone}
-                            placeholder="enter your contact"
-                            keyboardType="phone-pad"
-                            editable={!isUpdating}
-                        />
-                    </View>
-                </View>
-                <View style={styles.updateContainer}>
-                    <Text style={styles.updateText}>Full Name</Text>
-                    <View style={styles.updateInputContainer}>
-                        <TextInput
-                            style={styles.textInput}
-                            value={fullName}
-                            onChangeText={setfullName}
-                            placeholder="enter your first and last name"
-                            multiline
-                            editable={!isUpdating}
-                        />
-                    </View>
-                </View>
-                <View style={styles.updateContainer}>
-                    <Text style={styles.updateText}>Location</Text>
-                    <View style={styles.updateInputContainer}>
-                        <RNPickerSelect
-                            value={location}
-                            onValueChange={(value) => setLocation(value)}
-                            placeholder={{ label: 'Select your location', value: null }}
-                            items={locationOptions}
-                            style={{inputAndroid: { color: '#000', bottom: 7 }}}
-                        />
-                    </View>
-                </View>
-                <View style={styles.updateContainer}>
-                    <Text style={styles.updateText}>Gender</Text>
-                    <View style={styles.updateInputContainer}>
-                        <RNPickerSelect
-                            value={gender}
-                            onValueChange={(value) => setGender(value)}
-                            placeholder={{ label: 'Select your gender', value: null }}
-                            items={genderOptions}
-                            style={{inputAndroid: { color: '#000', bottom: 7 }}}
-                        />
-                    </View>
-                </View>
-                <View style={styles.updateContainer}>
-                    <Text style={styles.updateText}>Hobbie</Text>
-                    <View style={styles.updateInputContainer}>
-                        <RNPickerSelect
-                            value={hobbies}
-                            onValueChange={(value) => setHobbies(value)}
-                            placeholder={{ label: 'Select your hobbie', value: null }}
-                            items={hobbiesOptions}
-                            style={{inputAndroid: { color: '#000', bottom: 7 }}}
-                        />
-                    </View>
-                </View>
-                <View style={styles.warinigContainer}>
-                    <Text style={styles.warning}>WARNING: 
-                        <Text style={styles.notice}> Username can olny be edited after each 20 days. Ensure your username is correct to avoid restriction of changing</Text>
-                    </Text>
-                </View>
-                <TouchableOpacity style={styles.updateOpacityContainer} onPress={() =>  handleUpdateProfile()}>
-                    {isUpdating ? (
-                        <ActivityIndicator size={'small'} color={'#ffff'}>
-                        </ActivityIndicator>
-                    ) : (
-                        <Text style={styles.text}>Submit</Text>
-                    )}
-                </TouchableOpacity>
-            </UpdateUserProfile>
-            
-            <UserDetailPage isVisible={isModalVisible} onClose={onCloseDisplayUserDetails}>
-                <View style={styles.userInfo}>
-                    <View style={styles.userProfilePicture}>
-                        <Image source={{ uri: user?.profilePicture }} style={styles.image} contentFit="cover" />
-                    </View>
-                    <View style={styles.userDetailsInfo}>
-                        <Text style={styles.userText}>{user?.fullName}/
-                            <Text style={styles.userTextGender}>{user?.gender}</Text>
-                        </Text>
-                    </View>
-                    <View style={styles.userDetailsInfoOther}>
-                        <Text style={styles.userTextPlaceHolder}>Phone Number: <Text style={styles.userTextLocation}>{user?.phone}</Text></Text>
-                        <Text style={styles.userTextPlaceHolder}>Hobby: <Text style={styles.userTextLocation}>{user?.hobbies}</Text></Text>
-                        <Text style={styles.userTextPlaceHolder}>Location: <Text style={styles.userTextLocation}>{user?.location}</Text></Text>
-                        <Text style={styles.userTextPlaceHolder}>Email: <Text style={styles.userTextLocation}>{user?.email}</Text></Text>
-                    </View>
-                    <View style={styles.userDetailsInfoOther}>
-                        <Text style={styles.userTextPlaceHolder}> </Text>
-                        <Text style={styles.userTextLocation}>{user?.bio}</Text>
-                    </View>
-                </View>
-            </UserDetailPage>
-        </View>
-          );
+            </KeyboardAvoidingView>
+        </SafeAreaView>
+    );
 
 }

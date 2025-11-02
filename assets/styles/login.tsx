@@ -1,24 +1,27 @@
-import { StyleSheet } from "react-native";
+import { Dimensions, StyleSheet } from "react-native";
+const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
   container: {
     flex: 1,
-    backgroundColor: "#4B0082",
-
+    backgroundColor: "#4B0082"
   },
-  card:{   
-    width: "auto",
-    height: 'auto',
+  card: {   
+    width: screenWidth - 40,
+    height: screenHeight / 3.3,
     borderRadius: 10,
     alignItems: 'center',
   },
   cardView:{   
-    width: "auto",
-    height: 'auto',
-    borderRadius: 10,
+    width: screenWidth - 30,
     alignItems: 'center',
     flexDirection: "row", 
-    marginTop: 50
+    marginTop: 50,
+    justifyContent: 'space-evenly',
   },
   cardposition:{
     position: 'absolute',
@@ -29,7 +32,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     width: "100%",
-    height: 600,
+    height: screenHeight / 2.5,
     borderRadius: 10,
     marginTop: 10,
     padding: 20,
@@ -39,31 +42,30 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     width: "100%",
-    height: 600,
+    height: screenHeight / 2.5,
     borderRadius: 20,
     marginTop: 10,
     padding: 20,
     overflow: 'hidden',
-    position: "absolute", 
-    top: 180
+    top: screenHeight * 0.18
   },
   textinput: {
     color: '#000',
     alignSelf: 'flex-start',
-    fontSize: 16,
+    fontSize: screenWidth / 40 * 1.8,
     marginLeft: 9,
   },
   textinputItem: {
     color: '#000',
     alignSelf: 'flex-start',
-    fontSize: 16,
+    fontSize: screenWidth / 40 * 1.8,
     marginLeft: 9,
     marginTop: 20,
   },
   eyeicon: { 
-    position: "absolute", 
-    top: 158, 
-    right: 40 
+    bottom: screenHeight * 0.05,
+    right: screenWidth * 0.05,
+    alignSelf: 'flex-end',
   },  
   text: {
     color: '#4B0082',
@@ -74,36 +76,37 @@ const styles = StyleSheet.create({
   textWelcome: {
     fontWeight: 'bold',
     fontFamily: 'serif',
-    position: "absolute",
-    top: 90,
+    top: screenHeight * 0.1,
     color: "#fff", 
-    left: 85, 
-    fontSize: 30 
+    left: screenWidth * 0.20, 
+    fontSize: screenWidth / 40 * 3, 
   },
   fonttext:{
     color: '#fff',
-    fontSize: 21,
+    fontSize: screenWidth / 40 * 1.6,
   },
   register: {
-    fontSize: 18,
+    fontSize: screenWidth / 40 * 1.9,
     color: "#4B0082",
     fontWeight: "bold",
     marginLeft: 7,
   },
   accountText:{
-   fontSize: 18, 
+   fontSize: screenWidth / 40 * 1.8, 
    color: "#000"
   },
   login: {
     color: '#fff',
-    fontSize: 21,
-    fontWeight: "bold" 
+    fontSize: screenWidth / 40 * 1.9,
+    fontWeight: "bold",
+    width: '100%',
+    textAlign: 'center',
   },
   fontText: { 
     color: "#4B0082", 
-    fontSize: 15, 
+    fontSize: screenWidth / 40 * 1.8, 
     marginTop: 20, 
-    left: 195 
+    alignSelf: 'flex-end',
   },
   image: {
     width: 400,
@@ -114,9 +117,10 @@ const styles = StyleSheet.create({
     margin: 7,
     height: 45,
     width: '95%',
+    color: '#000',
     borderColor: '#4B0082',
     borderWidth: 1,
-    backgroundColor: '#fff',
+    backgroundColor: 'transparent',
     borderRadius: 5,
     padding: 10,
   },
@@ -132,13 +136,10 @@ const styles = StyleSheet.create({
   },
   buttonInside:{
     backgroundColor: '#4B0082',
-    color: '#fff',
     width: '95%',
-    height: 'auto',
-    textAlign: 'center',
-    padding: 10,
+    height: '18%',
     borderRadius: 5,
-    marginTop: 70,
+    marginTop: '30%',
     justifyContent: "center",
     alignItems: "center"
   },
@@ -151,7 +152,6 @@ const styles = StyleSheet.create({
     borderColor: '#ACACAC',
     borderWidth: 1,
     textAlign: 'center',
-    color: '#000',
     width: '70%',
     padding: 10,
     borderRadius: 5,

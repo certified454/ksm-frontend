@@ -12,6 +12,8 @@ export default function ChallengeLayout() {
                     <Stack screenOptions={{ headerShown: false }}>
                         <Stack.Screen name="index" />
                         <Stack.Screen name="challengedetails" />
+                        <Stack.Screen name="create-team" />
+                        <Stack.Screen name="create-target-team" />
                     </Stack>
                 </KeyboardAvoidingView>
             </SafeScreen>

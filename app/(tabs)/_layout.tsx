@@ -19,7 +19,7 @@ export default function Tabslayout() {
             elevation: 5,
             borderTopLeftRadius: 30,
             borderTopRightRadius: 30,
-            height: 70,
+            height: 60,
           },
         
           tabBarShowLabel: false

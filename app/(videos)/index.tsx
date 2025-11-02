@@ -14,6 +14,7 @@ import { io } from 'socket.io-client';
 import styles from '../../assets/styles/analysis';
 import { useAuthStore } from '../../store/authStore';
 import { formatLikes } from '../../store/util';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Analysis ={
     _id: string;
@@ -289,64 +290,66 @@ export default function Analysis() {
         </View>
     )
     return(
-        <View style={styles.container}>
-             <>
-                <FlatList
-                    data={analysis}
-                    keyExtractor={(item) => item._id}
-                    renderItem={renderAnalysis}
-                    showsHorizontalScrollIndicator={false}
-                    onEndReached={handleLoadMore}
-                />
-            </>
-            <TouchableOpacity onPress={() => {setIsVisible(true); pickVideo()}}>
-                <Ionicons name='videocam' size={45} color={'#4B0082'} />
-            </TouchableOpacity> 
-            <CreateVideoPage isVisible={isVisible} onClose={handleCreateVideoClose}>
-                {videoUri && (
-                    <>
-                        <TouchableOpacity onPress={  handeleVideoPress }  style={styles.videoSize}>
-                            <Video
-                                style={[ { aspectRatio: 1, backgroundColor: videoUri ? '#fff' : '#000'}]}
-                                source={{ uri: videoUri}}
-                                ref={videoRef}
-                                isLooping
-                                resizeMode='contain'
-                                shouldPlay={isPlaying}
-                                useNativeControls={false}
-                            />
-                        </TouchableOpacity>
-                    </>
-                )}
-                <View style={styles.video}>
-                    <TouchableOpacity style={styles.videocam} onPress={pickVideo}>
-                        <Ionicons name='videocam' size={30} color={'#4B0082'} />
-                    </TouchableOpacity>
-                    <TextInput
-                            style={styles.inputContainer}
-                            placeholder="Enter analysis title"
-                            value={title}
-                            onChangeText={setTitle}
-                            editable={!isLoading}
-                            multiline
-                        />
-                    <View style={styles.upload}>
-                        { submiting ? (
-                            <ActivityIndicator size="large" color="#4B0082" />
-                        ) : (
-                            <TouchableOpacity onPress={uploadVideo}>
-                                <Ionicons name={ submiting ? 'send-outline' : 'send'}size={30} color="#4B0082" />
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+            <View style={styles.container}>
+                <>
+                    <FlatList
+                        data={analysis}
+                        keyExtractor={(item) => item._id}
+                        renderItem={renderAnalysis}
+                        showsHorizontalScrollIndicator={false}
+                        onEndReached={handleLoadMore}
+                    />
+                </>
+                <TouchableOpacity onPress={() => {setIsVisible(true); pickVideo()}}>
+                    <Ionicons name='videocam' size={45} color={'#4B0082'} />
+                </TouchableOpacity> 
+                <CreateVideoPage isVisible={isVisible} onClose={handleCreateVideoClose}>
+                    {videoUri && (
+                        <>
+                            <TouchableOpacity onPress={  handeleVideoPress }  style={styles.videoSize}>
+                                <Video
+                                    style={[ { aspectRatio: 1, backgroundColor: videoUri ? '#fff' : '#000'}]}
+                                    source={{ uri: videoUri}}
+                                    ref={videoRef}
+                                    isLooping
+                                    resizeMode='contain'
+                                    shouldPlay={isPlaying}
+                                    useNativeControls={false}
+                                />
                             </TouchableOpacity>
-                        )}
-                    </View>
+                        </>
+                    )}
+                    <View style={styles.video}>
+                        <TouchableOpacity style={styles.videocam} onPress={pickVideo}>
+                            <Ionicons name='videocam' size={30} color={'#4B0082'} />
+                        </TouchableOpacity>
+                        <TextInput
+                                style={styles.inputContainer}
+                                placeholder="Enter analysis title"
+                                value={title}
+                                onChangeText={setTitle}
+                                editable={!isLoading}
+                                multiline
+                            />
+                        <View style={styles.upload}>
+                            { submiting ? (
+                                <ActivityIndicator size="large" color="#4B0082" />
+                            ) : (
+                                <TouchableOpacity onPress={uploadVideo}>
+                                    <Ionicons name={ submiting ? 'send-outline' : 'send'}size={30} color="#4B0082" />
+                                </TouchableOpacity>
+                            )}
+                        </View>
 
-                </View>
-    
-            </CreateVideoPage>
-            <Caption isVisible={captionVisible} onClose={handleCaptionClose}>
-                
-            </Caption>
-           
-        </View> 
+                    </View>
+        
+                </CreateVideoPage>
+                <Caption isVisible={captionVisible} onClose={handleCaptionClose}>
+                    
+                </Caption>
+            
+            </View> 
+        </SafeAreaView>
     )
 }

@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert } from "react-native";
 import { create } from "zustand";
+import { registerForPushNotificationsAsync } from "../utils/registerForPushNotificationAsync";
 
 export const useAuthStore = create((set) => ({
   user: null,
@@ -25,6 +26,7 @@ export const useAuthStore = create((set) => ({
       const data = await response.json();
 
       if (!response.ok) {
+        console.log("Registration error:", data);
         throw new Error(data.message || "Something went wrong");
       }
 
@@ -57,6 +59,13 @@ export const useAuthStore = create((set) => ({
     set({ isLoading: true });
 
     try {
+      let pushToken = null;
+      try {
+        pushToken = await registerForPushNotificationsAsync();
+      } catch (error) {
+        console.log("Push notification token registration failed:", error);
+      }
+      const body = { email, code, ...(pushToken ? { expoPushToken: pushToken } : {}) };
       const response = await fetch(
         "https://kismit-official.onrender.com/api/auth/verify-code",
         {
@@ -64,7 +73,7 @@ export const useAuthStore = create((set) => ({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ email, code }),
+          body: JSON.stringify(body),
         }
       );
 
@@ -140,10 +149,54 @@ export const useAuthStore = create((set) => ({
     }
   },
 
+  forgotPassword: async (email) => {
+    set({ isLoading: true });
+
+    try {
+      if (!email) {
+        Alert.alert("Error", "Please provide your email address");
+        set({ isLoading: false });
+        return {
+          success: false,
+          error: "Email is required",
+        };
+      }
+      const response = await fetch(
+        "https://kismit-official.onrender.com/api/auth/forgotten-password",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email }),
+        }
+      );
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || "Something went wrong");
+      }
+      set({ token: data.token, isLoading: false });
+    } catch (error) {
+      set({ isLoading: false });
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  },
+
   login: async (email, password, router) => {
     set({ isLoading: true });
 
     try {
+      let pushToken = null;
+      try {
+        pushToken = await registerForPushNotificationsAsync();
+      } catch (error) {
+        console.log("Push notification token registration failed:", error);
+      }
+      const body = { email, password, ...(pushToken ? { expoPushToken: pushToken } : {}) };
       const response = await fetch(
         "https://kismit-official.onrender.com/api/auth/login",
         {
@@ -151,7 +204,7 @@ export const useAuthStore = create((set) => ({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ email, password }),
+          body: JSON.stringify(body),
         }
       );
 
@@ -175,6 +228,7 @@ export const useAuthStore = create((set) => ({
       await AsyncStorage.setItem("token", data.token);
 
       set({ token: data.token, user: data.user, isLoading: false });
+
       router.push({
         pathname: "/(tabs)",
       })

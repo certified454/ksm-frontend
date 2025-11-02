@@ -39,6 +39,7 @@ export default function UserDetailPage({isVisible, children, onClose}: Props) {
         borderTopRightRadius: 10,
         borderTopLeftRadius: 10,
         paddingHorizontal: 20,
+        top: 40,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -50,7 +51,7 @@ export default function UserDetailPage({isVisible, children, onClose}: Props) {
     },
     childrenContainer: {
         flex: 1,
-        top: 10,
+        top: 40,
         alignItems: 'center',
         gap: 40
     },

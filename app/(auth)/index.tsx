@@ -1,6 +1,8 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Link, router } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useLocalSearchParams } from "expo-router";
+import { API_URL } from "../../store/postStore";
 import {
   ActivityIndicator,
   Alert,
@@ -12,8 +14,10 @@ import {
   View,
 } from "react-native";
 
+import { SafeAreaView } from "react-native-safe-area-context";
 import styles from "../../assets/styles/login";
 import { useAuthStore } from "../../store/authStore";
+import { useNotification } from "@/context/NotificationContext";
 
 export default function Index() {
   const [email, setEmail] = useState("");
@@ -21,80 +25,84 @@ export default function Index() {
   const [showPassword, setShowPassword] = useState(false);
   const { isLoading, login } = useAuthStore();
 
+  const { expoPushToken, notification, error } = useNotification();
+  const { userId } = useLocalSearchParams();
+  const { token } = useAuthStore();
+
   const handleLogin = async () => {
     const result = await login(email, password, router);
 
     if (!result.success) Alert.alert("Message", result.error);
   };
+  
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      <View style={styles.container}>
-        <View style={styles.card}>
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <View style={styles.container}>
           <Text style={styles.textWelcome}>
-            Welcome Back
-          </Text>
-        </View>
-
-        <View style={styles.cardformContainer}>
-          <Text style={[styles.textinput]}>Email</Text>
-          <TextInput
-            style={styles.inputform}
-            placeholder="enter your email"
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-          />
-
-          <Text style={styles.textinputItem}>Password</Text>
-          <TextInput
-            style={styles.inputform}
-            placeholder="enter your password"
-            onChangeText={setPassword}
-            value={password}
-            secureTextEntry={!showPassword}
-          />
-
-          <TouchableOpacity
-            onPress={() => setShowPassword(!showPassword)}
-            style={styles.eyeicon}
-          >
-            <Ionicons
-              name={showPassword ? "eye-off" : "eye"}
-              size={20}
-              color="#4B0082"
+            Welcome Back {}
+          </Text>     
+          <View style={styles.cardformContainer}>
+            <Text style={styles.textinput}>Email {}</Text>
+            <TextInput
+              style={styles.inputform}
+              placeholder="enter your email"
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              keyboardType="email-address"
             />
-          </TouchableOpacity>
 
-          <Text style={styles.fontText}>
-            forgoten password?
-          </Text>
+            <Text style={styles.textinputItem}>Password {}</Text>
+            <TextInput
+              style={styles.inputform}
+              placeholder="enter your password"
+              onChangeText={setPassword}
+              value={password}
+              secureTextEntry={!showPassword}
+              autoCorrect={false}
+              autoCapitalize="none"
+            />
 
-          <View style={styles.card}>
-            <TouchableOpacity style={styles.buttonInside} onPress={handleLogin} disabled={isLoading}>
-              {isLoading ? (
-                <ActivityIndicator color="#ffffff" size={"small"} />
-              ) : (
-                <Text style={[styles.login]}>
-                  Login
-                </Text>
-              )}
+            <TouchableOpacity
+              onPress={() => setShowPassword(!showPassword)}
+              style={styles.eyeicon}
+            >
+              <Ionicons
+                name={showPassword ? "eye-off" : "eye"}
+                size={20}
+                color="#4B0082"
+              />
             </TouchableOpacity>
+            <Link href="/(auth)/forgotten-password" style={styles.fontText}>
+              Forgot Password? {}
+            </Link>
+            <View style={styles.card}>
+              <TouchableOpacity style={styles.buttonInside} onPress={handleLogin} disabled={isLoading}>
+                {isLoading ? (
+                  <ActivityIndicator color="#ffffff" size={"small"} />
+                ) : (
+                  <Text style={styles.login}>
+                    Login {}
+                  </Text>
+                )}
+              </TouchableOpacity>
 
-            <View style={styles.cardView}>
-              <Text style={styles.accountText}>
-                Don't have an account?
-              </Text>
-              <Link href="/(auth)/register" style={styles.register}>
-                Register
-              </Link>
+              <View style={styles.cardView}>
+                <Text style={styles.accountText}>
+                  Don't have an account? {}
+                </Text>
+                <Link href="/(auth)/register" style={styles.register}>
+                  Register {}
+                </Link>
+              </View>
             </View>
           </View>
         </View>
-      </View>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

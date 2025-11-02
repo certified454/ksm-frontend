@@ -139,6 +139,10 @@ const styles = StyleSheet.create({
         left: 240
     },
     textCommented: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 5,
         fontFamily: 'sarif',
         fontSize: 17,
         bottom: 35,
@@ -175,7 +179,126 @@ const styles = StyleSheet.create({
         left: 50,
         bottom: 5
     },
-    
+    optionsDropdown: {
+        position: 'absolute',
+        width: 150, 
+        top: 30, 
+        right: 0, 
+        backgroundColor: '#fff', 
+        borderRadius: 8, 
+        elevation: 4, 
+        shadowColor: '#000', 
+        shadowOpacity: 0.1, 
+        shadowRadius: 4, 
+        padding: 8, 
+        zIndex: 1,
+        gap: 10
+    },
+    arrowUp: {
+        left: 50,
+        width: 40,
+        height: 7,
+        borderRadius: 20,
+        backgroundColor: '#00000017',
+    },
+    editComment: {
+        flex: 1,
+        paddingLeft: 10,
+    },
+    comments: {
+        paddingVertical: 8,
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 7
+    },
+    backComment: { 
+        paddingVertical: 8,
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 7,
+        justifyContent: "center",
+        borderRadius: 5,
+        backgroundColor: "#eeeeee85",
+    },
+    select: {
+        right: 1,
+        width: 10,
+        height: 10,
+        borderRadius: 2,
+        backgroundColor: '#000',
+        transform: [{ rotate: '45deg' }],
+    },
+    text3: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#0b0fe0ff',
+    },
+    text4: {
+        fontSize: 16,
+        fontWeight: 'bold'
+    },
+    text5: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#ff0000',
+    },
+    captionContainer1: {
+        flex: 1,
+        padding: 5,
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        gap: 10
+    },
+    header1: {
+        backgroundColor: '#fff',
+        borderRadius: 5,
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 10,
+        bottom: 3,
+        width: '99%',
+        height: 70,
+        flexDirection: 'row',
+        shadowColor: '#000',
+        shadowOpacity: 2,
+        elevation: 5,
+    },
+    usercaptionContainer: {
+        alignItems: 'center',
+    },
+    profile: {
+        width: 40,
+        height: 40,
+        borderRadius: 20
+    },
+    input: {
+        width: '99%',
+        minHeight: 45,
+        maxHeight: "auto",
+        borderColor: '#4B0082',
+        borderWidth: 1,
+        borderRadius: 5
+    },
+    updatePostButtonContainer: {
+        width: '100%',
+        backgroundColor: '#4B0082',
+        alignItems: 'center',
+        height: 40,
+        borderRadius: 5,
+        justifyContent: 'center'
+    },
+    updatePostButton: {
+        width: '99%',
+        height: 40,
+        borderRadius: 5,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    saveText: {
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: 'bold'
+    }
 });
 
 export default styles;

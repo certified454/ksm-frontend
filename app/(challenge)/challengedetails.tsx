@@ -6,7 +6,7 @@ import { BlurView } from 'expo-blur';
 import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Animated, FlatList, RefreshControl, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Animated, FlatList, Platform, KeyboardAvoidingView, RefreshControl, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 // import { RewardedAd, RewardedAdEventType, TestIds } from 'react-native-google-mobile-ads';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import io from 'socket.io-client';
@@ -249,7 +249,8 @@ export default function ChallengeDetail() {
         </View>
     );
     return (
-        <SafeAreaView>
+        <SafeAreaView style={{flex: 1}}>
+            <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
             <ScrollView contentContainerStyle={{ backgroundColor: '#fff'}}>
                 <View style={styles.containers}>
                     {isLoading ? (
@@ -430,7 +431,7 @@ export default function ChallengeDetail() {
                         )}
                 </View>
             </ScrollView>
-             <Vote isVisible={modalVisible} onClose={() => setModalVisible(false)}>
+                <Vote isVisible={modalVisible} onClose={() => setModalVisible(false)}>
                 <View style={styles.challengeVotes}>    
                     <FlatList
                         data={votes}
@@ -445,6 +446,7 @@ export default function ChallengeDetail() {
                     />
                 </View>
             </Vote>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     )
 }

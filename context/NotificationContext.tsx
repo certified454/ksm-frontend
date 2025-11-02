@@ -1,6 +1,7 @@
 import { registerForPushNotificationsAsync } from '@/utils/registerForPushNotificationAsync';
 import { Subscription } from 'expo-media-library';
 import * as Notifications from 'expo-notifications';
+import { useRouter } from 'expo-router';
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from 'react';
 
 interface NotificationContextType{
@@ -31,6 +32,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     const responseListener = useRef<Subscription | null>(null);
     const [error, setError] = useState<Error | null>(null);
 
+    const router = useRouter();
 
     useEffect(() => {
         registerForPushNotificationsAsync().then((token) => {
@@ -45,14 +47,18 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
             setNotification(notification)
         });
         responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
-        
+            const url = response.notification.request.content.data?.url;
+            if (url) {
+                const path = url.replace('ksm://', '/');
+                router.push(path);
+            }
         });
         return () => {
-            if (notificationListener.current) {
-                Notifications.removeNotificationSubscription(notificationListener.current);
+            if (notificationListener.current && typeof notificationListener.current.remove === 'function') {
+                notificationListener.current.remove();
             }
-            if (responseListener.current) {
-                Notifications.removeNotificationSubscription(responseListener.current);
+            if (responseListener.current && typeof responseListener.current.remove === 'function') {
+                responseListener.current.remove();
             }
         }
     }, []);

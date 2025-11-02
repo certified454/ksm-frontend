@@ -1,4 +1,5 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
+const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
     container: {
@@ -10,7 +11,7 @@ const styles = StyleSheet.create({
     },
     containers: {
         width: '100%',
-        minHeight: 800,
+        minHeight: screenHeight,
         padding: 0,
         overflow: 'hidden',
         justifyContent: 'center',
@@ -18,7 +19,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#ffffff'
     },
     itemsContainer: {
-        width: 360,
+        width: screenWidth * 1,
         height: 'auto',
         justifyContent: 'center',
         alignItems: 'center',
@@ -31,7 +32,6 @@ const styles = StyleSheet.create({
         width: '100%',
         minHeight: 40,
         maxHeight: 100,
-        position: 'relative',
         paddingLeft: 15
     },
     inputContainerDate: {
@@ -49,7 +49,6 @@ const styles = StyleSheet.create({
     },
     inputContainer: {
         width: '90%',
-        height: 'auto',
         backgroundColor: 'rgba(76, 0, 130, 0.07)',
         flexDirection: 'row',
         alignItems: 'center',
@@ -64,12 +63,10 @@ const styles = StyleSheet.create({
         width: '80%',
         minHeight: 40,
         maxHeight: 80,
-        position: 'relative',
         paddingLeft: 15
     },
     indexItems: {
         width: '90%',
-        height: 'auto',
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',

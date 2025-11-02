@@ -6,8 +6,9 @@ import { Video } from 'expo-av';
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Alert, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, Platform, KeyboardAvoidingView, Text, TouchableOpacity, View } from "react-native";
 import styles from '../../assets/styles/analysis';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Analysis ={
     id: string;
@@ -87,44 +88,48 @@ export default function VideoDetails() {
         fetchAnalysis();
     }, [])
     return (
-        <View style={styles.analysisDetailContainer}>
-            
-                {loading ? (
-                    <ActivityIndicator size={'large'} color={"#4B0082"} />
-                ) : analysis ? (
-                    <View style={styles.analysisDetailItems}>
-                        <TouchableOpacity>
-                            <Image source={{ uri: analysis.user.profilePicture }} style={{ width: 50, height: 50, borderRadius: 25 }} />
-                            <Video 
-                                source={{ uri: analysis.video }}
-                                style={styles.video}
-                                resizeMode="contain"
-                                isLooping
-                                
-                            />
-                        </TouchableOpacity>
-                    </View>
-                ) : (
-                    <Text>No analysis found</Text>
-                )}
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+                <View style={styles.analysisDetailContainer}>
+                    
+                        {loading ? (
+                            <ActivityIndicator size={'large'} color={"#4B0082"} />
+                        ) : analysis ? (
+                            <View style={styles.analysisDetailItems}>
+                                <TouchableOpacity>
+                                    <Image source={{ uri: analysis.user.profilePicture }} style={{ width: 50, height: 50, borderRadius: 25 }} />
+                                    <Video 
+                                        source={{ uri: analysis.video }}
+                                        style={styles.video}
+                                        resizeMode="contain"
+                                        isLooping
+                                        
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                        ) : (
+                            <Text>No analysis found</Text>
+                        )}
 
-        
-            
-            <Text>{analysis?.title}</Text>
-            <TouchableOpacity onPress={() => { setLike(!like); handleLikeAnalysis()}} style={styles.likeAnalysis}>
-                        <Ionicons 
-                            name={ like ? 'heart' : 'heart-outline'}
-                            size={40} 
-                            color="#4B0082" 
-                            style={styles.icons} 
-                        />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleShareAnalysis} style={styles.shareAnalysis}>
-                        <Ionicons name="share-social-outline" size={40} color="#4B0082" style={styles.icons}/>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleSaveAnalysis} style={styles.saveAnalysis}>
-                       <MaterialIcons name="save-alt" size={40} color="#4B0082" style={styles.icons}/>
-            </TouchableOpacity>
-        </View>
+
+                    
+                    <Text>{analysis?.title}</Text>
+                    <TouchableOpacity onPress={() => { setLike(!like); handleLikeAnalysis()}} style={styles.likeAnalysis}>
+                                <Ionicons 
+                                    name={ like ? 'heart' : 'heart-outline'}
+                                    size={40} 
+                                    color="#4B0082" 
+                                    style={styles.icons} 
+                                />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={handleShareAnalysis} style={styles.shareAnalysis}>
+                                <Ionicons name="share-social-outline" size={40} color="#4B0082" style={styles.icons}/>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={handleSaveAnalysis} style={styles.saveAnalysis}>
+                                <MaterialIcons name="save-alt" size={40} color="#4B0082" style={styles.icons}/>
+                    </TouchableOpacity>
+                </View>
+            </KeyboardAvoidingView>
+        </SafeAreaView>
     );
 }

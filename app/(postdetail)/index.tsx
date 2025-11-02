@@ -1,5 +1,5 @@
 import styles from '@/assets/styles/postindex';
-import Caption from '@/components/caption';
+import EditPost from '@/components/caption';
 import ViewImage from '@/components/viewImage';
 import { useAuthStore } from '@/store/authStore';
 import { API_URL } from '@/store/postStore';
@@ -7,7 +7,6 @@ import { formatTimeAgo } from '@/store/util';
 import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Audio } from 'expo-av';
-
 import { Image } from 'expo-image';
 import * as MediaLabriary from 'expo-media-library';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -23,10 +22,12 @@ import {
     Text,
     TextInput,
     TouchableOpacity,
-    View
+    View,
 } from 'react-native';
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { captureRef } from 'react-native-view-shot';
 import io from 'socket.io-client';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Post = {
     id: string;
@@ -56,9 +57,10 @@ type Comment = {
 
 export default function PostDetail() {
     //get a post variables
-    const { token } = useAuthStore();
+    const { token, user } = useAuthStore();
     const [ post, setPost ] = useState<Post | null>(null);
     const { postId } = useLocalSearchParams();
+    const { commentId } = useLocalSearchParams();
     const [ loading, setLoading] = useState(true);
     const [ isImageVissable, setIsImageVisile ] = useState(false);
     const [ isModelVisible, setModelIsvisible] = useState(false);
@@ -70,12 +72,14 @@ export default function PostDetail() {
 
     // create a  comment variables
     const [ text, setText ] = useState('');
+    const [ editText, setEditText ] = useState('');
     const [ audio, setAudio ] = useState<Audio.Recording | null>(null)
     const [ audioUri, setAudioUri ] = useState<string | null>(null);
     const [ isRecording, setIsRecording ] = useState(false);
     const [ duration, setDuration] = useState<string | null>(null);
     const [ submitComment, setSubmitComment ] = useState(false);
     const [ uploading, setUploading ] = useState(false);
+    const [isUpdatingComment, setIsUpdatingComment] = useState(false)
 
     //fetch comments vairables
     const [ comments, setComments] = useState<Comment[]>([]);
@@ -91,6 +95,9 @@ export default function PostDetail() {
     const CLOUDINARY_NAME = 'dimg4aui1'
     const UPLOAD_PRESET = 'multiplecomment';
  
+    const [editVisible, setEditVisible] = useState(false);
+    const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+    const [optionsDropdownId, setOptionsDropdownId] = useState<string | null>(null);
 
     const getPost = async () => {
         try {
@@ -115,14 +122,10 @@ export default function PostDetail() {
         } finally {
         setLoading(false);
         }
-    };
-    const onCloseReadMore = () => {
-        setModelIsvisible(false)
     }
     const onCloseImageView = () => {
         setIsImageVisile(false)
     }
-
     const saveImage = async () => {
         try {
             const imageUri = await captureRef(imageRef, {height: 450, quality:1});
@@ -135,7 +138,6 @@ export default function PostDetail() {
             console.error('Failed')
         }
     }
-
     const fetchComments = async (pageNum = 1, refresh = false) => {
         try {
             if (refresh) setRefreshing(true)
@@ -168,12 +170,61 @@ export default function PostDetail() {
                 else setLoading(false)
         }
     }
-
+    const handleEditComment = async (commentId: string | null) => {
+        setIsUpdatingComment(true);
+        if (!commentId) return;
+        try{
+            const response = await fetch(`${API_URL}/post/${postId}/${commentId}`,{
+                method: 'PUT',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    text: editText
+                })
+            })
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message || "Something went wrong")
+            setEditVisible(false);
+            setComments((comments) => comments.map((comment) => comment._id === commentId ? {...comment, text: editText} : comment));
+        } catch(error){
+            console.error(error, "failed")
+        } finally {
+            setIsUpdatingComment(false)
+        }
+    }
+    const handleDeleteComment = async (commentId: string) => {
+          Alert.alert(
+            "Delete Post", 
+            "Are you sure you want to delete this post?",
+            [
+              {text: 'Cancel', style: 'cancel'},
+              {text: "Delete", onPress: async () => {
+                try {
+                  if (postId) {
+                  const response = await fetch(`${API_URL}/${commentId}`, {
+                      method: 'DELETE',
+                      headers: {
+                          Authorization: `Bearer ${token}`,
+                      },
+                  });
+                const data = await response.json();
+                console.log(data);
+                if(!response.ok) throw new Error(data.message || "Something went wrong")
+                setComments((comments) => comments.filter(comment => comment._id !== commentId));
+              }
+                } catch (error) {
+                    console.error(error);
+                } 
+              }, style: 'destructive'}
+          ]);
+          
+    };
     const handleLoadMoreComments = async () => {
         if ( hasMoreComments && !loading && !refresh )
             await fetchComments(page + 1)
     }
-
     const startRecordingAudio = async () => {
         try {
             const { status} = await Audio.requestPermissionsAsync();
@@ -200,7 +251,6 @@ export default function PostDetail() {
             Alert.alert('Error', 'Failed to start recording');
         } 
     }
-  
     const stopRecordingAudio = async () => {
         setIsRecording(false);
         try {
@@ -221,7 +271,6 @@ export default function PostDetail() {
             Alert.alert('Error', 'Failed to stop recording');
         }
     }
-
     const playAudio = async () => {
         const { sound } = await Audio.Sound.createAsync(
             { uri: audioUri ? audioUri : '' },
@@ -255,22 +304,13 @@ export default function PostDetail() {
         setSoundPlay(sound);
         setPlay(true);
 
-    };
-
+    }
     const pauseAudio = async () => {
         if (soundPlay) {
             await soundPlay.pauseAsync();
             setPlay(false)
         }
-    };
-
-    const resumeAudio = async () => {
-        if (soundPlay) {
-            await soundPlay.playAsync();
-            setPlay(true)
-        }
     }
-  
     const uploadedAudioToCloudinary = async (uri: string) => {
         setUploading(true);
         try {
@@ -303,7 +343,6 @@ export default function PostDetail() {
             setUploading(false);
         }
     }
-    
     const handleCommentSubmit = async () => {
         try {
             if (!text.trim() && !audioUri ) {
@@ -354,7 +393,6 @@ export default function PostDetail() {
             setSubmitComment(false);
         }
     }
-
     const handleSubmitLike = async () => {
         setSubmitLike(true)
         try {
@@ -375,7 +413,17 @@ export default function PostDetail() {
             Alert.alert('Error', 'Failed to like post');
         }
     }
-
+    const showOptionsDropDown = (commentId: string) => {
+        setOptionsDropdownId(commentId === optionsDropdownId ? null : commentId);
+    }
+    const modalClicked = (commentId: string) => {
+        setEditingCommentId(commentId);
+        setEditVisible(true);
+        const comment = comments.find(c => c._id === commentId); 
+        if (comment) {
+            setEditText(comment.text)
+        }
+    }
     useEffect(() => {
         getPost();
         fetchComments();
@@ -393,7 +441,6 @@ export default function PostDetail() {
             socket.disconnect();
         };
     }, [])
-    
     useEffect(() => {
         return() => {
             if (audio) {
@@ -403,12 +450,13 @@ export default function PostDetail() {
             }
         }
     }, [audio])
-
     const handleprofilePicturePress = async (id: string) => {
         router.push({ pathname: '/(profile)', params: {userId: id} });
-      }
+    }
+    const renderComment = ({ item}: {item: any }) => {
+        const isCommentOwner = item.user._id === user.id;
+        return(
 
-    const renderComment = ({ item}: {item: any }) => (
         <View style={styles.commentContainer}>
                 <Image
                     source={{ uri: item.user?.profilePicture ? item.user?.profilePicture : "https://api.dicebear.com/9.x/miniavs/svg?seed=George&backgroundType=gradientLinear&backgroundColor=b6e3f4,c0aede,ffdfbf" }}
@@ -443,138 +491,194 @@ export default function PostDetail() {
                         </View>
                     }
                 </View>  
+                
                 <View>
                     { item.text &&
                     <View style={styles.textCommented}>
                         <Text style={styles.commenttext}>{item.text}</Text>
+                        {isCommentOwner && (
+                            <View> 
+                                <TouchableOpacity onPress={() => showOptionsDropDown(item._id)}>
+                                    <Ionicons name='ellipsis-vertical' size={25} color='#4B0082' />
+                                </TouchableOpacity>
+    
+                                {optionsDropdownId === item._id && (
+                                    <View style={styles.optionsDropdown}>
+                                        <TouchableOpacity style={styles.arrowUp}>
+                                        </TouchableOpacity>
+                                        <View style={styles.editComment}>
+                                            <TouchableOpacity onPress={() => { setOptionsDropdownId(null);  modalClicked(item._id)}} style={styles.comments}>
+                                            <View style={styles.select}></View>
+                                            <Text style={styles.text4}>Edit Comment</Text>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity onPress={() => {setOptionsDropdownId(null); handleDeleteComment(item._id) }} style={styles.comments}>
+                                            <View style={styles.select}></View>
+                                            <Text style={styles.text5}>Delete Comment</Text>
+                                            </TouchableOpacity>
+                                        
+                                        </View>
+                                    
+                                        <TouchableOpacity onPress={() => setOptionsDropdownId(null)} style={styles.backComment}>
+                                            <Text style={styles.text3}>Back</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
+                            </View>
+                        )} 
                     </View>
                     } 
-                </View>  
+                </View> 
         </View>
-    )
-
+        )
+    }
     return(
-        <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'padding' : 'height'} style={{ flex: 1,  backgroundColor: "#fff" }} keyboardVerticalOffset={50}>
-        <View>
-            <ScrollView contentContainerStyle={{ padding: 5 }} keyboardShouldPersistTaps='handled'>
-                {loading ? (
-                    <ActivityIndicator size={'large'} color={'#4B0082'} style={{ top: 300 }} />
-                ) : post ? (
-                    <View style={styles.container}>
-                        <View style={styles.userdetail}>
-                            <TouchableOpacity onPress={ () => router.back()}>
-                                <Ionicons
-                                    name="arrow-back"
-                                    size={37}
-                                    color="#4B0082"
-                                    style={styles.text}
-                                />
-
-                            </TouchableOpacity>
-                            <View style={styles.userInfo}>
-                                <TouchableOpacity onPress={() => handleprofilePicturePress(post.user._id)} >
-                                    <Image
-                                        source={{ uri: post.user.profilePicture|| 'https://via.placeholder.com/50' }}
-                                        style={styles.userImage}
-                                    />
-                                </TouchableOpacity>
-                                <View style={styles.userInfoText}>
-                                    <Text style={styles.username}>{post.user.username}</Text>
-                                    <Text style={styles.createdAt}>{formatTimeAgo(post.createdAt)}</Text>
-                                </View>
-                            </View>
-
-                            <TouchableOpacity onPress={() => setIsImageVisile(true)}>
-                                <Image
-                                    source={{ uri: post.image }}
-                                    style={styles.postImage}
-                                    contentFit="cover"
-                                />
-                            </TouchableOpacity>
-                        </View>
-                        <View style={styles.recordedAudioContainer}>
-                            { audioUri && (
-                               <>
-                                    <TouchableOpacity onPress={playAudio}>
-                                        <Ionicons name='play-circle-outline' size={40} color='#4B0092'/>
-                                    </TouchableOpacity>
-                                    <Text style={{ color: '#4B0082', fontSize: 16, marginTop: 7 }}>Audio Duration: {duration ? `${duration} seconds` : 'Calculating...'}</Text>
-                               </>
-                            )}
-                        </View>
-                        
-                        <View style={styles.commentSection}>
-                                <TouchableOpacity onPress={() => { setLike(!like); handleSubmitLike() } }>
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+            <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'padding' : 'height'} style={{ flex: 1,  backgroundColor: "#fff" }} keyboardVerticalOffset={50}>
+            <View>
+                <ScrollView contentContainerStyle={{ padding: 5 }} keyboardShouldPersistTaps='handled'>
+                    {loading ? (
+                        <ActivityIndicator size={'large'} color={'#4B0082'} style={{ top: 300 }} />
+                    ) : post ? (
+                        <View style={styles.container}>
+                            <View style={styles.userdetail}>
+                                <TouchableOpacity onPress={ () => router.back()}>
                                     <Ionicons
-                                        name={like ? 'heart' : 'heart-outline'}
-                                        size={32}
-                                        color={like ? '#4B0082' : '#4B0082'}
-                                        style={styles.like}
+                                        name="arrow-back"
+                                        size={37}
+                                        color="#4B0082"
+                                        style={styles.text}
                                     />
+
                                 </TouchableOpacity>
-                                <View style={styles.textInputContainer}>
-                                    <TextInput 
-                                        style={styles.comment}
-                                        placeholder='Add a comment...'
-                                        value={text}
-                                        onChangeText={setText}
-                                        editable={!isRecording}
-                                        multiline
-                                    />
+                                <View style={styles.userInfo}>
+                                    <TouchableOpacity onPress={() => handleprofilePicturePress(post.user._id)} >
+                                        <Image
+                                            source={{ uri: post.user.profilePicture|| 'https://via.placeholder.com/50' }}
+                                            style={styles.userImage}
+                                        />
+                                    </TouchableOpacity>
+                                    <View style={styles.userInfoText}>
+                                        <Text style={styles.username}>{post.user.username}</Text>
+                                        <Text style={styles.createdAt}>{formatTimeAgo(post.createdAt)}</Text>
+                                    </View>
                                 </View>
-                               <TouchableOpacity
-                                    style={styles.recordSection}
-                                    onPress={isRecording? stopRecordingAudio : startRecordingAudio }
-                               >
-                                    <Ionicons size={35} 
-                                        name={isRecording ? 'mic-off' : 'mic-outline'}
-                                        style={isRecording ? styles.recordButton : styles.recordButton} />
-                               </TouchableOpacity>
-                               
-                                <TouchableOpacity
-                                    onPress={handleCommentSubmit} disabled={submitComment}
-                                    >
-                                    <Ionicons size={32} color={submitComment ? '#4B0082' : '#4B0082'} 
-                                    name={submitComment ? 'send' : 'send-outline'}
-                                    style={styles.sendButton}
-                                    />                 
+
+                                <TouchableOpacity onPress={() => setIsImageVisile(true)}>
+                                    <Image
+                                        source={{ uri: post.image }}
+                                        style={styles.postImage}
+                                        contentFit="cover"
+                                    />
                                 </TouchableOpacity>
-                          
+                            </View>
+                            <View style={styles.recordedAudioContainer}>
+                                { audioUri && (
+                                <>
+                                        <TouchableOpacity onPress={playAudio}>
+                                            <Ionicons name='play-circle-outline' size={40} color='#4B0092'/>
+                                        </TouchableOpacity>
+                                        <Text style={{ color: '#4B0082', fontSize: 16, marginTop: 7 }}>Audio Duration: {duration ? `${duration} seconds` : 'Calculating...'}</Text>
+                                </>
+                                )}
+                            </View>
+                            
+                            <View style={styles.commentSection}>
+                                    <TouchableOpacity onPress={() => { setLike(!like); handleSubmitLike() } }>
+                                        <Ionicons
+                                            name={like ? 'heart' : 'heart-outline'}
+                                            size={32}
+                                            color={like ? '#4B0082' : '#4B0082'}
+                                            style={styles.like}
+                                        />
+                                    </TouchableOpacity>
+                                    <View style={styles.textInputContainer}>
+                                        <TextInput 
+                                            style={styles.comment}
+                                            placeholder='Add a comment...'
+                                            value={text}
+                                            onChangeText={setText}
+                                            editable={!isRecording}
+                                            multiline
+                                        />
+                                    </View>
+                                <TouchableOpacity
+                                        style={styles.recordSection}
+                                        onPress={isRecording? stopRecordingAudio : startRecordingAudio }
+                                >
+                                        <Ionicons size={35} 
+                                            name={isRecording ? 'mic-off' : 'mic-outline'}
+                                            style={isRecording ? styles.recordButton : styles.recordButton} />
+                                </TouchableOpacity>
+                                
+                                    <TouchableOpacity
+                                        onPress={handleCommentSubmit} disabled={submitComment}
+                                        >
+                                        <Ionicons size={32} color={submitComment ? '#4B0082' : '#4B0082'} 
+                                        name={submitComment ? 'send' : 'send-outline'}
+                                        style={styles.sendButton}
+                                        />                 
+                                    </TouchableOpacity>
+                            
+                            </View>
                         </View>
+                    ) : (
+                        <ActivityIndicator size={'large'} color={'#4B0082'} style={{top: 300}}></ActivityIndicator>
+                    )}
+                </ScrollView>
+            </View> 
+                <FlatList 
+                        data={comments}
+                        renderItem={renderComment}
+                        keyExtractor={(item) => item._id}
+                        showsVerticalScrollIndicator={false}
+                        onEndReached={handleLoadMoreComments}
+                        ItemSeparatorComponent={() => <View style={{ height: -4 }} />}
+                        onEndReachedThreshold={0.1}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={refresh}
+                                onRefresh={() => fetchComments(1, true)}
+                            />
+                        }
+                    />  
+                <ViewImage isVisible={isImageVissable} onClose={onCloseImageView}>
+                    <View style={styles.displayOption}>
+                        <Text style={styles.displayUsername}>{post?.user.username}</Text>
+                        <Feather style={{bottom: 5}} onPress={saveImage} name="download" size={25} color="#ffffff" />
                     </View>
-                ) : (
-                    <ActivityIndicator size={'large'} color={'#4B0082'} style={{top: 300}}></ActivityIndicator>
-                )}
-            </ScrollView>
-        </View> 
-            <FlatList 
-                    data={comments}
-                    renderItem={renderComment}
-                    keyExtractor={(item) => item._id}
-                    showsVerticalScrollIndicator={false}
-                    onEndReached={handleLoadMoreComments}
-                    ItemSeparatorComponent={() => <View style={{ height: -4 }} />}
-                    onEndReachedThreshold={0.1}
-                    refreshControl={
-                        <RefreshControl
-                            refreshing={refresh}
-                            onRefresh={() => fetchComments(1, true)}
+                    <View ref={imageRef} collapsable={false}>
+                        <Image
+                            source={{ uri: post?.image }}
+                            style={[styles.postImage, {height:450, left: 0}]}
+                            contentFit="cover"
                         />
-                    }
-                />  
-            <ViewImage isVisible={isImageVissable} onClose={onCloseImageView}>
-                <View style={styles.displayOption}>
-                    <Text style={styles.displayUsername}>{post?.user.username}</Text>
-                    <Feather style={{bottom: 5}} onPress={saveImage} name="download" size={25} color="#ffffff" />
-                </View>
-                <View ref={imageRef} collapsable={false}>
-                    <Image
-                        source={{ uri: post?.image }}
-                        style={[styles.postImage, {height:450, left: 0}]}
-                        contentFit="cover"
-                    />
-                </View>
-            </ViewImage>
-       </KeyboardAvoidingView> 
+                    </View>
+                </ViewImage>
+                <EditPost isVisible={editVisible} onClose={() => setEditVisible(false)}>
+                    <SafeAreaProvider>
+                            <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding" keyboardVerticalOffset={80}>
+                                <View style={styles.captionContainer1}>
+                                    <TextInput 
+                                        style={styles.input}
+                                        value={editText}
+                                        onChangeText={setEditText}
+                                        multiline
+                                        editable={!isUpdatingComment}
+                                    />
+                                <View style={styles.updatePostButtonContainer}>
+                                    {isUpdatingComment ?(
+                                        <ActivityIndicator size="small" color="#fff" />
+                                    ): (
+                                        <TouchableOpacity style={styles.updatePostButton} onPress={() => {handleEditComment(editingCommentId)}}>
+                                        <Text style={styles.saveText}>Update Comment</Text>
+                                        </TouchableOpacity>
+                                    )}
+                                </View>
+                                </View>
+                            </KeyboardAvoidingView>
+                        </SafeAreaProvider>
+                </EditPost>
+            </KeyboardAvoidingView> 
+        </SafeAreaView>
     );
 }

@@ -7,9 +7,10 @@ import { BlurView } from 'expo-blur';
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, FlatList, Platform, RefreshControl, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, FlatList, KeyboardAvoidingView, Platform, RefreshControl, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import io from "socket.io-client";
 import styles from "../../assets/styles/challenge";
+import { SafeAreaView } from "react-native-safe-area-context";
 import TimePickerModal from "../../components/setTime";
 
 type Challenge = {
@@ -71,8 +72,6 @@ export default function Challenge(){
     const {token, user} = useAuthStore();
     const [poolInput, setPoolInput] = useState('');
     const [pools, setPools] = useState<string[]>([]);
-
-    
 
     const addPoolOption = () => {
         if (poolInput.trim()) {
@@ -302,171 +301,175 @@ export default function Challenge(){
         );
     };
     return(
-        <View style={styles.container}>
-            {isLoading ? (
-                <ActivityIndicator size={'large'}  color={'#4B0082'}/>
-            ): user.isOwner? (
-                <>
-                    <View style={styles.header}>
-                            <TouchableOpacity style={styles.userInfo} onPress={() => handleprofilePicturePress(user.id)}>
-                                <Image source={{ uri: user.profilePicture }} style={styles.profilePicture} />
-                                <Text style={styles.username}>{user.username}</Text>
-                            </TouchableOpacity>
-                            <BlurView tint='light' intensity={50} style={styles.create}>
-                                <TouchableOpacity onPress={() => onTimePickerOpen()}>
-                                    <Ionicons name="add-circle-outline" size={40} color="#4B0082" />
+           <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+             <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
+                <View style={styles.container}>
+                    {isLoading ? (
+                        <ActivityIndicator size={'large'}  color={'#4B0082'}/>
+                    ): user.isOwner? (
+                        <>
+                            <View style={styles.header}>
+                                    <TouchableOpacity style={styles.userInfo} onPress={() => handleprofilePicturePress(user.id)}>
+                                        <Image source={{ uri: user.profilePicture }} style={styles.profilePicture} />
+                                        <Text style={styles.username}>{user.username}</Text>
+                                    </TouchableOpacity>
+                                    <BlurView tint='light' intensity={50} style={styles.create}>
+                                        <TouchableOpacity onPress={() => onTimePickerOpen()}>
+                                            <Ionicons name="add-circle-outline" size={40} color="#4B0082" />
+                                        </TouchableOpacity>
+                                        
+                                    </BlurView>
+                            </View>
+                            <FlatList
+                                data={challenges}
+                                renderItem={renderChallenge}
+                                keyExtractor={(item: Challenge) => item._id}
+                                showsVerticalScrollIndicator={false}
+                                refreshControl={
+                                    <RefreshControl 
+                                        refreshing={refresh} 
+                                        onRefresh={() => fetchChallenge(1, true)} 
+                                    />
+                                }
+                            />
+                        </>
+                    ):(
+                        <>
+                            <View style={styles.userHeader}>
+                                <TouchableOpacity onPress={() => router.back()}>
+                                    <Ionicons name="arrow-back" size={30} color="#4B0082" />
+                                    <Text style={styles.dontMissOutText}>Don't miss out on this week's Challenge</Text>
                                 </TouchableOpacity>
-                                
-                            </BlurView>
-                    </View>
-                    <FlatList
-                        data={challenges}
-                        renderItem={renderChallenge}
-                        keyExtractor={(item: Challenge) => item._id}
-                        showsVerticalScrollIndicator={false}
-                        refreshControl={
-                            <RefreshControl 
-                                refreshing={refresh} 
-                                onRefresh={() => fetchChallenge(1, true)} 
+                                <TouchableOpacity style={styles.userInfo} onPress={() => handleprofilePicturePress(user.id)}>
+                                    <Image source={{ uri: user.profilePicture }} style={styles.profilePicture} />
+                                    <Text style={styles.username}>{user.username}</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <FlatList
+                                data={challenges}
+                                renderItem={renderChallenge}
+                                keyExtractor={(item: Challenge) => item._id}
+                                showsVerticalScrollIndicator={false}
+                                refreshControl={
+                                    <RefreshControl 
+                                        refreshing={refresh} 
+                                        onRefresh={() => fetchChallenge(1, true)} 
+                                    />
+                                }
                             />
-                        }
-                    />
-                </>
-            ):(
-                <>
-                     <View style={styles.userHeader}>
-                        <TouchableOpacity onPress={() => router.back()}>
-                            <Ionicons name="arrow-back" size={30} color="#4B0082" />
-                            <Text style={styles.dontMissOutText}>Don't miss out on this week's Challenge</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.userInfo} onPress={() => handleprofilePicturePress(user.id)}>
-                            <Image source={{ uri: user.profilePicture }} style={styles.profilePicture} />
-                            <Text style={styles.username}>{user.username}</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <FlatList
-                        data={challenges}
-                        renderItem={renderChallenge}
-                        keyExtractor={(item: Challenge) => item._id}
-                        showsVerticalScrollIndicator={false}
-                        refreshControl={
-                            <RefreshControl 
-                                refreshing={refresh} 
-                                onRefresh={() => fetchChallenge(1, true)} 
-                            />
-                        }
-                    />
-                </>
-            )}
-            
-            <View style={{padding: 10}}>
-                 <TimePickerModal isVisible={modalVisible} onClose={onTimePickerClose}>
+                        </>
+                    )}
+                    
+                    <View style={{padding: 10}}>
+                        <TimePickerModal isVisible={modalVisible} onClose={onTimePickerClose}>
 
-                    <View style={styles.itemsContainer}>
-                        <View style={styles.inputContainer}>
-                            <TextInput 
-                                style={styles.inputItem}
-                                placeholder="Title"
-                                value={title}
-                                onChangeText={setTitle}
-                                editable={!isUploading}
-                                multiline
-                            />
-                        </View>
-                        <View style={styles.inputContainer}>
-                            <TextInput 
-                                style={styles.inputItem}
-                                placeholder="Description"
-                                value={description}
-                                onChangeText={setDescription}
-                            editable={!isUploading}
-                            multiline
-                            />
-                        </View>
-                        <View style={styles.inputContainer}>
-                            <TextInput
-                                style={styles.addPoolsInput}
-                                placeholder="⚽Add question"
-                                value={poolInput}
-                                onChangeText={setPoolInput}
-                                editable={!isUploading}
-                                multiline
-                        />
-                        <TouchableOpacity onPress={addPoolOption}>
-                            <Ionicons 
-                            name={poolInput ? "checkmark-circle" : 'add-circle-outline'} 
-                            size={35} 
-                            color="#4B0082" 
-                        />
-                        </TouchableOpacity>
-                        </View>
-                        {pools.map((option, index) => (
-                                <View key={index} style={styles.indexItems}>
-                                    <Text style={styles.text}>{option}</Text>
-                                    <MaterialIcons name="question-mark" size={27} color="#4B0082" />
+                            <View style={styles.itemsContainer}>
+                                <View style={styles.inputContainer}>
+                                    <TextInput 
+                                        style={styles.inputItem}
+                                        placeholder="Title"
+                                        value={title}
+                                        onChangeText={setTitle}
+                                        editable={!isUploading}
+                                        multiline
+                                    />
                                 </View>
-                        ))}
-                        <Text style={styles.predictText}>
-                            3/5 correct answers take home this week challenge winnings
-                        </Text>
-                        <View style={styles.inputContainer}>
-                            <TouchableOpacity onPress={() => {setShowStartDate(true)}} style={styles.inputContainerDate}>
-                                <Ionicons name="calendar-number-sharp" size={24} color="#4B0082" />
-                                <Text>{startDate.toLocaleDateString([], { day: 'numeric', month: 'numeric', year: 'numeric' })}</Text>
-                            </TouchableOpacity>
+                                <View style={styles.inputContainer}>
+                                    <TextInput 
+                                        style={styles.inputItem}
+                                        placeholder="Description"
+                                        value={description}
+                                        onChangeText={setDescription}
+                                    editable={!isUploading}
+                                    multiline
+                                    />
+                                </View>
+                                <View style={styles.inputContainer}>
+                                    <TextInput
+                                        style={styles.addPoolsInput}
+                                        placeholder="⚽Add question"
+                                        value={poolInput}
+                                        onChangeText={setPoolInput}
+                                        editable={!isUploading}
+                                        multiline
+                                />
+                                <TouchableOpacity onPress={addPoolOption}>
+                                    <Ionicons 
+                                    name={poolInput ? "checkmark-circle" : 'add-circle-outline'} 
+                                    size={35} 
+                                    color="#4B0082" 
+                                />
+                                </TouchableOpacity>
+                                </View>
+                                {pools.map((option, index) => (
+                                        <View key={index} style={styles.indexItems}>
+                                            <Text style={styles.text}>{option}</Text>
+                                            <MaterialIcons name="question-mark" size={27} color="#4B0082" />
+                                        </View>
+                                ))}
+                                <Text style={styles.predictText}>
+                                    3/5 correct answers take home this week challenge winnings
+                                </Text>
+                                <View style={styles.inputContainer}>
+                                    <TouchableOpacity onPress={() => {setShowStartDate(true)}} style={styles.inputContainerDate}>
+                                        <Ionicons name="calendar-number-sharp" size={24} color="#4B0082" />
+                                        <Text>{startDate.toLocaleDateString([], { day: 'numeric', month: 'numeric', year: 'numeric' })}</Text>
+                                    </TouchableOpacity>
 
-                            <TouchableOpacity  onPress={() => {setShowEndDate(true)}} style={styles.inputContainerDate}>
-                                <Ionicons name="calendar-number-sharp" size={24} color="#4B0082" />
-                                <Text>{endDate.toLocaleDateString([], { day: 'numeric', month: 'numeric', year: 'numeric' })}</Text>
-                            </TouchableOpacity>
-                        </View>
-                        { showStartDate && (
-                            <DateTimePicker
-                                value={startDate}
-                                mode="date"
-                                display="default"
-                                onChange={startDatePicker}
-                            />
-                        )}
-                        { showEndDate && (
-                            <DateTimePicker
-                                value={endDate}
-                                mode="date"
-                                display="default"
-                                onChange={endDatePicker}
-                            />
-                        )}
-                         <TouchableOpacity onPress={() => setShowTime(true)} style={styles.time}>
-                            <Ionicons 
-                                name={ time ? "time" : "time-outline"} 
-                                size={24} 
-                                color="#4B0082" 
-                            />
-                            <Text>{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit'})}</Text>
-                        </TouchableOpacity>
-                                    
-                        { showTime && Platform.OS === 'android' && (
-                            <DateTimePicker
-                                value={time}
-                                mode="time"
-                                display="default"
-                                onChange={timePicker}
-                            />
-                        )}
-                        <TouchableOpacity style={styles.createChallenge} onPress={() =>  createChallenge()}>
-                            {isUploading ? (
-                                <ActivityIndicator size={'small'} color={'#ffff'}>
-                                </ActivityIndicator>
-                            ) : (
-                                <Text style={styles.createText}>Upload</Text>
-                            )}
-                        </TouchableOpacity>
-                     </View>
-                     <View style={{height: 90}}>
+                                    <TouchableOpacity  onPress={() => {setShowEndDate(true)}} style={styles.inputContainerDate}>
+                                        <Ionicons name="calendar-number-sharp" size={24} color="#4B0082" />
+                                        <Text>{endDate.toLocaleDateString([], { day: 'numeric', month: 'numeric', year: 'numeric' })}</Text>
+                                    </TouchableOpacity>
+                                </View>
+                                { showStartDate && (
+                                    <DateTimePicker
+                                        value={startDate}
+                                        mode="date"
+                                        display="default"
+                                        onChange={startDatePicker}
+                                    />
+                                )}
+                                { showEndDate && (
+                                    <DateTimePicker
+                                        value={endDate}
+                                        mode="date"
+                                        display="default"
+                                        onChange={endDatePicker}
+                                    />
+                                )}
+                                <TouchableOpacity onPress={() => setShowTime(true)} style={styles.time}>
+                                    <Ionicons 
+                                        name={ time ? "time" : "time-outline"} 
+                                        size={24} 
+                                        color="#4B0082" 
+                                    />
+                                    <Text>{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit'})}</Text>
+                                </TouchableOpacity>
+                                            
+                                { showTime && Platform.OS === 'android' && (
+                                    <DateTimePicker
+                                        value={time}
+                                        mode="time"
+                                        display="default"
+                                        onChange={timePicker}
+                                    />
+                                )}
+                                <TouchableOpacity style={styles.createChallenge} onPress={() =>  createChallenge()}>
+                                    {isUploading ? (
+                                        <ActivityIndicator size={'small'} color={'#ffff'}>
+                                        </ActivityIndicator>
+                                    ) : (
+                                        <Text style={styles.createText}>Upload</Text>
+                                    )}
+                                </TouchableOpacity>
+                            </View>
+                            <View style={{height: 90}}>
 
-                     </View>
-                </TimePickerModal>
-            </View>
-        </View>
+                            </View>
+                        </TimePickerModal>
+                    </View>
+                </View>
+             </KeyboardAvoidingView>
+           </SafeAreaView>
     )
 }

@@ -14,6 +14,7 @@ import {
   View
 } from "react-native";
 
+import { SafeAreaView } from "react-native-safe-area-context";
 import styles from "../../assets/styles/register";
 import { useAuthStore } from "../../store/authStore";
 
@@ -60,99 +61,105 @@ export default function Register() {
   };
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
-      <View style={styles.container}>
-        <View style={styles.card}>
-          <Text style={[styles.createText,]}>
-            Create An Account
-          </Text>
-        </View>
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+        <View style={styles.container}>
+          <View style={styles.card}>
+            <Text style={styles.createText}>
+              Create An Account
+            </Text>
+          </View>
 
-        <View style={styles.card}>
-          <TouchableOpacity style={styles.card} onPress={pickProfileImage}>
-          {profilePicture ? (
-            <View>
-              <Image
-                source={{ uri: profilePicture || "https://api.dicebear.com/9.x/miniavs/svg?seed=George&backgroundType=gradientLinear&backgroundColor=b6e3f4,c0aede,ffdfbf" }} style={styles.profilePicture}
-              />
-            </View>
-          ): (
-            <View style={styles.profilePicturePlaceholder}>
-              <Inonicons name="person-circle" size={100} color="#4B0082" />
-              <Text style={styles.placeholderText}>Tap to select profile picture</Text>
-            </View>
-          )}
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.cardItem}>
-          <Text style={styles.textinput}>Username</Text>
-          <TextInput
-            style={styles.inputform}
-            placeholder="Enter your username"
-            value={username}
-            onChangeText={setUsername}
-          />
-
-          <Text style={styles.textinputItem}>Email</Text>
-          <TextInput
-            style={styles.inputform}
-            placeholder="Enter your email"
-            value={email}
-            onChangeText={setEmail}
-          />
-
-          <Text style={styles.textinputItem}>Password</Text>
-          <View style={styles.textInputView}>
-            <TextInput
-              style={styles.inputform}
-              placeholder="Enter your password"
-              secureTextEntry={!showPassword}
-              value={password}
-              onChangeText={setPassword}
-            />
-            <TouchableOpacity
-              onPress={() => setShowPassword(!showPassword)}
-              style={styles.passwordContainer}
-            >
-              <Inonicons
-                name={showPassword ? "eye-off" : "eye"}
-                size={24}
-                color="#4B0082"
-              />
+          <View style={styles.card}>
+            <TouchableOpacity style={styles.card} onPress={pickProfileImage}>
+            {profilePicture ? (
+              <View>
+                <Image
+                  source={{ uri: profilePicture || "https://api.dicebear.com/9.x/miniavs/svg?seed=George&backgroundType=gradientLinear&backgroundColor=b6e3f4,c0aede,ffdfbf" }} style={styles.profilePicture}
+                />
+              </View>
+            ): (
+              <View style={styles.profilePicturePlaceholder}>
+                <Inonicons name="person-circle" size={100} color="#4B0082" />
+                <Text style={styles.placeholderText}>Tap to select profile picture {}</Text>
+              </View>
+            )}
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity
-            style={[styles.button, { marginTop: 70, alignItems: "center" }]}
-            onPress={handleRegister}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <ActivityIndicator size="small" color="#ffffff" />
-            ) : (
-              <Text style={styles.fonttext}>Register</Text>
-            )}
-          </TouchableOpacity>
+          <View style={styles.cardItem}>
+            <Text style={styles.textinput}>Username {}</Text>
+            <TextInput
+              style={styles.inputform}
+              placeholder="Enter your username"
+              value={username}
+              onChangeText={setUsername}
+            />
 
+            <Text style={styles.textinputItem}>Email {}</Text>
+            <TextInput
+              style={styles.inputform}
+              placeholder="Enter your email"
+              value={email}
+              onChangeText={setEmail}
+            />
+
+            <Text style={styles.textinputItem}>Password {}</Text>
+            <View style={styles.textInputView}>
+              <TextInput
+                style={styles.inputform}
+                placeholder="Enter your password"
+                secureTextEntry={!showPassword}
+                value={password}
+                onChangeText={setPassword}
+                autoCorrect={false}
+                autoCapitalize="none"
+              />
+              <TouchableOpacity
+                onPress={() => setShowPassword(!showPassword)}
+                style={styles.passwordContainer}
+              >
+                <Inonicons
+                  name={showPassword ? "eye-off" : "eye"}
+                  size={24}
+                  color="#4B0082"
+                />
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleRegister}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <ActivityIndicator size="small" color="#ffffff" />
+              ) : (
+                <Text style={styles.fonttext}>
+                  Register {}
+                </Text>
+              )}
+            </TouchableOpacity>
+
+          </View>
+          <Text style={styles.fontText}>
+            Already have an account? {}
+          </Text>
           <View style={styles.cardItems}>
-            <Text style={styles.fontText}>
-              Already have an account?
-            </Text>
             <Link href="/(auth)">
               <Text style={styles.login}>
-                Login
+                Login {}
               </Text>
             </Link>
             <Text style={styles.sepration}>
               ||
             </Text>
             <Link href="/(auth)/verify" style={styles.login}>
-              Verify
+              Verify {}
             </Link>
           </View>
         </View>
-      </View>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

@@ -3,7 +3,8 @@ import { useAuthStore } from "@/store/authStore";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
 import { useState } from "react";
-import { KeyboardAvoidingView, Platform, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from "../../assets/styles/menu";
 
 export default function Profile() {
@@ -16,15 +17,12 @@ export default function Profile() {
     const onCloseImageView = () => {
         setImagevisable(false)
     }
-    const handleEditProfile = () => {}
-
     const handleFollow = () => {}
 
     const handleCall = () => {}
 
     return (
-        <KeyboardAvoidingView 
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
             <View style={styles.container}>
                 <View style={styles.userprofileImage}>
                     <TouchableOpacity onPress={onImageView}>
@@ -71,6 +69,6 @@ export default function Profile() {
                 </View>
             <ViewImage isVisible={isImageVissable} onClose={onCloseImageView} />
             </View>
-        </KeyboardAvoidingView>
+        </SafeAreaView>
     );
 }

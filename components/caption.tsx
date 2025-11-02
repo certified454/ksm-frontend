@@ -7,13 +7,13 @@ type Props = PropsWithChildren <{
     onClose: () => void
 }>
 
-export default function Caption({isVisible, children, onClose}: Props) {
+export default function EditPost({isVisible, children, onClose}: Props) {
     return(
         <View>
             <Modal animationType="slide" transparent={true} visible={isVisible}>
                 <View style={style.modalContent}>
                     <View style={style.titleContainer}>
-                        <Text style={style.title}> Read more</Text>
+                        <Text style={style.title}> Edit Post</Text>
                         <Pressable onPress={onClose}>
                             <Ionicons name="close" size={25} color={'#4B0082'}/>
                         </Pressable>
@@ -25,14 +25,13 @@ export default function Caption({isVisible, children, onClose}: Props) {
     )
 }
  const style = StyleSheet.create({
-     modalContent: {
-        flex: 1,
-        height: 'auto',
+    modalContent: {
+        minHeight: 500,
+        maxHeight: '80%',
+        overflow: 'hidden',
         width: '100%',
-        borderTopRightRadius: 18,
-        borderTopLeftRadius: 18,
         position: 'absolute',
-        bottom: 0,
+        top: 35,
     },
     titleContainer: {
         height: 45,
@@ -45,7 +44,6 @@ export default function Caption({isVisible, children, onClose}: Props) {
     title: {
         color: '#000',
         fontSize: 18,
-        fontStyle: 'italic',
         fontWeight: 'bold'
     },
 })

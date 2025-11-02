@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  KeyboardAvoidingView,
   Platform,
   Text,
   TextInput,
@@ -16,11 +17,10 @@ import {
 } from "react-native";
 import { useAuthStore } from "../../store/authStore";
 import { API_URL } from "../../store/postStore";
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Index() {
   const [caption, setcaption] = useState("");
-  const [tags, setTags] = useState("");
-  const [mentions, setMentions] = useState("");
   const [image, setImage] = useState<any>(null);
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [isLoading, setLoading] = useState<boolean>(false);
@@ -57,11 +57,9 @@ export default function Index() {
       console.error("Error picking image", error);
     }
   };
-
   useEffect(() => {
     userProfilePictureStore.getState().fetchProfilePicture();
   }, []);
-
   const handleUpload = async () => {
     if (!caption.trim() || !image){
       Alert.alert("Error", "All fields are required");
@@ -95,7 +93,7 @@ export default function Index() {
       setcaption("");
       setImage(null);
       setImageBase64(null);
-      router.push("/");
+      router.push("/(tabs)");
     } catch(error){
       console.error(error, "Error while uploading")
       const errorMessage = (error instanceof Error && error.message) ? error.message : "Something went Wrong";
@@ -104,57 +102,61 @@ export default function Index() {
   }
 
   return (
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()}>
-            <Ionicons name="arrow-back" size={35} color="#4B0082" />
-          </TouchableOpacity>
-          <Text style={styles.headerText}>Create Post</Text>
-            <Image
-              source = {{ uri: user.profilePicture || "https://api.dicebear.com/9.x/miniavs/svg?seed=George&backgroundType=gradientLinear&backgroundColor=b6e3f4,c0aede,ffdfbf"}}
-              style={styles.profile}/>    
-        </View>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <TouchableOpacity onPress={() => router.back()}>
+              <Ionicons name="arrow-back" size={35} color="#4B0082" />
+            </TouchableOpacity>
+            <Text style={styles.headerText}>Create Post</Text>
+              <Image
+                source = {{ uri: user.profilePicture || "https://api.dicebear.com/9.x/miniavs/svg?seed=George&backgroundType=gradientLinear&backgroundColor=b6e3f4,c0aede,ffdfbf"}}
+                style={styles.profile}/>    
+          </View>
 
-        <View style={styles.createcard}>
-          <TextInput 
-            style={styles.caption}
-            placeholder="write a caption"
-            value={caption}
-            onChangeText={setcaption}
-            editable={!isLoading}
-            multiline
-            />
-        </View>
+          <View style={styles.createcard}>
+            <TextInput 
+              style={styles.caption}
+              placeholder="write a caption"
+              value={caption}
+              onChangeText={setcaption}
+              editable={!isLoading}
+              multiline
+              />
+          </View>
 
-        <View style={styles.card}>
-          <TouchableOpacity style={styles.imagecard} onPress={pickImage}>
-            {imageBase64 ? (
-              <View style={styles.imagecard}>
-                <Image style={[styles.imagecard]} source={{ uri: imageBase64 }} />
-              </View>
+          <View style={styles.card}>
+            <TouchableOpacity style={styles.imagecard} onPress={pickImage}>
+              {imageBase64 ? (
+                <View style={styles.imagecard}>
+                  <Image style={[styles.imagecard]} source={{ uri: imageBase64 }} />
+                </View>
+              ) : (
+                <View>
+                  <Ionicons style={{left:"15%"}} name="camera" size={40} color={"#4B0082"} />
+                  <Text style={styles.text}> Choose a file </Text>
+                </View>
+              )
+            }
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.post}>
+            <TouchableOpacity
+              style={[styles.button,  { justifyContent: "center", alignItems: "center" },
+              ]}
+              onPress={handleUpload}
+              disabled={isLoading}> 
+              {isLoading ? (
+                <ActivityIndicator color="#ffffff" size={"small"}/>
             ) : (
-              <View>
-                <Ionicons style={{left:"15%"}} name="camera" size={40} color={"#4B0082"} />
-                <Text style={styles.text}> Choose a file </Text>
-              </View>
-            )
-          }
-          </TouchableOpacity>
+                <Text style={[styles.fonttext, { fontWeight: "bold" }]}> Upload </Text>
+            )}
+            </TouchableOpacity>
+          </View>
         </View>
-
-        <View style={styles.post}>
-          <TouchableOpacity
-            style={[styles.button,  { justifyContent: "center", alignItems: "center" },
-            ]}
-            onPress={handleUpload}
-            disabled={isLoading}> 
-            {isLoading ? (
-              <ActivityIndicator color="#ffffff" size={"small"}/>
-           ) : (
-              <Text style={[styles.fonttext, { fontWeight: "bold" }]}> Upload </Text>
-           )}
-          </TouchableOpacity>
-        </View>
-      </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   )
 }
