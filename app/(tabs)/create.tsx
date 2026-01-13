@@ -1,6 +1,6 @@
 import styles from "@/assets/styles/create";
 import { userProfilePictureStore } from "@/store/profileStore";
-import Ionicons from "@expo/vector-icons/Ionicons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
@@ -15,9 +15,10 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Toast from "react-native-toast-message";
 import { useAuthStore } from "../../store/authStore";
 import { API_URL } from "../../store/postStore";
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Index() {
   const [caption, setcaption] = useState("");
@@ -55,14 +56,24 @@ export default function Index() {
      }
     } catch (error) {
       console.error("Error picking image", error);
+      Toast.show({
+        type: "error",
+        text1: "Error picking image",
+        text2: "An error occurred while picking the image. Please try again."
+      });
     }
   };
   useEffect(() => {
     userProfilePictureStore.getState().fetchProfilePicture();
   }, []);
+
   const handleUpload = async () => {
     if (!caption.trim() || !image){
-      Alert.alert("Error", "All fields are required");
+     Toast.show({
+      type: "error",
+      text1: "Upload Failed",
+      text2: "Caption and Image are required to upload a post",
+     })
       return;
     }
     try {
@@ -93,11 +104,20 @@ export default function Index() {
       setcaption("");
       setImage(null);
       setImageBase64(null);
+      Toast.show({
+        type: "success",
+        text1: "Upload Successful",
+        text2: "Your post has been uploaded successfully",
+      });
       router.push("/(tabs)");
     } catch(error){
       console.error(error, "Error while uploading")
       const errorMessage = (error instanceof Error && error.message) ? error.message : "Something went Wrong";
-      Alert.alert("Failed", errorMessage);
+      Toast.show({
+        type: "error",
+        text1: "Upload Failed",
+        text2: errorMessage,
+      });
     } finally { setLoading(false)}
   }
 
@@ -107,7 +127,7 @@ export default function Index() {
         <View style={styles.container}>
           <View style={styles.header}>
             <TouchableOpacity onPress={() => router.back()}>
-              <Ionicons name="arrow-back" size={35} color="#4B0082" />
+              <MaterialIcons name="arrow-back-ios" size={35} color="#4B0082" style={styles.backIcon} />
             </TouchableOpacity>
             <Text style={styles.headerText}>Create Post</Text>
               <Image

@@ -1,15 +1,15 @@
 import SafeScreen from "@/components/safescreen";
 import { NotificationProvider } from "@/context/NotificationContext";
 import { useAuthStore } from "@/store/authStore";
+import { Image } from 'expo-image';
 import * as Notifications from 'expo-notifications';
 import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
+import { ActivityIndicator, View, } from 'react-native';
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { View, ActivityIndicator } from "react-native";
-import { Image } from "expo-image";
-
+import Toast from "react-native-toast-message";
 SplashScreen.preventAutoHideAsync();
 
 Notifications.setNotificationHandler({
@@ -75,10 +75,13 @@ export default function RootLayout() {
             <Stack.Screen name="(challenge)" />
             <Stack.Screen name="(tag)" />
             <Stack.Screen name="(respond)" />
+            <Stack.Screen name="(news)" />
+            <Stack.Screen name="(contest)" />
           </Stack>
         </NotificationProvider>
       </SafeScreen>
       <StatusBar style="dark" />
+      <Toast />
     </SafeAreaProvider>
   );
 }

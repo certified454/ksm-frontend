@@ -1,7 +1,8 @@
 import { useAuthStore } from "@/store/authStore";
-import Ionicons from "@expo/vector-icons/Ionicons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { PropsWithChildren } from "react";
-import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import { Dimensions, Modal, Pressable, StyleSheet, Text, View } from "react-native";
+const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
 type Props = PropsWithChildren <{
     isVisible: boolean;
@@ -15,11 +16,13 @@ export default function UserDetailPage({isVisible, children, onClose}: Props) {
             <Modal animationType="slide" transparent={true} visible={isVisible}>
                 <View style={style.modalContent}>
                     <View style={style.titleContainer}>
-                        <Text style={style.title}>{user?.username}'s profile details</Text>
-                        <Pressable onPress={onClose}>
-                            <Ionicons name="close" size={25} color={'#4B0082'}/>
-                        </Pressable>
-                    </View>
+                             <Pressable onPress={onClose} style={style.press}>
+                                <View style={style.icon}>
+                                    <MaterialIcons name="arrow-back-ios" size={24} style={style.icons} color={'#4B0082'}/>    
+                                </View>
+                                <Text style={style.title}>{user?.username}'s profile details</Text>
+                            </Pressable>
+                        </View>
                     <View style={style.childrenContainer}>
                         {children}
                     </View>
@@ -34,25 +37,43 @@ export default function UserDetailPage({isVisible, children, onClose}: Props) {
         width: '100%',
         backgroundColor: '#fff'
     },
-    titleContainer: {
-        height: 45,
-        borderTopRightRadius: 10,
-        borderTopLeftRadius: 10,
-        paddingHorizontal: 20,
-        top: 40,
+        titleContainer: {
+        height: '5%',
+        paddingLeft: 10,
         flexDirection: 'row',
+        paddingHorizontal: 20,
         alignItems: 'center',
-        justifyContent: 'space-between',
+        justifyContent: "space-between"
+    },
+    icon: {
+        width: screenWidth * 0.11,
+        height: screenHeight * 0.05,
+        borderWidth: 0.5,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderColor: '#4c00829f',
+        borderRadius: screenHeight * 0.01
+    },
+    icons: {
+        marginLeft: screenWidth * 0.025
+    },
+    press: {
+        flexDirection: 'row',
+        alignItems: 'center', 
+        position: 'absolute', 
+        top: screenHeight * 0.05, 
+        left:10,
+        gap: 10
     },
     title: {
-        color: '#4B0082',
-        fontSize: 20,
+        fontSize: screenHeight * 0.022,
         fontWeight: 'bold'
     },
     childrenContainer: {
         flex: 1,
-        top: 40,
+        top: screenHeight * 0.07,
         alignItems: 'center',
         gap: 40
     },
 })
+

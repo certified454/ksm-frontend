@@ -38,7 +38,23 @@ export function formatTimeAgo(dateString) {
     return `${years} year${years === 1 ? '' : 's'} ago`
   
 }
-
+// Format data to show today, yesterday, or the date
+export function formatDateWithTime(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const isToday = date.toDateString() === now.toDateString();
+    const yesterday = new Date(now);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const isYesterday = date.toDateString() === yesterday.toDateString();
+    
+    const time = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    
+     return isToday
+         ? `Today @ ${time}`
+         : isYesterday
+             ? `Yesterday @ ${time}`
+             : date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ` at ${time}`;
+}
 // Comments label to each post
 export function formatComments(count) {
     if (count === 0) return ''
@@ -79,4 +95,40 @@ export function formatVoteCount(count) {
     if (count === 1) return `${count} entry`;
     if (count < 99) return `${count} entries`;
     if (count < 100) return '99+ entries';
+}
+
+//convert date to tue, wed, etc. or return the date string
+export function getDateLabel(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const isToday = date.toDateString() === now.toDateString();
+    const yesterday = new Date(now);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const isYesterday = date.toDateString() === yesterday.toDateString();
+    if (isToday) return 'Today';
+    if (isYesterday) return 'Yesterday';
+    const options = { weekday: 'short' };
+    return date.toLocaleDateString('en-US', options);
+}
+
+//convert date to a time string
+export function formatTimeFromTimeString(timeString, dateString = null) {
+    if (!timeString) return '';
+    try {
+        const datePart = dateString ?? new Date().toISOString().split('T')[0];
+        const iso = `${datePart}T${timeString}Z`; // treat backend time as UTC
+        const d = new Date(iso);
+        if (isNaN(d.getTime())) throw new Error('invalid date');
+        // format like "9:30pm"
+        return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }).toLowerCase().replace(' ', '');
+    } catch {
+        // fallback: parse "HH:MM" or "HH:MM:SS"
+        const parts = (timeString || '').split(':').map(p => parseInt(p, 10));
+        if (parts.length >= 2) {
+            const tmp = new Date();
+            tmp.setHours(parts[0], parts[1], parts[2] || 0, 0);
+            return tmp.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }).toLowerCase().replace(' ', '');
+        }
+        return timeString;
+    }
 }

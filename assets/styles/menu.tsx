@@ -6,9 +6,8 @@ export const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 2, 
-        justifyContent: 'flex-start', 
         alignItems: 'center',
-        width: 360,
+        width: screenWidth -5,
         backgroundColor: '#fff',
     },
     innerContainer: {
@@ -19,7 +18,7 @@ export const styles = StyleSheet.create({
         width: '100%',
         marginInline: 10,
         top: 10,
-        gap: 10
+        gap: 5
     },
     userContainer: {
         minHeight: 100,
@@ -27,11 +26,12 @@ export const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: '#ffffff',
+        backgroundColor: '#fff',
         borderRadius: 5,
         shadowColor: '#000',
-        shadowOpacity: 2,
-        elevation: 5,
+        shadowOpacity: 0.05,
+        elevation: 3,
+        marginLeft: screenWidth / 120,
     },
     item: {
         width: '100%',
@@ -40,70 +40,88 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
-        gap: 10,
-        backgroundColor: '#ffffff',
+        gap: 13
     },
     onpress: {
-        height: 80,
+        height: screenHeight / 9,
         width: "45%",
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        backgroundColor: '#ffffff',
-        borderRadius: 20,
+        justifyContent: 'center',
+        backgroundColor: '#fff',
+        borderRadius: 15,
         shadowColor: '#000',
-        shadowOpacity: 0.1,
-        elevation: 5,
+        shadowOpacity: 0.05,
+        elevation: 2,
+        overflow: 'hidden'
     },
     itemContainer: {
         height: screenHeight / 10,
-        width: "45%",
+        width: "90%",
         alignSelf: 'center',
         justifyContent: 'center',
+        alignItems: 'center',
+        gap: 5
+    },
+    itemslists: {
+        width: '98%',
+        height: '40%',
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     menuTitle: {
         fontSize: screenWidth / 40 * 2.3,
         fontWeight: 'bold',
         color: 'black',
-        right: 30
+        marginRight: 40
     },
     userprofile: {
         width: '50%',
         flexDirection: 'row-reverse',
         justifyContent: 'flex-start',
-        right: 15
+        marginRight: 15
     },
     userInfo: {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'flex-start',
+        marginTop: 10
+    },
+    profilePictureContainer: {
+        width: screenWidth / 6,
+        height: screenWidth / 6,
+        borderRadius: screenWidth / 6,
+        position: 'absolute',
+        overflow: 'hidden',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: screenHeight / -65,
+        marginLeft: screenWidth / 60,
+        shadowColor: "#000",
+        shadowOpacity: 0.05,
+        elevation: 3.5
     },
     profilePicture: {
-        width: 60,
-        height: 60,
-        borderRadius: 60,
-        position: 'absolute',
-        marginTop:-32,
-        left: -30
+        width: screenWidth / 6,
+        height: screenWidth / 6,
     },
     username: {
-        fontSize: 18,
-        fontWeight: '500',
-        top: 30
+        fontSize: screenHeight * 0.023,
+        fontWeight: 'bold',
+        fontFamily: 'serif',
+        marginTop: screenHeight / 15
     },
     itemslist: {
-        left: 67,
-        bottom: 3
+        alignSelf: 'center',
     },
     text: {
-        fontSize: screenWidth / 40 * 1.6,
+        fontSize: screenWidth / 40 * 1.5,
         width: '100%',
         textAlign: 'center',
-        fontWeight: '500',
         color: '#000',
     },
     logout: {
-        height: 50,
+        height: screenHeight / 15,
         width: "98%",
         backgroundColor: '#4B0082',
         borderRadius: 5,
@@ -111,21 +129,24 @@ export const styles = StyleSheet.create({
         gap: 5,
         justifyContent: 'center',
         alignItems: 'center',
+        marginLeft: screenWidth / 80 * 2
     },
-    userprofileImage: {
-        width: "100%",
-        height: 350,
+    logoutContent: {
+        maxWidth: '50%',
+        flexDirection: 'row',
+        justifyContent: 'center',
         alignItems: 'center',
-        overflow: 'hidden',
+        gap: 10,
+    },
+    logoutText: {
+        color: '#f9f9f9',
+        fontSize: screenWidth / 40 * 1.9,
+        fontWeight: '500',
     },
     mainItemContainer: {
         height: 200,
         width: '100%', 
         overflow: 'hidden',
-    },
-     profileImage: {
-        width: 360,
-        height:  360
     },
     mainUserContainer:{
         width: '100%',
@@ -150,6 +171,15 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: '#e8e8e8',
         paddingLeft: 5,
+    },
+    iconBack: {
+        width: screenWidth * 0.11,
+        height: screenHeight * 0.05,
+        borderWidth: 0.5,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderColor: '#4c00829f',
+        borderRadius: screenHeight * 0.01
     },
     iconView: {
         width: 'auto',

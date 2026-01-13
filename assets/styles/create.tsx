@@ -20,8 +20,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 3,
   },
+  backIcon: {
+    marginLeft: 10,
+  },
   headerText: {
-    fontSize: 25,
+    fontSize: 20,
     fontWeight: "bold",
     color: "#4B0082",
     fontFamily: "serif",
@@ -30,8 +33,12 @@ const styles = StyleSheet.create({
     width:60,
     height: 60,
     borderRadius: 100,
+    borderColor: '#cccccc',
     marginTop: 0,
-    borderWidth: 0.2
+    borderWidth: 1,
+    shadowOpacity: 0.05,
+    elevation: 3.5,
+    marginRight: 10
   },
   card: {   
     width: "93%",
@@ -39,9 +46,9 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: "#ffffff",
     shadowColor: "#000",
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.05,
     shadowRadius: 5,
-    elevation: 3, 
+    elevation: 2, 
     alignItems: 'center',
     overflow: "hidden",
     justifyContent: "center",
@@ -80,9 +87,10 @@ const styles = StyleSheet.create({
     marginBottom: 0,
     minHeight: 50,
     maxHeight: 100,
+    fontSize: 12,
   },
   text: {
-    fontSize: 25,
+    fontSize: 20,
     fontFamily: "serif"
   },
   post: {
@@ -101,7 +109,7 @@ const styles = StyleSheet.create({
   },
   fonttext:{
     color: '#fff',
-    fontSize: 21,
+    fontSize: 16,
   },
   
 })

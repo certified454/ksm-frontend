@@ -27,21 +27,24 @@ export default function Menu() {
     };
     const handleAnalysisPress = () => {
         router.push('/(videos)')
-    }
+    };
     const handleChallengePress = () => {
         router.push({ pathname: '/(challenge)' })
+    };
+    const handleNewsPress = () => {
+        router.push({ pathname: '/(news)'})
     }
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
             <View style={styles.container}>
                 <View style={styles.innerContainer}>
                     <View style={styles.userContainer}>
-                        <Ionicons name={"arrow-back"} color={'#4B0082'} size={35} onPress={() => router.back()} style={{left:3}}/>
+                        <MaterialIcons name="arrow-back-ios" color={'#4B0082'} size={30} onPress={() => router.back()} style={{marginLeft: 15}}/>
                         <Text style={styles.menuTitle}>Menu{}</Text>
                         <View style={styles.userprofile}>
                             <View style={styles.userInfo}>
-                                <TouchableOpacity onPress={() => handleprofilePicturePress(user?.id)}>
-                                   <Image  style={styles.profilePicture} source={{ uri: user.profilePicture}}/>
+                                <TouchableOpacity style={styles.profilePictureContainer} onPress={() => handleprofilePicturePress(user?.id)}>
+                                   <Image style={styles.profilePicture} source={{ uri: user.profilePicture}}/>
                                 </TouchableOpacity>
                             <Text style={styles.username}>{user.username}</Text>
                             </View>
@@ -53,7 +56,6 @@ export default function Menu() {
                             <View style={styles.itemContainer}>
                                 <View style={styles.itemslists}>
                                     <Ionicons style={styles.itemslist} name={'person-add'} color={'#4B0082'} size={24}/>
-                                    
                                 </View>
                                 <View style={styles.itemslists}>
                                     <Text style={styles.text}>Followers{}</Text>
@@ -63,69 +65,83 @@ export default function Menu() {
 
                         <TouchableOpacity style={styles.onpress}>
                             <View style={styles.itemContainer}>
-                                <View>
+                                <View style={styles.itemslists}>
                                     <Ionicons style={styles.itemslist} name={'tv'} color={'#4B0082'} size={24}/>
-                                    <Text style={[styles.text, { left: 64 }]}>Live</Text>
+                                </View>
+                                <View style={styles.itemslists}>
+                                    <Text style={styles.text}>Live</Text>
                                 </View>
                             </View>
                         </TouchableOpacity>
                     </View>
 
-                    <View style={ [styles.item, { bottom: 10 }]}>
+                    <View style={styles.item}>
                         <TouchableOpacity onPress={handleAnalysisPress} style={styles.onpress}>
                             <View style={styles.itemContainer}>
-                                <View >
+                                <View style={styles.itemslists}>
                                     <MaterialIcons style={styles.itemslist}name="analytics" size={25} color={'#4B0082'} />
-                                    <Text style={[styles.text, { left: 53 }]}>Analysis</Text>
+                                </View>
+                                <View style={styles.itemslists}>
+                                    <Text style={styles.text}>Analysis</Text>
                                 </View>
                             </View>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.onpress}>
+                        <TouchableOpacity style={styles.onpress} onPress={handleNewsPress}>
                             <View style={styles.itemContainer}>
-                                <View>
+                                <View style={styles.itemslists}>
                                     <Ionicons style={styles.itemslist} name={'newspaper'} color={'#4B0082'} size={24}/>
-                                    <Text style={[styles.text, { left: 61 }]}>News</Text>
+                                </View>
+                                <View style={styles.itemslists}>
+                                    <Text style={styles.text}>News</Text>
                                 </View>
                             </View>
                         </TouchableOpacity>
                     </View>
 
-                    <View style={ [styles.item, { bottom: 10 }]}>
+                    <View style={ [styles.item, ]}>
                         <TouchableOpacity style={styles.onpress} onPress={() => handleChallengePress()}>
                             <View style={styles.itemContainer}>
-                                <View >
-                                    <MaterialCommunityIcons style={[styles.itemslist,{bottom: 3}]} name="head-lightbulb" size={30} color={'#4B0092'} />
-                                    <Text style={[styles.text, {bottom: 3, left: 45, fontSize: 16 }]}>Challenges</Text>
+                                <View style={styles.itemslists}>
+                                    <MaterialCommunityIcons style={styles.itemslist} name="head-lightbulb" size={30} color={'#4B0092'} />
+                                </View>
+                                <View style={styles.itemslists}>
+                                    <Text style={styles.text}>Challenges</Text>
                                 </View>
                             </View>
                         </TouchableOpacity>
 
                         <TouchableOpacity style={styles.onpress}>
                             <View style={styles.itemContainer}>
-                                <View>
-                                    <MaterialIcons style={[styles.itemslist, {top:2}]}name="sports-esports" size={30} color={'#4B0082'} />
-                                    <Text style={[styles.text, { left: 60 }]}>Sports</Text>
+                                <View style={styles.itemslists}>
+                                    <MaterialIcons style={styles.itemslist} name="sports-esports" size={30} color={'#4B0082'} />
+                                </View>
+                                <View style={styles.itemslists}>
+                                    <Text style={styles.text}>Sports</Text>
                                 </View>
                             </View>
                         </TouchableOpacity>
                     </View>
 
-                    <View style={ [styles.item, { bottom: 10 }]}>
+                    <View style={ [styles.item, ]}>
                         <TouchableOpacity style={styles.onpress} onPress={() => Linking.openURL('https://www.youtube.com/@kismetKSM')}>
                             <View style={styles.itemContainer}>
-                                <View >
+                                <View style={styles.itemslists}>
                                     <MaterialIcons style={styles.itemslist}name="slideshow" size={29} color={'#4B0082'} />
-                                    <Text style={[styles.text, { left: 50 }]}>Highlights</Text>
+                                </View>
+                                <View style={styles.itemslists}>
+                                    <Text style={styles.text}>Highlights</Text>
                                 </View>
                             </View>
                         </TouchableOpacity>
 
                         <TouchableOpacity style={styles.onpress}>
                             <View style={styles.itemContainer}>
-                                <View>
-                                    <MaterialIcons style={styles.itemslist}name="help" size={29} color={'#4B0082'} />
-                                    <Text style={[styles.text, { left: 67 }]}>Help</Text>
+                                <View style={styles.itemslists}>
+                                    <MaterialIcons style={styles.itemslist} name="help" size={29} color={'#4B0082'} />
+                                </View>
+                                <View style={styles.itemslists}>
+                                    <Text style={styles.text}>Help</Text>
                                 </View>
                             </View>
                         </TouchableOpacity>
@@ -133,9 +149,10 @@ export default function Menu() {
 
                     <View style={styles.item}>
                     <TouchableOpacity style={styles.logout} onPress={handleLogout}>
-                        <Ionicons  name={'log-out'} color={'#f9f9f9'} size={26}
-                        />
-                        <Text style={[styles.text, {color: '#f9f9f9'}]}>Logout</Text>
+                        <View style={styles.logoutContent}>
+                            <Ionicons  name={'log-out'} color={'#f9f9f9'} size={26} />
+                            <Text style={styles.logoutText}>Logout</Text>
+                        </View>
                     </TouchableOpacity>
                     </View>
                 </View>

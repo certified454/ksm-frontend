@@ -1,11 +1,11 @@
 import { API_URL } from "@/store/postStore";
-import { Ionicons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useState, useEffect } from "react";
-import { ActivityIndicator, Text, TextInput, KeyboardAvoidingView, Platform,TouchableOpacity, View } from "react-native";
+import { useState } from "react";
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import styles from '../../assets/styles/team';
 import { useAuthStore } from "../../store/authStore";
-import { SafeAreaView } from "react-native-safe-area-context";
 // import { RewardedAd, RewardedAdEventType, TestIds } from 'react-native-google-mobile-ads';
 
 export default function CreateTeam() {
@@ -22,11 +22,11 @@ export default function CreateTeam() {
     
     const position = [
         {key: 'GK', label: 'GK', top: '80%', left: '45%'},
-        {key: 'LB', label: 'LB', top: '62%', left: '30%'},
-        {key: 'CB', label: 'CB', top: '62%', left: '65%'},
-        {key: 'CM', label: 'CM', top: '40%', left: '45%'},
-        {key: 'RW', label: 'RW', top: '23%', left: '80%'},
-        {key: 'LW', label: 'LW', top: '23%', left: '13%'},
+        {key: 'LB', label: 'LB', top: '62%', left: '27%'},
+        {key: 'CB', label: 'CB', top: '62%', left: '70%'},
+        {key: 'CM', label: 'CM', top: '42%', left: '45%'},
+        {key: 'RW', label: 'RW', top: '23%', left: '75%'},
+        {key: 'LW', label: 'LW', top: '23%', left: '16%'},
         {key: 'ST', label: 'ST', top: '8%', left: '45%'},
 
     ]
@@ -79,7 +79,7 @@ export default function CreateTeam() {
             <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
                 <View style={styles.container}>
                     <View style={styles.topBar} >
-                        <Ionicons onPress={() => {router.back()}} name="arrow-back" size={34} color="#4B0082"/>
+                        <MaterialIcons onPress={() => {router.back()}} name="arrow-back-ios" size={34} color="#4B0082"/>
                         <Text style={styles.title}>Create your fantasy team</Text>
                     </View>
                     <TextInput

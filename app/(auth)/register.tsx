@@ -4,7 +4,6 @@ import { Link, router } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -13,6 +12,7 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+import Toast from "react-native-toast-message";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import styles from "../../assets/styles/register";
@@ -32,7 +32,11 @@ export default function Register() {
             const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     
             if (status !== "granted") {
-              Alert.alert("Permission Denied", "You need to grant camera roll permission to upload image");
+              Toast.show({
+                type: "error",
+                text1: "Permission Denied",
+                text2: "Sorry, we need camera roll permissions to make this work!",
+              });
               return;
             }
           }
@@ -57,7 +61,25 @@ export default function Register() {
 
     const result = await register(username, email, password, profilePicture, router);
 
-    if (!result.success) Alert.alert("Failed", result.error);
+    if (!result.success) {
+      Toast.show({
+        type: "error",
+        text1: "Registration Failed",
+        text2: result.error,
+      })
+    }
+    Toast.show({
+      type: "success",
+      text1: "Registration Successful",
+      text2: "Please check your email for verification code to verify your account",
+    });
+    setTimeout(() => {
+      router.push({
+              pathname: "/(auth)/verify",
+              params: { email: result.user?.email || "" },
+      });
+    }, 3500);
+
   };
 
   return (
@@ -160,6 +182,7 @@ export default function Register() {
           </View>
         </View>
       </KeyboardAvoidingView>
+      <Toast />
     </SafeAreaView>
   );
 }

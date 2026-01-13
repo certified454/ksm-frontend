@@ -6,7 +6,8 @@ import { BlurView } from 'expo-blur';
 import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Animated, FlatList, Platform, KeyboardAvoidingView, RefreshControl, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Animated, FlatList, KeyboardAvoidingView, Platform, RefreshControl, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 // import { RewardedAd, RewardedAdEventType, TestIds } from 'react-native-google-mobile-ads';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import io from 'socket.io-client';
@@ -63,6 +64,7 @@ export default function ChallengeDetail() {
             try {
                 if (challengeStatus === 'Ended') {
                     throw new Error('Challenge has ended. Voting is closed.');
+                    
                 }
                 if (challengeStatus === 'Live') {
                     throw new Error('Challenge is live. Voting is closed.');
@@ -80,10 +82,19 @@ export default function ChallengeDetail() {
                 const data = await response.json();
                 if(!response.ok) throw new Error(data.message || 'Failed to create vote');
                 setIsVoting(false);
+                Toast.show({
+                    type: 'success',
+                    text1: 'Vote submitted successfully',
+                    text2: 'Your vote has been uploaded.'
+                });
                 
             } catch (error) {
                 console.error('Error creating vote:', error);
-                Alert.alert(error instanceof Error ? error.message : 'Failed to create vote');
+               Toast.show({
+                    type: 'error',
+                    text1: 'Failed to submit vote',
+                    text2: error instanceof Error ? error.message : 'An unexpected error occurred',
+               });
             } finally {
                 setIsVoting(false)
             }
@@ -239,7 +250,7 @@ export default function ChallengeDetail() {
                 <TouchableOpacity onPress={() => handleprofilePicturePress(item.user._id)} style={styles.userItems}>
                     <View style={styles.userItem}>
                         <Image source={{ uri: item.user.profilePicture }} style={styles.itemProfilePicture}/>
-                        <Text style={styles.username}>{item.user.username}</Text>
+                        <Text style={styles.voterUsername}>{item.user.username}</Text>
                     </View>
                     <Text style={styles.createdAT}>{formatTimeAgo(item.createdAt)}</Text>
                 </TouchableOpacity>
@@ -275,7 +286,7 @@ export default function ChallengeDetail() {
                                                 </Text>
                                             </TouchableOpacity>
                                             <View style={styles.currentTime}>
-                                                <Ionicons name="time" size={24} color="#4B0082" />
+                                                <Ionicons name="time-outline" size={24} color="#4B0082" />
                                                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                                                     {challengeStatus === 'Live' ? (
                                                         <>
@@ -351,7 +362,7 @@ export default function ChallengeDetail() {
                                                 </Text>
                                             </TouchableOpacity>
                                             <View style={styles.currentTime}>
-                                                    <Ionicons name="time" size={24} color="#4B0082" />
+                                                    <Ionicons name="time-outline" size={24} color="#4B0082" />
                                                     <View style={{ flexDirection: "row", alignItems: "center" }}>
                                                         {challengeStatus === 'Live' ? (
                                                             <>
@@ -367,12 +378,12 @@ export default function ChallengeDetail() {
                                                                         }),
                                                                     }}
                                                                 />
-                                                                <Text style={[styles.currentTimeText, { color: "#ff1744", fontWeight: "bold" }]}>
+                                                                <Text style={[styles.live, { color: "#ff1744"}]}>
                                                                     Live
                                                                 </Text>
                                                             </>
                                                         ) : (
-                                                            <Text style={styles.currentTimeText}>{challengeStatus}</Text>
+                                                            <Text style={styles.live}>{challengeStatus}</Text>
                                                         )}
                                                     </View>
                                             </View>
@@ -407,7 +418,7 @@ export default function ChallengeDetail() {
                                         <View style={styles.challengeItem}>
                                             <TextInput 
                                                 style={styles.answerInput} 
-                                                placeholder="Your answer" 
+                                                placeholder="Enter your answer" 
                                                 value={text}
                                                 onChangeText={setText}
                                                 multiline

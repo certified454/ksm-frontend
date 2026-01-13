@@ -29,15 +29,6 @@ export const useAuthStore = create((set) => ({
         console.log("Registration error:", data);
         throw new Error(data.message || "Something went wrong");
       }
-
-      Alert.alert(
-        "Success",
-        "Registration on Kismet is successful! please check your email for verification code to verify your account"
-      );
-      router.push({
-        pathname: "/(auth)/verify",
-        params: { email: data.user.email },
-      });
       await AsyncStorage.setItem("user", JSON.stringify(data.user));
       await AsyncStorage.setItem("token", data.token);
 
@@ -211,7 +202,6 @@ export const useAuthStore = create((set) => ({
       const data = await response.json();
       if (!response.ok) {
         if (data.message === "Account is not verified"){
-          Alert.alert("Failed", "Account is not verified, please check your email for verification code");
           router.push({
             pathname: "/(auth)/verify",
             params: { email },
@@ -228,10 +218,6 @@ export const useAuthStore = create((set) => ({
       await AsyncStorage.setItem("token", data.token);
 
       set({ token: data.token, user: data.user, isLoading: false });
-
-      router.push({
-        pathname: "/(tabs)",
-      })
       return {
         success: true,
         message: "Login Successful",

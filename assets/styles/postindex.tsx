@@ -1,4 +1,6 @@
-import { StyleSheet } from "react-native";
+import { Dimensions, StyleSheet } from "react-native";
+
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
     container: {
@@ -19,44 +21,71 @@ const styles = StyleSheet.create({
     userInfo: {
         flexDirection: 'row',
         alignItems: 'center',
-        height: 'auto'
+        height: 'auto',
+        marginTop: screenHeight * 0.03,
+    
     },
     userPost:{
         width: 'auto',
-        minHeight: 60,
+        minHeight: screenHeight * 0.1,
         maxHeight: 'auto'
     },
     userImage: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
+        width: screenWidth * 0.14,
+        height: screenWidth * 0.14,
+        borderRadius: (screenWidth * 0.14) / 2,
         marginRight: 5
     },
+    commetImage: {
+        width: screenWidth * 0.110,
+        height: screenWidth * 0.110,
+        borderRadius: (screenWidth * 0.110) / 2,
+        marginRight: screenWidth * 0.02
+    },
     caption: {
-        fontSize: 17,
+        fontSize: screenHeight * 0.017,
         padding: 5,
     },
     userInfoText: {
         flex: 1,
     },
     username: {
-        fontSize: 20,
+        fontSize: screenHeight * 0.022,
         fontWeight: 'bold',
-        bottom: 2,
-        left: 7
+        fontFamily: 'serif',
+        left: screenWidth * 0.02
+    },
+    commentUsername: {
+        fontSize: screenHeight * 0.020,
+        fontWeight: 'bold',
+        fontFamily: 'serif',
+    },
+    iconDownload: {
+        marginLeft: screenWidth * 0.86,
+        position: 'absolute',
+        marginTop: screenHeight * -0.06,
+    },
+    createdat: {
+        fontSize: screenHeight * 0.016,
+        left: screenWidth * 0.03,
+        color: '#000',
     },
     createdAt: {
-        fontSize: 15,
-        bottom: 2,
-        left: 6,
-        color: '#888',
+        fontSize: screenHeight * 0.016,
+        left: screenWidth * 0.33,
+        color: '#000',
     },
     postImage: {
-        width: 360,
-        height: 360,
-        right: 5,
+        width: screenWidth * 0.99,
+        height: screenHeight * 0.5,
+        right: screenWidth * 0.005,
         objectFit: 'contain',
         top: 18
+    },
+    audioDuration: {
+        color: '#4B0082',
+        fontSize: screenHeight * 0.017,
+        marginTop: screenHeight * 0.007
     },
     recordedAudioContainer: {
         width: '100%',
@@ -92,7 +121,7 @@ const styles = StyleSheet.create({
         right: 20
     },
     comment: {
-        fontSize: 16,
+        fontSize: screenHeight * 0.017,
         backgroundColor: '#fff',
         borderRadius: 5,
         borderWidth:0.5,
@@ -120,52 +149,75 @@ const styles = StyleSheet.create({
     },
     commentContainer: {
         flex:1,
-        left: 12,
-        backgroundColor: '#fff'
+        margin: screenHeight * 0.02 ,
+        
+    },
+    main: {
+        gap: screenHeight * 0.02
+    },
+    eachComment: {
+        width: '100%',
+        height: 'auto',
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: screenWidth * 0.003,
+    },
+    createpostContainer: {
+        width: '100%',
+        height: screenHeight * 0.2,
+        alignItems: 'center',
+        justifyContent: 'space-between',
+
+    },
+    createpost: {
+        marginTop: screenHeight * 0.04,
+        width: '30%',
+        height: '50%',
+        borderRadius: 100
+    },
+    createpostText: {
+        fontSize: screenHeight * 0.023,
+        fontWeight: 'bold',
+        color: '#000000',
+        textAlign: 'center'
+    },
+    createpostext: {
+        fontSize: screenHeight * 0.017,
+        color: '#000000a6',
+        marginTop: screenHeight * 0.001,     
     },
     itemContainer: {
         borderRadius: 5,
-        width: '80%',
-        left: 45,
-        bottom: 35
+        width: '13%',
+        marginTop: screenHeight * -0.01,
     },
     audio: {
         paddingLeft: 2,
         borderRadius:5,
         backgroundColor: '#f8f8f8',
     },
-    commentAt: {
-        bottom: 45,
-        left: 240
-    },
     textCommented: {
-        flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 5,
-        fontFamily: 'sarif',
-        fontSize: 17,
-        bottom: 35,
-        left: 50,
-        width: "80%",
         backgroundColor: '#f8f8f8',
         borderRadius: 5,
-        minHeight: 40,
-        minWidth: 20,
-        padding: 5
+        flexDirection: 'row',
+        fontSize: screenHeight * 0.015,
+        justifyContent: 'space-between',
+        marginTop: screenHeight * -0.015,
+        minHeight: screenHeight * 0.05,
+        minWidth: screenWidth * 0.6,
+        padding: screenWidth * 0.01,
+        width: "100%",
     },
     commenttext: {
-        fontSize: 18,
-        left: 2
+        fontSize: screenHeight * 0.017,
+       
     },
     diplayIsModelVisible: {
         width: "95%",
-        flex:1,
-        top: 10,
-        left: 10
-    },
-    readmore: {
-        fontSize: 18
+        flex: 1,
+        top: screenHeight * 0.01,
+        left: screenWidth * 0.02,
     },
     displayOption: {
         flexDirection:'row',
@@ -175,9 +227,9 @@ const styles = StyleSheet.create({
     },
     displayUsername: {
         color: '#ffffff',
-        fontSize: 16,
-        left: 50,
-        bottom: 5
+        fontSize: screenHeight * 0.017,
+        left: screenWidth * 0.05,
+        bottom: screenHeight * 0.005
     },
     optionsDropdown: {
         position: 'absolute',
@@ -194,16 +246,10 @@ const styles = StyleSheet.create({
         zIndex: 1,
         gap: 10
     },
-    arrowUp: {
-        left: 50,
-        width: 40,
-        height: 7,
-        borderRadius: 20,
-        backgroundColor: '#00000017',
-    },
+
     editComment: {
         flex: 1,
-        paddingLeft: 10,
+        paddingLeft: screenWidth * 0.03,
     },
     comments: {
         paddingVertical: 8,
@@ -221,24 +267,24 @@ const styles = StyleSheet.create({
         backgroundColor: "#eeeeee85",
     },
     select: {
-        right: 1,
-        width: 10,
-        height: 10,
+        right: screenWidth * 0.02,
+        width: screenWidth * 0.02,
+        height: screenWidth * 0.02,
         borderRadius: 2,
         backgroundColor: '#000',
         transform: [{ rotate: '45deg' }],
     },
     text3: {
-        fontSize: 16,
+        fontSize: screenHeight * 0.017,
         fontWeight: 'bold',
         color: '#0b0fe0ff',
     },
     text4: {
-        fontSize: 16,
+        fontSize: screenHeight * 0.017,
         fontWeight: 'bold'
     },
     text5: {
-        fontSize: 16,
+        fontSize: screenHeight * 0.017,
         fontWeight: 'bold',
         color: '#ff0000',
     },
@@ -298,6 +344,14 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 18,
         fontWeight: 'bold'
+    },
+    separator: {
+        width: '100%',
+        height: 'auto',
+        backgroundColor: '#ccc',
+        position: 'relative',
+        marginTop: screenHeight * -0.5,
+        marginBottom: screenHeight * 0.17,
     }
 });
 

@@ -1,20 +1,23 @@
-import Ionicons from "@expo/vector-icons/Ionicons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { PropsWithChildren } from "react";
-import { Modal, Pressable, StyleSheet, View } from "react-native";
+import { Dimensions, Modal, Pressable, StyleSheet, View } from "react-native";
+const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
 type Props = PropsWithChildren <{
     isVisible: boolean;
     onClose: () => void;
 }>
 
-export default function ViewImage({isVisible, children, onClose}:Props) {
+export default function ViewImage({isVisible, children, onClose}: Props) {
     return(
         <View>
-            <Modal  visible={isVisible}>
+            <Modal visible={isVisible}>
                 <View style={style.modalContainer}>
                     <View style={style.titleContainer}>
                         <Pressable onPress={onClose}>
-                            <Ionicons  name="arrow-back" size={30} color={'#ffffff'}/>
+                            <View style={style.icon}>
+                                <MaterialIcons name="arrow-back-ios" size={24} style={style.icons} color={'#4B0082'}/>   
+                            </View>
                         </Pressable>
                     </View>
                     {children}
@@ -37,8 +40,25 @@ const style = StyleSheet.create({
         paddingLeft: 10,
         flexDirection: 'row',
         paddingHorizontal: 20,
-        top: 30,
+        marginTop: screenHeight * 0.03,
+        marginBottom: screenHeight * 0.02,
         alignItems: 'center',
         justifyContent: "space-between"
+    },
+    arrowBack: {
+        marginLeft: screenHeight * 0.015
+    },
+    icon: {
+        width: screenWidth * 0.11,
+        height: screenHeight * 0.05,
+        borderWidth: 0.5,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderColor: '#4B0082',
+        borderRadius: screenHeight * 0.01,
+        backgroundColor: '#eee'
+    },
+    icons: {
+        marginLeft: screenWidth * 0.025
     }
 })

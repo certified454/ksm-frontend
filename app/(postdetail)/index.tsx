@@ -1,11 +1,9 @@
 import styles from '@/assets/styles/postindex';
 import EditPost from '@/components/caption';
-import ViewImage from '@/components/viewImage';
 import { useAuthStore } from '@/store/authStore';
 import { API_URL } from '@/store/postStore';
 import { formatTimeAgo } from '@/store/util';
-import Feather from '@expo/vector-icons/Feather';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
 import { Image } from 'expo-image';
 import * as MediaLabriary from 'expo-media-library';
@@ -24,11 +22,10 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { captureRef } from 'react-native-view-shot';
 import io from 'socket.io-client';
-import { SafeAreaView } from 'react-native-safe-area-context';
-
+import ViewImage from "../../components/viewImage";
 type Post = {
     id: string;
     profilePicture: string; 
@@ -46,7 +43,7 @@ type Comment = {
     _id: string;
     postId: string;
     user: {
-        id: string;
+        _id: string;
         username: string;
         profilePicture?: string;
     };
@@ -66,7 +63,7 @@ export default function PostDetail() {
     const [ isModelVisible, setModelIsvisible] = useState(false);
     const [ soundPlay, setSoundPlay ] = useState<Audio.Sound | null>(null);
     const [ play, setPlay] = useState(false);
-    const [playingId, setPlayingId] = useState(null);
+    const [playingId, setPlayingId] = useState<string | null>(null);
     const imageRef = useRef<View>(null);
 
 
@@ -128,6 +125,11 @@ export default function PostDetail() {
     }
     const saveImage = async () => {
         try {
+            const { status } = await MediaLabriary.requestPermissionsAsync();
+            if ( status !== 'granted') {
+                Alert.alert('Permission Denied', 'You need to grant media library permission to save images');
+                return;
+            }
             const imageUri = await captureRef(imageRef, {height: 450, quality:1});
             await MediaLabriary.saveToLibraryAsync(imageUri)
 
@@ -135,7 +137,7 @@ export default function PostDetail() {
                 Alert.alert("Saved", "Image has been downloaded")
             }
         } catch (error) {
-            console.error('Failed')
+            console.error('Failed', error)
         }
     }
     const fetchComments = async (pageNum = 1, refresh = false) => {
@@ -453,28 +455,29 @@ export default function PostDetail() {
     const handleprofilePicturePress = async (id: string) => {
         router.push({ pathname: '/(profile)', params: {userId: id} });
     }
-    const renderComment = ({ item}: {item: any }) => {
-        const isCommentOwner = item.user._id === user.id;
-        return(
-
+    const renderComment = ({ item}: { item: Comment }) => {
+        const isCommentOwner =
+            item.user?._id === user.id ||
+            item.user?._id === user.id;
+         return(
         <View style={styles.commentContainer}>
-                <Image
-                    source={{ uri: item.user?.profilePicture ? item.user?.profilePicture : "https://api.dicebear.com/9.x/miniavs/svg?seed=George&backgroundType=gradientLinear&backgroundColor=b6e3f4,c0aede,ffdfbf" }}
-                    style={[styles.userImage, {width: 40, height: 40}]}/>
-
-                <View style={styles.userInfoText}>
-                    <Text style={[styles.username, {fontSize: 16, bottom: 30, left: 50}]}>{item.user?.username}</Text>
-                </View>
-                <View style={styles.commentAt}>
+            <View style={styles.main}>
+                <View style={styles.eachComment}>
+                    <Image
+                        source={{ uri: item.user?.profilePicture ? item.user?.profilePicture : "https://api.dicebear.com/9.x/miniavs/svg?seed=George&backgroundType=gradientLinear&backgroundColor=b6e3f4,c0aede,ffdfbf" }}
+                        style={styles.commetImage}
+                        />
+                    <Text style={styles.commentUsername}>{item.user?.username}</Text>
                     <Text style={styles.createdAt}>{formatTimeAgo(item.createdAt)}</Text>
                 </View>
+
                 <View style={styles.itemContainer}>
                     { item.audio && 
                         <View> 
-                            { playingId !== item.id ? (
+                            { playingId !== item._id ? (
                                 <TouchableOpacity  style={styles.audio} onPress={() => {
                                     playAudioFromUrl(item.audio);
-                                    setPlayingId(item.id);
+                                    setPlayingId(item._id);
                                 }}>
                                     <Ionicons name='play-circle-outline' size={35} color='#4B0082' style={styles.audio} />
                                 </TouchableOpacity>
@@ -501,11 +504,9 @@ export default function PostDetail() {
                                 <TouchableOpacity onPress={() => showOptionsDropDown(item._id)}>
                                     <Ionicons name='ellipsis-vertical' size={25} color='#4B0082' />
                                 </TouchableOpacity>
-    
+
                                 {optionsDropdownId === item._id && (
                                     <View style={styles.optionsDropdown}>
-                                        <TouchableOpacity style={styles.arrowUp}>
-                                        </TouchableOpacity>
                                         <View style={styles.editComment}>
                                             <TouchableOpacity onPress={() => { setOptionsDropdownId(null);  modalClicked(item._id)}} style={styles.comments}>
                                             <View style={styles.select}></View>
@@ -528,6 +529,7 @@ export default function PostDetail() {
                     </View>
                     } 
                 </View> 
+             </View>
         </View>
         )
     }
@@ -541,15 +543,6 @@ export default function PostDetail() {
                     ) : post ? (
                         <View style={styles.container}>
                             <View style={styles.userdetail}>
-                                <TouchableOpacity onPress={ () => router.back()}>
-                                    <Ionicons
-                                        name="arrow-back"
-                                        size={37}
-                                        color="#4B0082"
-                                        style={styles.text}
-                                    />
-
-                                </TouchableOpacity>
                                 <View style={styles.userInfo}>
                                     <TouchableOpacity onPress={() => handleprofilePicturePress(post.user._id)} >
                                         <Image
@@ -559,7 +552,7 @@ export default function PostDetail() {
                                     </TouchableOpacity>
                                     <View style={styles.userInfoText}>
                                         <Text style={styles.username}>{post.user.username}</Text>
-                                        <Text style={styles.createdAt}>{formatTimeAgo(post.createdAt)}</Text>
+                                        <Text style={styles.createdat}>{formatTimeAgo(post.createdAt)}</Text>
                                     </View>
                                 </View>
 
@@ -575,9 +568,9 @@ export default function PostDetail() {
                                 { audioUri && (
                                 <>
                                         <TouchableOpacity onPress={playAudio}>
-                                            <Ionicons name='play-circle-outline' size={40} color='#4B0092'/>
+                                            <Ionicons name='play-circle-outline' size={32} color='#4B0092'/>
                                         </TouchableOpacity>
-                                        <Text style={{ color: '#4B0082', fontSize: 16, marginTop: 7 }}>Audio Duration: {duration ? `${duration} seconds` : 'Calculating...'}</Text>
+                                        <Text style={styles.audioDuration}>Audio Duration: {duration ? `${duration} seconds` : 'Calculating...'}</Text>
                                 </>
                                 )}
                             </View>
@@ -586,7 +579,7 @@ export default function PostDetail() {
                                     <TouchableOpacity onPress={() => { setLike(!like); handleSubmitLike() } }>
                                         <Ionicons
                                             name={like ? 'heart' : 'heart-outline'}
-                                            size={32}
+                                            size={30}
                                             color={like ? '#4B0082' : '#4B0082'}
                                             style={styles.like}
                                         />
@@ -605,7 +598,7 @@ export default function PostDetail() {
                                         style={styles.recordSection}
                                         onPress={isRecording? stopRecordingAudio : startRecordingAudio }
                                 >
-                                        <Ionicons size={35} 
+                                        <Ionicons size={30} 
                                             name={isRecording ? 'mic-off' : 'mic-outline'}
                                             style={isRecording ? styles.recordButton : styles.recordButton} />
                                 </TouchableOpacity>
@@ -626,58 +619,69 @@ export default function PostDetail() {
                     )}
                 </ScrollView>
             </View> 
-                <FlatList 
-                        data={comments}
-                        renderItem={renderComment}
-                        keyExtractor={(item) => item._id}
-                        showsVerticalScrollIndicator={false}
-                        onEndReached={handleLoadMoreComments}
-                        ItemSeparatorComponent={() => <View style={{ height: -4 }} />}
-                        onEndReachedThreshold={0.1}
-                        refreshControl={
-                            <RefreshControl
-                                refreshing={refresh}
-                                onRefresh={() => fetchComments(1, true)}
-                            />
-                        }
-                    />  
-                <ViewImage isVisible={isImageVissable} onClose={onCloseImageView}>
-                    <View style={styles.displayOption}>
-                        <Text style={styles.displayUsername}>{post?.user.username}</Text>
-                        <Feather style={{bottom: 5}} onPress={saveImage} name="download" size={25} color="#ffffff" />
-                    </View>
-                    <View ref={imageRef} collapsable={false}>
-                        <Image
-                            source={{ uri: post?.image }}
-                            style={[styles.postImage, {height:450, left: 0}]}
-                            contentFit="cover"
+            { loading ? (
+                <ActivityIndicator size="large" color="#4B0082" style={{ top: 300 }} />
+            ) : comments.length > 0 ? (
+                <FlatList<Comment>
+                    data={comments}
+                    renderItem={renderComment}
+                    keyExtractor={(item) => item._id}
+                    showsVerticalScrollIndicator={false}
+                    onEndReached={handleLoadMoreComments}
+                    ItemSeparatorComponent={() => <View style={{ height: -4 }} />}
+                    onEndReachedThreshold={0.1}
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={refresh}
+                            onRefresh={() => fetchComments(1, true)}
                         />
-                    </View>
-                </ViewImage>
-                <EditPost isVisible={editVisible} onClose={() => setEditVisible(false)}>
-                    <SafeAreaProvider>
-                            <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding" keyboardVerticalOffset={80}>
-                                <View style={styles.captionContainer1}>
-                                    <TextInput 
-                                        style={styles.input}
-                                        value={editText}
-                                        onChangeText={setEditText}
-                                        multiline
-                                        editable={!isUpdatingComment}
-                                    />
-                                <View style={styles.updatePostButtonContainer}>
-                                    {isUpdatingComment ?(
-                                        <ActivityIndicator size="small" color="#fff" />
-                                    ): (
-                                        <TouchableOpacity style={styles.updatePostButton} onPress={() => {handleEditComment(editingCommentId)}}>
-                                        <Text style={styles.saveText}>Update Comment</Text>
-                                        </TouchableOpacity>
-                                    )}
-                                </View>
-                                </View>
-                            </KeyboardAvoidingView>
-                        </SafeAreaProvider>
-                </EditPost>
+                    }
+                />
+            ) : (
+                <View style={styles.createpostContainer}>
+                    <Image source={require('../../assets/images/commet.png')} style={styles.createpost}/>
+                    <Text style={styles.createpostText}>Be the first to comment!</Text>
+                    <Text style={styles.createpostext}>Share your thoughts and start the conversation.</Text>
+                </View>
+            )}
+      
+            <ViewImage isVisible={isImageVissable} onClose={onCloseImageView}>
+                <View style={styles.displayOption}>
+
+                    <MaterialIcons onPress={saveImage} name="download" size={30} color="#ffffff" style={styles.iconDownload}    />
+                </View>
+                <View ref={imageRef} collapsable={false}>
+                    <Image
+                        source={{ uri: user?.profilePicture }}
+                        style={styles.postImage}
+                        contentFit="cover"
+                    />
+                </View>
+            </ViewImage> 
+            <EditPost isVisible={editVisible} onClose={() => setEditVisible(false)}>
+               <SafeAreaProvider>
+                        <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding" keyboardVerticalOffset={80}>
+                            <View style={styles.captionContainer1}>
+                              <TextInput 
+                                  style={styles.input}
+                                  value={editText}
+                                  onChangeText={setEditText}
+                                  multiline
+                                  editable={!isUpdatingComment}
+                              />
+                              <View style={styles.updatePostButtonContainer}>
+                                  {isUpdatingComment ?(
+                                    <ActivityIndicator size="small" color="#fff" />
+                                  ): (
+                                    <TouchableOpacity style={styles.updatePostButton} onPress={() => handleEditComment(editingCommentId)}>
+                                      <Text style={styles.saveText}>Update Post</Text>
+                                    </TouchableOpacity>
+                                  )}
+                              </View>
+                            </View>
+                        </KeyboardAvoidingView>
+                    </SafeAreaProvider>
+            </EditPost>
             </KeyboardAvoidingView> 
         </SafeAreaView>
     );

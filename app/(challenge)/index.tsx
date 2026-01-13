@@ -8,9 +8,9 @@ import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, FlatList, KeyboardAvoidingView, Platform, RefreshControl, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import io from "socket.io-client";
 import styles from "../../assets/styles/challenge";
-import { SafeAreaView } from "react-native-safe-area-context";
 import TimePickerModal from "../../components/setTime";
 
 type Challenge = {
@@ -186,7 +186,6 @@ export default function Challenge(){
         socket.disconnect();
         };
     }, []);
-
     const renderChallenge = ({ item }: { item: Challenge }) => {
         const status = isChallengeActive(item.startDate, item.endDate);
         return (
@@ -204,7 +203,7 @@ export default function Challenge(){
                                     <Text style={styles.detailText} ellipsizeMode="tail" numberOfLines={3}>{item.description}</Text>
                                     <View style={styles.challengeitems}>
                                         <View style={styles.startDate}>
-                                            <Text style={styles.itemTime}>Start: </Text>
+                                            <Text style={styles.itemTime}>Star: </Text>
                                             <Text style={styles.currentTimeText}>{new Date(item.startDate).toLocaleDateString()}</Text>
                                         </View>
                                         <View style={styles.endDate}>
@@ -215,7 +214,7 @@ export default function Challenge(){
                                     <View>
                                     <TouchableOpacity style={styles.creator} onPress={() => handleprofilePicturePress(item.user._id)}>
                                         <Image source={{ uri: item.user.profilePicture }} style={styles.profilePicture} />
-                                        <Text style={styles.username}>{item.user.username}</Text>
+                                        <Text style={styles.authorUsername}>{item.user.username}</Text>
                                     </TouchableOpacity>
                                    
                                     {status === "active" && (
@@ -251,7 +250,6 @@ export default function Challenge(){
                                 <TouchableOpacity onPress={() => handleChallengePress(item._id)} style={styles.checkItOutButton}>
                                     <Text style={styles.checkItOutText}>Check it out</Text>
                                 </TouchableOpacity>
-                                <Image style={styles.backgrounImage} source={{uri: 'https://avatars.mds.yandex.net/i?id=e70cd60a4cf4c5faccd2e56342e46e0ef6dc5bfb-10651780-images-thumbs&n=13'}}/>
                                 <BlurView tint="light" intensity={70} style={styles.challengeDetails}>
                                     <Text style={styles.adminText}>{item.title}</Text>
                                     <Text style={styles.detailText} ellipsizeMode="tail" numberOfLines={3}>{item.description}</Text>
@@ -268,7 +266,7 @@ export default function Challenge(){
                                     <View>
                                     <TouchableOpacity style={styles.creator} onPress={() => handleprofilePicturePress(item.user._id)}>
                                         <Image source={{ uri: item.user.profilePicture }} style={styles.profilePicture} />
-                                        <Text style={styles.username}>{item.user.username}</Text>
+                                        <Text style={styles.authorUsername}>{item.user.username}</Text>
                                     </TouchableOpacity>
                                     {status === "active" && (
                                             <View style={styles.activeChallenge}>
@@ -337,7 +335,7 @@ export default function Challenge(){
                         <>
                             <View style={styles.userHeader}>
                                 <TouchableOpacity onPress={() => router.back()}>
-                                    <Ionicons name="arrow-back" size={30} color="#4B0082" />
+                                    <MaterialIcons name="arrow-back-ios" size={30} color="#4B0082" />
                                     <Text style={styles.dontMissOutText}>Don't miss out on this week's Challenge</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity style={styles.userInfo} onPress={() => handleprofilePicturePress(user.id)}>

@@ -1,4 +1,3 @@
-import styles from "@/assets/styles/index";
 import EditPost from "@/components/caption";
 import Match from "@/components/match";
 import Search from "@/components/search";
@@ -10,13 +9,15 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
+import { LinearGradient } from 'expo-linear-gradient';
 import * as Linking from 'expo-linking';
 import { useRouter } from "expo-router";
 import { debounce } from "lodash";
 import React, { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, Alert, FlatList, KeyboardAvoidingView, Platform, RefreshControl, Share, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, Animated, FlatList, KeyboardAvoidingView, Platform, Pressable, RefreshControl, Share, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import io from "socket.io-client";
+import styles from '../../assets/styles/index';
 
 type Post = {
   _id: string;
@@ -117,15 +118,17 @@ export default function Index() {
   const [expandCaptionId, setExpandCaptionId]= useState<string | null>(null);
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [optionsDropdownId, setOptionsDropdownId]= useState<string | null>(null);
-
+  const [loadingMore, setLoadingMore] = useState(false);
   const router = useRouter();
+
+  const animationValueRef = React.useRef(new Animated.Value(0));
 
   const timePicker = (event: any, selectedTime?: Date) => {
         setShowTime(false);
         if(selectedTime){
             setTime(selectedTime)
         }
-    };
+  };
   const pickHomeTeamLogo = async () => {
     try {
       if (Platform.OS !== "web") {
@@ -138,7 +141,6 @@ export default function Index() {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
-      
         quality: 1,
         base64: true,
       });
@@ -252,14 +254,31 @@ export default function Index() {
     }
   };
   const handleSharePost = async (post: Post) => {
-    const message = `\nusername : ${post.user.username}\ncomment : ${post.commentsCount}\nlikes : ${post.likesCount}\ncaption : ${post.caption}\nimage : ${post.image}`;
-    const shareOptions = {
+    try {
+      // Prefer an HTTPS web URL so other apps (WhatsApp, Facebook) generate a clickable link/preview.
+      // This domain is already referenced in app.json intent filters; ensure the backend route exists
+      // and provides Open Graph meta tags for rich previews.
+      const webUrl = `https://kismit-official.onrender.com/post/${encodeURIComponent(post._id)}`;
+      // Also prepare app deep links as fallback
+      let appUrl = '';
+      try {
+        appUrl = Linking.createURL('/(postdetail)', { queryParams: { postId: post._id } });
+      } catch (e) {
+        appUrl = `kismet://post/${encodeURIComponent(post._id)}`;
+      }
+
+      // Most platforms render a preview when the shared text contains an https:// URL on its own line.
+      const message = `${post.caption || 'Check out this post'}\n\n${webUrl}`;
+      const shareOptions: any = {
         title: 'Share Post',
         message,
-        type: 'image/jpeg'
-    };
+        url: webUrl,
+      };
 
-    await Share.share(shareOptions);
+      await Share.share(shareOptions);
+    } catch (error) {
+      console.error('Error sharing post', error);
+    }
   };
   const fetchPosts = async (pageNum = 1, refresh = false) => {
     try {
@@ -335,6 +354,8 @@ export default function Index() {
     } catch (error) {
     } finally {
         setSearchLoading(false);
+        // clear search results after 5 secounds of inactivity
+        setTimeout(() => setQuery(''), 1000);
     }
   };
   const debounceSearch = useCallback(
@@ -394,9 +415,37 @@ export default function Index() {
       socket.disconnect();
       };
   }, []);
+  
+  useEffect(() => {
+    const anim = Animated.loop(
+      Animated.sequence([
+        Animated.timing(animationValueRef.current, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(animationValueRef.current, {
+          toValue: 0,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    anim.start();
+    return () => anim.stop();
+  }, []);
+
+  const scale = animationValueRef.current.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 1.4],
+  });
+  const pulseOpacity = animationValueRef.current.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.9, 3],
+  });
   const handleLoadMorePost = async () => {
     if (hasMore && !loading && !refresh)
-      await fetchPosts(page + 1);
+        await fetchPosts(page + 1);
   };
   const handlePostPress = async (id: string) => {
     router.push({ pathname: "/(postdetail)", params: { postId: id } });
@@ -482,15 +531,14 @@ export default function Index() {
   const renderPost = ({ item }: {item:any}) => {
     const isPostOwner = !!user && item.user && item.user._id === user.id;
 
-    return(
+  return(
       <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
         <View style={styles.container}>
           <View style={styles.header}>
-            <TouchableOpacity onPress={() =>handleprofilePicturePress(item.user?._id)}>
+            <TouchableOpacity style={styles.profileImage} onPress={() =>handleprofilePicturePress(item.user?._id)}>
               <Image
               source={{ uri: item.user?.profilePicture ? item.user.profilePicture : "https://api.dicebear.com/9.x/miniavs/svg?seed=George&backgroundType=gradientLinear&backgroundColor=b6e3f4,c0aede,ffdfbf" }}
-              style={styles.profileImage}/>
-
+              style={styles.profileImages}/>
             </TouchableOpacity>
             
             <View style={styles.userInfoText}>
@@ -549,11 +597,12 @@ export default function Index() {
               </View>
             )}
           </View>
-
-          <Image
-            source={{ uri: item.image }}
-            style={styles.postImage}
-            contentFit="cover"/>
+          <View style={styles.imageContainer}>
+            <Image
+              source={{ uri: item.image }}
+              style={styles.postImage}
+              contentFit="cover"/>
+          </View>
 
             <TouchableOpacity onPress={() => setExpandCaptionId(expandCaptionId === item._id ? null: item._id )} activeOpacity={0.8} style={styles.tagContainer}>
               <View style={styles.captionContainer}>
@@ -591,13 +640,13 @@ export default function Index() {
                 <TouchableOpacity style={styles.commentIcons}onPress={() => handlePostPress(item._id)}>
                   <View style={styles.likesSection}> 
                     <View style={styles.likesCounts}>
-                      <Ionicons name="chatbox-outline" size={24} color="#4B0082"/>
+                      <Ionicons name="chatbox-outline" size={24} color="#4b0082"/>
                       <Text style={styles.textcomment}> {formatComments(item.commentsCount)}</Text>
                     </View>    
                   </View>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.likesSection}onPress={() => handleSharePost(item)}>
-                    <Ionicons name="share-social" size={34} color="#4B0082" style={styles.share}/>
+                    <Ionicons name="share-social" size={30} color="#4b0082" style={styles.share}/>
                 </TouchableOpacity>
               
             </View>
@@ -619,37 +668,39 @@ export default function Index() {
     return t.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
   }
   const renderMatch = ({ item }: { item: any }) => (
-    <TouchableOpacity style={styles.match} onPress={() => Linking.openURL('https://www.youtube.com/@kismetKSM')}>
-      <View style={styles.item}>
-        <View style={styles.matchDate}>
-          <View style={styles.leagueName}>
-            <Ionicons name="trophy" size={24} color="#f7e651ff" />
-            <Text style={styles.leagueText}>{item.leagueName}</Text>
+    <View style={styles.mainContainer}>
+      <TouchableOpacity style={styles.match} onPress={() => Linking.openURL('https://www.youtube.com/@kismetKSM')}>
+        <View style={styles.item}>
+          <View style={styles.matchDate}>
+            <View style={styles.leagueName}>
+              <Ionicons name="trophy" size={20} color="#f7e651ff" />
+              <Text style={styles.leagueText}>{item.leagueName}</Text>
+            </View>
+            <Text style={styles.locationText}>{item.location}</Text>
           </View>
-          <Text style={styles.locationText}>{item.location}</Text>
-        </View>
-        <View style={styles.teams}>
-          <View style={styles.team}>
-            <Text style={styles.teamName}>{item.homeTeamName}</Text>
-            <Image source={{ uri: item.homeTeamLogo }} style={styles.logo} />
+          <View style={styles.teams}>
+            <View style={styles.team}>
+              <Text style={styles.teamName}>{item.homeTeamName}</Text>
+              <Image source={{ uri: item.homeTeamLogo }} style={styles.logo} />
+            </View>
+            <Text style={styles.vsText}> VS </Text>
+            <View style={styles.team}>
+              <Text style={styles.teamName}>{item.awayTeamName}</Text>
+              <Image source={{ uri: item.awayTeamLogo }} style={styles.logo} />
+            </View>
           </View>
-          <Text style={styles.vsText}> VS </Text>
-          <View style={styles.team}>
-            <Text style={styles.teamName}>{item.awayTeamName}</Text>
-            <Image source={{ uri: item.awayTeamLogo }} style={styles.logo} />
+          <View style={styles.matchTime}> 
+              <Text style={styles.timeText}>{formatMatchTime(item.time)}</Text>
+              <Text>||</Text>
+              <Text style={styles.timeText}>{formatMatchDate(item.matchDate)}</Text>
           </View>
+          {/* Button to open YouTube link */}
+          <TouchableOpacity onPress={() => Linking.openURL('https://www.youtube.com/')}> 
+            <Text style={{color: 'blue', marginTop: 8}}>Open YouTube</Text>
+          </TouchableOpacity>
         </View>
-        <View style={styles.matchTime}> 
-            <Text style={styles.timeText}>{formatMatchTime(item.time)}</Text>
-            <Text>||</Text>
-            <Text style={styles.timeText}>{formatMatchDate(item.matchDate)}</Text>
-        </View>
-        {/* Button to open YouTube link */}
-        <TouchableOpacity onPress={() => Linking.openURL('https://www.youtube.com/')}> 
-          <Text style={{color: 'blue', marginTop: 8}}>Open YouTube</Text>
-        </TouchableOpacity>
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+    </View>
   )
   const renderCombinedSearch = ({ item }: { item: any }) => {
       if (item.type === 'user') {
@@ -692,70 +743,77 @@ export default function Index() {
                   { zIndex: 1, paddingVertical: 0 },
                 ]}
               >
-                <View style={styles.searchcontaiiner}>
-                    <TouchableOpacity onPress={handleProfilePress}>
+                <LinearGradient
+                    colors={['#4c008241', '#fff']}                 
+                    style={styles.profileItems}>
+
+                    <TouchableOpacity onPress={handleProfilePress}  style={styles.profileButton}>
                       <Image 
                         source={{ uri: profilePicture || "https://api.dicebear.com/9.x/miniavs/svg?seed=George&backgroundType=gradientLinear&backgroundColor=b6e3f4,c0aede,ffdfbf"}}
                         style={styles.profileImage }
                       />
                     </TouchableOpacity>
-                    <Ionicons name="notifications" size={27} color="#000" style={styles.notification}
-                    />
-                    <TextInput style={[styles.textInput, {width: '50%', left: 80}]} 
-                      placeholder="Search"
-                      value={query}
-                      editable={!searchLoading}
-                      multiline
-                      onChangeText={(text) => {setQuery(text); debounceSearch(text)} }
-                    />
-                    {searchLoading ? (
-                      <></>
-                    ): (
-                      <View style={styles.searchContainer}>
-                          <View style={styles.searchBar}>
-                          <TouchableOpacity  onPress={() => {SearchUsers(query, token), setSearchVisible(true)}} style={styles.searchBar}>
-                            <Ionicons name="search" size={30} color="#4B0082" style={styles.search}
-                            />
+                    <View style={styles.hotmatchContainer}>
+                        {submiting ? (
+                          <ActivityIndicator size="small" color="#4B0082" />
+                        ): (
+                          <TouchableOpacity onPress={() => modalVisible ? setModalVisible(false) : setModalVisible(true)}>
+                            <Ionicons name="add-circle" size={34} color="#000" />
                           </TouchableOpacity>
+                        )}
+                    </View>
+                    <View
+                      style={styles.searchcontaiiner}>
+                        <TextInput style={styles.textsearchInput} 
+                          placeholder="Search"
+                          value={query}
+                          editable={!searchLoading}
+                          onChangeText={(text) => {setQuery(text); debounceSearch(text)} }
+                        />
+                        {searchLoading ? (
+                          <></>
+                        ): (
+                          <View style={styles.searchContainer}>
+                              <View style={styles.searchBar}>
+                              <TouchableOpacity  onPress={() => {SearchUsers(query, token), setSearchVisible(true)}} style={styles.searchBar}>
+                                <Ionicons name="search" size={24} color="#9b9b9bff"
+                                />
+                              </TouchableOpacity>
 
-                          </View>
-                      </View>   
-                    )}
-                </View>
-                  <Text style={styles.generaltext}>Hot Match</Text>
-                  <View style={styles.hotmatchContainer}>
-                    {submiting ? (
-                      <ActivityIndicator size="small" color="#4B0082" />
-                    ): (
-                      <TouchableOpacity onPress={() => modalVisible ? setModalVisible(false) : setModalVisible(true)}>
-                        <Ionicons name="add-circle" size={34} color="#000" />
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                      <FlatList 
-                        data={matches}
-                        renderItem={renderMatch}
-                        keyExtractor={(item) => item._id}
-                        showsHorizontalScrollIndicator={false}
-                        horizontal
-                        contentContainerStyle={{top: 60, maxHeight: 144}}
-                      />
-                <View style={styles.sepration}></View>
-                </View>
-                <FlatList
-                  data={posts}
-                  renderItem={renderPost}
+                              </View>
+                          </View>   
+                        )}
+                        <Ionicons name="notifications-outline" size={21} color="#4B0082" style={styles.notification}/>
+                    </View>
+                  </LinearGradient>
+                
+                <Text style={styles.generaltext}>Hot Match</Text>
+
+                {/* <View style={styles.adsbannerChallenge}></View> */}
+                <FlatList 
+                  data={matches}
+                  renderItem={renderMatch}
                   keyExtractor={(item) => item._id}
-                  showsVerticalScrollIndicator={false}
-                  onEndReached={handleLoadMorePost}
-                  contentContainerStyle={styles.container}
-                  refreshControl={
-                    <RefreshControl
-                      refreshing={refresh}
-                      onRefresh={() =>  fetchPosts(1, true)}
-                    />
-                  }
+                  showsHorizontalScrollIndicator={false}
+                  horizontal
+                  contentContainerStyle={{top: 60,gap: 5, maxHeight: 144}}
                 />
+                <View style={styles.sepration}></View>
+              </View>
+              <FlatList
+                data={posts}
+                renderItem={renderPost}
+                keyExtractor={(item) => item._id}
+                showsVerticalScrollIndicator={false}
+                onEndReached={handleLoadMorePost}
+                contentContainerStyle={styles.container}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refresh}
+                    onRefresh={() =>  fetchPosts(1, true)}
+                  />
+                }
+              />
               <Search isVisible={searchVisible} onClose={handleSearchClose}>
                   <TextInput 
                           placeholder="Search"
@@ -900,49 +958,54 @@ export default function Index() {
           ): (
             <>
               <View
-                  style={[
-                    styles.card,
-                    { zIndex: 1, paddingVertical: 0 },
-                  ]}
+                  style={styles.itemCard}
                 >
-                <View style={styles.searchcontaiiner}>
-                    <TouchableOpacity onPress={handleProfilePress}>
+                  <LinearGradient
+                    colors={['#4c008250', '#fff']}                 
+                    style={styles.profileItems}>
+                      {/* join contest button moved to top-level so it's not clipped by overflow */}
+                    <TouchableOpacity onPress={handleProfilePress}  style={styles.profileButton}>
                       <Image 
                         source={{ uri: profilePicture || "https://api.dicebear.com/9.x/miniavs/svg?seed=George&backgroundType=gradientLinear&backgroundColor=b6e3f4,c0aede,ffdfbf"}}
                         style={styles.profileImage }
                       />
                     </TouchableOpacity>
-                    <Ionicons name="notifications" size={27} color="#000" style={styles.notification}
-                    />
-                    <TextInput style={[styles.textInput, {width: '50%', left: 80}]} 
-                      placeholder="Search"
-                      value={query}
-                      editable={!searchLoading}
-                      multiline
-                      onChangeText={(text) => {setQuery(text); debounceSearch(text)} }
-                    />
-                    {searchLoading ? (
-                      <></>
-                    ): (
-                      <View style={styles.searchContainer}>
-                          <View style={styles.searchBar}>
-                          <TouchableOpacity  onPress={() => {SearchUsers(query, token), setSearchVisible(true)}} style={styles.searchBar}>
-                            <Ionicons name="search" size={30} color="#4B0082" style={styles.search}
-                            />
-                          </TouchableOpacity>
+                    <View
+                      style={styles.searchcontaiiner}>
+                        <TextInput style={styles.textsearchInput} 
+                          placeholder="Search"
+                          value={query}
+                          editable={!searchLoading}
+                          onChangeText={(text) => {setQuery(text); debounceSearch(text)} }
+                        />
+                        {searchLoading ? (
+                          <></>
+                        ): (
+                          <View style={styles.searchContainer}>
+                              <View style={styles.searchBar}>
+                              <TouchableOpacity  onPress={() => {SearchUsers(query, token), setSearchVisible(true)}} style={styles.searchBar}>
+                                <Ionicons name="search" size={24} color="#9b9b9bff"
+                                />
+                              </TouchableOpacity>
 
-                          </View>
-                      </View>   
-                    )}
-                </View>
+                              </View>
+                          </View>   
+                        )}
+                        
+                        <Ionicons name="notifications-outline" size={21} color="#4B0082" style={styles.notification}/>
+                    </View>
+                  </LinearGradient>
+                
                 <Text style={styles.generaltext}>Hot Match</Text>
+
+                {/* <View style={styles.adsbannerChallenge}></View> */}
                 <FlatList 
                   data={matches}
                   renderItem={renderMatch}
                   keyExtractor={(item) => item._id}
                   showsHorizontalScrollIndicator={false}
                   horizontal
-                  contentContainerStyle={{top: 60, maxHeight: 144}}
+                  contentContainerStyle={{top: 60,gap: 5, maxHeight: 144}}
                 />
                 <View style={styles.sepration}></View>
               </View>
@@ -1017,6 +1080,20 @@ export default function Index() {
             </>
           )}
         </View>
+        {/* Top-level animated Join Contest button (not clipped by parents) */}
+        <Animated.View style={{
+          position: 'absolute',
+          bottom: 16,
+          right: 16,
+          zIndex: 9999,
+          opacity: pulseOpacity,
+          transform: [{ scale }]
+        }}>
+          <Pressable onPress={() => router.push({ pathname: '/(contest)' })} style={styles.animationPress}>
+           
+            <Image source={{ uri: 'https://img.freepik.com/free-vector/join-now-win-special-rewards-background-open-web-contest_1017-55839.jpg' }} style={styles.animationPress} contentFit="contain"/>
+          </Pressable>
+        </Animated.View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

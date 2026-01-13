@@ -4,13 +4,28 @@ const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 const styles = StyleSheet.create({
   containerItem: {
     flex: 1,
-    backgroundColor: "#ffffff",
     marginTop: 0,
     paddingTop: 0,
+    alignItems: 'flex-start',
+  },
+  itemCard: {
+    zIndex: 1, 
+    paddingVertical: 0, 
+    height: screenHeight / 3.5,
+    overflow: 'hidden', 
+    alignItems: 'center', 
+    justifyContent: 'center',
+  },
+  profileItems: {
+    width: screenWidth / 1,
+    height: screenHeight / 9,
+    paddingHorizontal: screenHeight / 60,
+    paddingTop: screenHeight / 150,
   },
   container: {
     paddingInline: 10,
-    backgroundColor: "#ffffff"
+    backgroundColor: "#ffffff",
+    marginTop: screenHeight / 100 * 0.5
   },
   header: {
     width: screenWidth - 20,
@@ -18,16 +33,24 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     right: screenWidth / 23
- 
   },
   profileImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: screenWidth / 6.8,
+    height: screenHeight / 15,
+    borderRadius: screenWidth / 3.4,
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
     borderWidth: 1,
     borderColor: "#cccccc",
     objectFit: "contain",
-    left : 5,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    elevation: 3.5
+  },
+  profileImages: {
+    width: screenWidth / 6.8,
+    height: screenHeight / 15,
   },
   username: {
     fontSize: screenWidth / 40 * 1.9,
@@ -37,77 +60,114 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   createdAt: {
-    fontSize: screenWidth / 40 * 1.5,
-    top: 1,
+    fontSize: screenWidth / 40 * 1.4,
     left: 12,
     color: '#888',
   },
   textcomment: {
     fontSize: screenWidth / 40 * 1.7,
-    marginBottom: screenHeight / 120
+    marginBottom: screenHeight / 200
+  },
+  imageContainer: {
+    width: screenWidth - 26,
+    overflow: "hidden",
+    height: screenHeight / 2.6,
+    borderRadius: 5,
+    shadowOpacity: 0.05,
+    elevation: 1.5,
+    marginTop: screenHeight / 100 * 0.3,
+    right: screenHeight / 100,
+    marginBottom: screenHeight / 100 * 0.7, 
   },
   postImage: {
-    width: screenWidth - 25,
-    backgroundColor: "#000",
-    height: screenHeight / 2.50,
-    borderRadius: 5,
-    right: screenWidth / 50,
+    width: '100%',
+    height: '100%',
+  },
+  profileButton: {
+    marginRight: screenWidth / 1.3,
   },
   searchcontaiiner: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    width: "100%",
+    justifyContent: 'flex-start',
+    width: "80%",
+    height: screenHeight / 15,
+    gap: 3,
+    right: screenWidth / 25,
     position: 'absolute',
-    top: 5
+    marginTop: screenHeight / 120,
+
   },
   searchContainer: {
     width: "15%",
     height:'100%',
+    marginLeft: screenWidth / 10,
     position: 'absolute',
-    right: 2
+    right: screenWidth / 7.5,
+    marginTop: screenHeight / 30,
+  },
+  textsearchInput: {
+    width: '70%',
+    height: '85%',
+    backgroundColor: 'transparent',
+    marginLeft: screenWidth / 12,
+    borderWidth: 1,
+    borderColor: '#9b9b9bff',
+    borderRadius: 25,
+    paddingLeft: 15
   },
   card:{   
     width: "auto",
-    height: 230,
+    height: screenHeight / 3.35,
     borderRadius: 10,
     alignItems: 'center',
   },
-  postcard: {
-    width: "90%",
-    height: 400,
-    backgroundColor: "#ffffff",
-    borderRadius: 10,
-    top: 5,
-    marginTop: 10
-  },
-  match: {
-    width: 250,
+  // postcard: {
+  //   width: "90%",
+  //   height: screenHeight / 2.15,
+  //   backgroundColor: "#000",
+  //   borderRadius: 10,
+  //   top: 5,
+  //   marginTop: 10
+  // },
+  mainContainer: {
+    width: screenWidth - 110,
     height: '90%',
-    backgroundColor: "#4B0082",
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#dddddd",
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
     marginLeft: 5,
     borderRadius: 5,
-    overflow: "hidden",
     flex: 1,
     flexDirection: "row",
-    top: 4,
+    marginTop: screenHeight / -13,
+  },
+  match: {
+    width: '100%',
+    height: '100%',
   },
   item: {
     width: '100%',
     height: '100%',
-    gap: 5
+    gap: 5,
+    overflow: 'hidden'
   },
   matchDate: {
     width: "100%",
-    height: 30,
-    top: 1,
+    height: screenHeight / 30,
+    marginTop: 1,
     flexDirection: "row",
     justifyContent: "space-between",
     paddingInline: 5,
     alignItems: 'center',
-    backgroundColor: '#fff',
-    borderBottomEndRadius: 15,
-    borderBottomStartRadius: 15
+    backgroundColor: '#f5f5f5',
+    borderBottomEndRadius: 20,
+    borderBottomStartRadius: 20
   },
   matchTime: {
     width: "80%",
@@ -115,10 +175,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     gap: 9,
-    top: 3.5,
-    left: 25,
-    height: 20,
-    backgroundColor: '#fff',
+    marginTop: 2.5,
+    marginLeft: 25,
+    height: screenHeight / 35,
+    backgroundColor: '#f5f5f5',
     borderTopEndRadius: 15,
     borderTopStartRadius: 15
   },
@@ -128,23 +188,25 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     alignItems: 'center',
     paddingInline: 8,
-    top: 0,
-    
+    marginTop: -2.5 
   },
-  team: {
+  team: {    
     flexDirection: "column",
     alignItems: "center",
     gap: 3
   },
   logo: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: screenWidth / 9,
+    height: screenHeight / 20,
+    borderRadius: 100,
+    shadowOpacity: 0.05,
+    elevation: 3,
+    backgroundColor: '#fff'
   },
   teamName: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "bold",
+    fontFamily: 'poppins',
+    color: "#1b1a1f",
+    fontSize: 13,
     textAlign: "center",
     marginTop: 3
   },
@@ -156,25 +218,26 @@ const styles = StyleSheet.create({
     gap: 3
   },
   vsText: {
-    color: "#fff",
-    fontSize: 20,
+    color: "#000",
+    fontSize: 17,
+    marginTop: 20,
     fontWeight: 'bold',
     fontFamily: 'serif'
   },
   locationText: {
     color: '#9b9b9bff',
     fontStyle: 'italic',
-    fontSize: 13
+    fontSize: 10
   },
   leagueText:{
     color: "#000",
-    fontSize: 16,
-    fontWeight: "bold"
+    fontSize: 13,
+    fontWeight: '500'
   },
   timeText: {
     color: '#000',
-    fontWeight: 'bold',
-    fontSize: 16
+    fontWeight: '500',
+    fontSize: 13
   },
   hotmatchContainer: {
     position: 'absolute',
@@ -211,11 +274,21 @@ const styles = StyleSheet.create({
   },
   generaltext: {
     color: "#4B0082",
-    fontSize: 23,
+    fontSize: screenWidth / 40 * 2.1,
     fontFamily: "serif",
     fontWeight: "bold",
-    right: 100,
-    top: 60
+    position: "absolute",
+    marginLeft: - screenWidth / 1.6,
+    marginTop: screenHeight / 100 * -9
+  },
+  adsbannerChallenge: {
+    position: "absolute",
+    marginTop: screenHeight / 13,
+    marginLeft: screenWidth / 1.5,
+    backgroundColor: "#dcdcdc",
+    width: screenWidth / 4,
+    height: screenHeight / 15,
+    borderRadius: 100,
   },
   matchlogo:{
     width: 45,
@@ -236,17 +309,16 @@ const styles = StyleSheet.create({
   },
   sepration: {
     width: "100%",
-    height: 8,
+    height: screenHeight / 120,
     position: "absolute",
     backgroundColor: "#cccccc",
-    top: 220,
+    marginTop: screenHeight / 3.85
   },
   tagContainer: {
-    width: 340, 
+    width: screenWidth / 1.1, 
     height: "auto",
-    top: 0, 
-    padding: 10, 
-    backgroundColor: "#ffffff"
+    right: screenWidth / 50, 
+    padding: 5, 
   },
   editPost: {
     flex: 1,
@@ -339,26 +411,24 @@ const styles = StyleSheet.create({
   },
   tag: { 
     color: "#4B0082", 
-    fontWeight: "bold" 
+    fontWeight: "500" 
   },
   mention: {
     color: "#4B0082", 
-    fontWeight: "bold"
+    fontWeight: "500"
   },
   seprationLine: {
-    width: 340, 
-    height: 7,
+    width: screenWidth - 20, 
+    height: screenHeight / 150,
     bottom: 15, 
-    right: 12, 
+    right: screenWidth / 35, 
     backgroundColor: "#eeeeeeff"
   },
   commentSection: {
-    width: 340,
-    height: 60,
-    right:12,
+    width: screenWidth - 20,
+    height: screenHeight / 13,
+    right: 11,
     bottom: 10,
-    objectFit: 'contain',
-    backgroundColor: "#ffffff",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -370,12 +440,13 @@ const styles = StyleSheet.create({
     height: 'auto',
     flex: 1,
   },
- 
   userInfoText: {
     flex: 1,
   },
   caption: {
-    fontSize: 18,
+    fontSize: screenHeight / 50,
+    fontFamily: "poppins",
+    width: screenWidth / 1.1,
     flexWrap: "wrap",
     flexShrink: 1
   },
@@ -400,10 +471,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
   },
   notification: {
-    left: 17,
-    backgroundColor: "#eeeeee85",
+    marginLeft: screenWidth / 35,
+    backgroundColor: "rgba(76, 0, 130, 0.12)",
     borderRadius: 50,
-    padding: 10,
+    padding: 8,
   },
   searchBar: {
     flex: 1,
@@ -420,11 +491,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     left: 40
   },
-  search: {
-    backdropFilter: "blur(10px)",
-    top: 7,
-    position: "absolute"
-  },
+  
     text1: {
         fontWeight: 'bold',
         fontSize: 18,
@@ -549,6 +616,19 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         paddingLeft: 10,
         fontSize: 16
-    }
+    },
+    animationPress: {
+      width: screenWidth / 6,
+      height: screenHeight / 13,
+      backgroundColor: '#4c008250',
+      borderRadius: screenWidth / 10,
+      padding: 10,
+      alignItems: 'center',
+      justifyContent: 'center',
+      shadowColor: "#000",
+      shadowOpacity: 0.1,
+      elevation: 6,
+    },
+    
 })
 export default styles;

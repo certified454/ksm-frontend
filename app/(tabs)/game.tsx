@@ -1,13 +1,14 @@
 import { API_URL } from '@/store/postStore';
-import { Ionicons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 import styles from '../../assets/styles/game';
 import { useAuthStore } from '../../store/authStore';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Compete = {
   _id: string;
@@ -61,6 +62,11 @@ export default function Game() {
       return data;
     } catch (error) {
       console.error(error);
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Failed to fetch user information. Please try again.",
+      });
       throw error;
     } finally {
       setLoading(false);
@@ -106,6 +112,11 @@ export default function Game() {
         throw new Error(data.message || 'Something went wrong');
       };
       setSubmitCompetition(false);
+      Toast.show({
+        type: "success",
+        text1: "Challenge Created",
+        text2: "Your challenge has been sent",
+      });
       router.push('/(tabs)')
     } catch (error) {
       console.error(error);
@@ -129,7 +140,7 @@ export default function Game() {
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>
         <View style={styles.container}>
           <View style={styles.head}>
-            <Ionicons name="arrow-back" size={34} color="#4B0082" onPress={() => router.back()} />
+            <MaterialIcons name="arrow-back-ios" size={34} color="#4B0082" onPress={() => router.back()} />
             <Text style={styles.title}>Challenge a friend!</Text>
           </View>
               <View style={styles.header}>
@@ -156,7 +167,7 @@ export default function Game() {
                 onChangeText={setDescription}
                 style={styles.input}
               />
-              <View style={styles.buttonContainer}>
+              
                 {submitCompetition ? 
                 (
                   <ActivityIndicator size="small" color="#fff" />
@@ -168,7 +179,7 @@ export default function Game() {
                       <Text style={styles.buttonText}>Create Challenge</Text>
                     </TouchableOpacity>
                 )}
-              </View>
+              
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>

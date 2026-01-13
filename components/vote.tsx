@@ -1,6 +1,8 @@
-import Ionicons from "@expo/vector-icons/Ionicons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { PropsWithChildren } from "react";
-import { KeyboardAvoidingView, Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import { Dimensions, KeyboardAvoidingView, Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import styles from '../assets/styles/challenge';
+const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
 type Props = PropsWithChildren<{
     isVisible: boolean;
@@ -15,8 +17,8 @@ export default function UpdateUserProfile({isVisible, children, onClose}:Props) 
                     <View style={style.modalContainer}>
                         <View style={style.titleContainer}>
                              <Pressable onPress={onClose} style={style.press}>
-                                <Ionicons style={{top: 0}} name="arrow-back" size={30} color={'#4B0082'}/>
-                                <Text style={style.titleText}>Votes</Text>
+                                <MaterialIcons name="arrow-back-ios" size={30} style={styles.arrowback} color={'#4B0082'}/>
+                                <Text style={style.titleText}>Votes on this Challange</Text>
                             </Pressable>
                         </View>
                     </View>
@@ -32,7 +34,7 @@ export default function UpdateUserProfile({isVisible, children, onClose}:Props) 
 const style = StyleSheet.create({
     modalContainer: {
         flex: 1,
-        top: 15,
+        marginTop: screenHeight * -0.02,
         height: '100%',
         width: '100%',
         position: "absolute",
@@ -40,10 +42,9 @@ const style = StyleSheet.create({
     },
     titleContainer: {
         height: '5%',
-        paddingLeft: 10,
-        top: 10,
+        paddingLeft: screenWidth * 0.01,
+        marginTop: screenHeight * 0.05,
         flexDirection: 'row',
-        paddingHorizontal: 20,
         alignItems: 'center',
         justifyContent: "space-between"
     },
@@ -51,17 +52,18 @@ const style = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center', 
         position: 'absolute', 
-        top: 20, left:10
+        marginLeft: screenWidth * 0.01,
+        marginTop: screenHeight * 0.035
     },
     childrenContainer: {
         flex: 1,
-        top: 0,
         alignItems: 'center',
-        gap: 40
+        gap: 40,
+        marginTop: screenHeight * 0,
     },
     titleText: { 
-        left: 15,
-        fontSize: 20, 
+        marginLeft: screenWidth * 0.06,
+        fontSize: screenHeight * 0.023, 
         fontWeight: 'bold'
     },
 })

@@ -1,4 +1,4 @@
-import { StyleSheet, Dimensions } from "react-native";
+import { Dimensions, StyleSheet } from "react-native";
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
@@ -7,7 +7,7 @@ const styles = StyleSheet.create({
         padding: 0,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#ffffff'
+        backgroundColor: '#edededff'
     },
     containers: {
         width: '100%',
@@ -139,8 +139,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#ffffff',
         borderRadius: 5,
         shadowColor: '#000',
-        shadowOpacity: 2,
-        elevation: 5,
+        shadowOpacity: 0.05,
+        elevation: 3,
         justifyContent: 'space-between',
         paddingHorizontal: 10,
     },
@@ -153,11 +153,29 @@ const styles = StyleSheet.create({
         width: 50,
         height: 50,
         borderRadius: 25,
-        marginRight: 10
+        borderWidth: 1,
+        borderColor: '#cccccc',
+        marginRight: 10,
+        shadowOpacity: 0.05,
+        elevation: 3.5,
     },
     username: {
-        fontSize: 18,
+        fontSize: screenHeight * 0.020,
+        fontWeight: 'bold',
+        fontFamily: 'serif'
+    },
+    authorUsername: {
+        fontSize: screenHeight * 0.018,
+        fontFamily: 'serif',
         fontWeight: 'bold'
+    },
+    arrowback: {
+        marginLeft: screenWidth * 0.05,
+    },
+    voterUsername: {
+        fontSize: screenHeight * 0.020,
+        fontWeight: 'bold',
+        fontFamily: 'serif'
     },
     challengeItemsContainer: {
         width: '100%',
@@ -187,19 +205,20 @@ const styles = StyleSheet.create({
         padding: 10
     },
     userPredictInstrutions: {
-        fontSize: 18,
+        fontSize: screenHeight * 0.020,
         color: '#008000',
-        marginBottom: 5,
+        marginBottom: screenHeight * 0.01,
+        marginLeft: screenWidth * 0.05,
         fontWeight: 'bold'
     },
     userPredictText: {
-        fontSize: 16,
+        fontSize: screenHeight * 0.018,
         color: '#000',
         width: '90%',
         fontWeight: 'semibold'
     },
     adminText: {
-        fontSize: 18,
+        fontSize: screenHeight * 0.020,
         color: '#4B0082',
         fontWeight: 'bold',
         left: 12,
@@ -234,12 +253,16 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     currentTimeText: {
-        fontSize: 15,
+        fontSize: screenHeight * 0.017,
+        color: '#4B0082',
+    },
+    live: {
+        fontSize: screenHeight * 0.017,
         color: '#4B0082',
         fontWeight: 'bold'
     },
     itemTime: {
-        fontSize: 15,
+        fontSize: screenHeight * 0.017,
         fontWeight: 'bold'
     },
     currentDate: {
@@ -271,19 +294,21 @@ const styles = StyleSheet.create({
         padding: 10
     },
     poolText: {
-        fontSize: 16,
+        fontSize: screenHeight * 0.018,
         color: '#000',
-        fontWeight: 'bold',
+        fontWeight: '500'
     },
     answerInput: {
         width: '90%',
-        height: 45,
         padding: 10,
-        bottom: 30,
+        bottom: screenHeight * 0.040,
+        fontSize: screenHeight * 0.016,
         borderWidth: 1,
         borderColor: '#4B0082',
         borderRadius: 5,
-        marginVertical: 5,
+        minHeight: 50,
+        maxHeight: 100,
+        
     },
     challengeItems: {
         width: '100%',
@@ -293,83 +318,83 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     challengeDetailsContainer: {
-        top: 20,
-        width: '100%',
-        height: 280
+        width: screenWidth * 1,
+        height: screenHeight * 0.40,
+        overflow: 'hidden',
+        alignItems: 'flex-end'
     },
-    challengeDetails: {
-        top: 38,
-        position: 'absolute',
+    challengeDetails: {    
         gap: 3,
-        height: '79%',
+        height: 'auto',
         width: '100%',
-        alignItems: 'baseline',
-        backgroundColor: '#ffffffe1',
+        backgroundColor: '#fff',
         borderRadius: 5,
-        marginVertical: 5,
-        overflow: 'hidden'
+        overflow: 'hidden',
     },
     challengeitems: {
         width: '80%',
-        top: 30,
-        left: 30,
+        marginTop: screenHeight * 0.025,
+        marginLeft:screenWidth * 0.03,
         borderTopWidth: 1,
-        borderTopColor: '#4c00827e',
+        borderTopColor: '#ccc',
         borderBottomWidth: 1,
-        borderBottomColor: '#4c00827e',
+        borderBottomColor: '#cccc',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between'
     },
     backgrounImage: {
-        width: 340, 
-        height: '90%', 
+        width: screenWidth * 1, 
+        height: screenHeight * 0.33, 
         objectFit: 'cover', 
         borderRadius: 5, 
     },
     creator: {
-        left: 10,
-        top: 40,
+        marginLeft: screenWidth * 0.05,
+        marginTop: screenHeight * 0.020,
         flexDirection: 'row',
         alignItems: 'center',
     },
     startDate: {
         width: '40%',
         padding: 10,
-        top: 4,
+        marginTop: screenHeight * 0.01,
         flexDirection: 'row',
         alignItems: 'center',
     },
     endDate: {
         width: '40%',
         padding: 10,
+        marginTop: screenHeight * 0.01,
         flexDirection: 'row',
         alignItems: 'center',
     },
     detailText: {
-        fontSize: 16,
-        fontWeight: 'bold',
+        fontSize: screenHeight * 0.020,
+        fontFamily: 'poppins',
         width: '80%',
-        left: 12,
-        top: 20
+        marginLeft:screenWidth * 0.05,
+        marginTop: screenHeight * 0.025,
     },
     dontMissOutText: {
-        fontSize: 15,
+        fontSize: screenHeight * 0.016,
         fontWeight: 'bold',
         color: '#4B0082',
         top: 10
     },
     checkItOutButton: {
         backgroundColor: '#4B0082',
-        borderTopRightRadius:5,
-        padding: 10,
+        borderTopRightRadius: 10,
+        justifyContent: 'center',
         alignItems: 'center',
-        width: '40%',
-        left: 203,
-        top: 6
+        width: '35%',
+        right: screenWidth * 0.055, 
+        marginBottom: screenHeight * -0.007,
+        height: screenHeight * 0.05,
+        flexBasis: 'auto',
     },
     checkItOutText: {
-        fontSize: 16,
+        fontSize: screenHeight * 0.018,
         fontWeight: 'bold',
         color: '#ffffff',
         marginBottom: 5
@@ -379,19 +404,19 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-evenly',
         alignItems: 'center',
-        left: 270,
-        width: '22%',
-        top: 20,
+        left: screenWidth * 0.72,
+        width: '25%',
+        bottom: 0,
         borderTopStartRadius: 5
     },
     textActive: {
         color: '#fff',
-        fontSize: 16,
+        fontSize: screenHeight * 0.017,
         fontWeight: 'bold'
     },
     voteCount: {
         position: 'absolute',
-        fontSize: 16,
+        fontSize: screenHeight * 0.017,
         color: '#4B0082',
         fontWeight: 'bold',
         bottom: 11
@@ -410,9 +435,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-evenly',
         alignItems: 'center',
-        left: 270,
-        width: '22%',
-        top: 20,
+        left: screenWidth * 0.72,
+        width: '25%',
+        bottom: 0,
         borderTopStartRadius: 5
     },
     upcomingChallenge: {
@@ -420,9 +445,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-evenly',
         alignItems: 'center',
-        left: 253,
-        width: '22%',
-        top: 20,
+        left: screenWidth * 0.66,
+        width: '28%',
+        bottom: 0,
         borderTopStartRadius: 5
     },
     voteButtonContainer: {
@@ -436,13 +461,13 @@ const styles = StyleSheet.create({
         backgroundColor: '#4B0082'
     },
     voteButtonText: {
-        fontSize: 16,
+        fontSize: screenHeight * 0.018,
         color: '#ffffff',
         fontWeight: 'bold',
     },
     voteButton: {
         width: '100%',
-        height: '100%',
+        height: '80%',
         borderRadius: 5,
         backgroundColor: '#4B0082',
         justifyContent: 'center',
@@ -450,7 +475,7 @@ const styles = StyleSheet.create({
     },
     answerPerUser: {
         width: '89%',
-        height: 50,
+        height: screenHeight * 0.10,
         padding: 10,
         borderRadius: 5,
         flexDirection: 'row',
@@ -461,7 +486,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#ff4646ff'
     },
     answerPerUserText: {
-        fontSize: 14,
+        fontSize: screenHeight * 0.017,
         width: '90%',
         color: '#ffffff',
         fontWeight: 'bold'
@@ -498,10 +523,14 @@ const styles = StyleSheet.create({
         padding: 5
     },
     itemProfilePicture: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        marginRight: 10
+        width: screenWidth * 0.13,
+        height: screenWidth * 0.13,
+        borderRadius: screenHeight * 0.13,
+        marginRight: screenWidth * 0.03,
+        borderColor: '#cccccc',
+        borderWidth: 1,
+        shadowOpacity: 0.05,
+        elevation: 2.5,
     },
     createdAT: {
         fontSize: 12,

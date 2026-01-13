@@ -1,0 +1,202 @@
+import { Dimensions, StyleSheet } from "react-native";
+const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        padding:  screenHeight * 0.002,
+        backgroundColor: '#e2e2e2',
+    },
+    childContainer: {
+        flex: 1,
+        width: '100%',
+        backgroundColor: '#ffffff',
+    },
+    newsContainer: {
+        width: '100%',
+        height: screenHeight * 0.09,
+        gap: 5,
+        backgroundColor: 'rgba(76, 0, 130, 0.17)'
+    },
+    clubLogo: {
+       width: screenWidth / 6.8,
+        height: screenHeight / 15,
+        borderRadius: screenWidth / 3.4,
+        justifyContent: "center",
+        alignItems: "center",
+        overflow: "hidden",
+        borderWidth: 1,
+        borderColor: "#cccccc",
+        objectFit: "contain",
+        shadowColor: "#000",
+        shadowOpacity: 0.05,
+        elevation: 3.5
+    },
+    newsHeading:{
+        fontSize: screenHeight * 0.020,
+        fontFamily: 'serif',
+        fontWeight: 'bold',
+        marginLeft: screenWidth * 0.03,
+    },
+    newsProperties: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        width: '100%',
+        gap: screenWidth * 0.02,
+        marginLeft: screenHeight * 0.002
+    },
+    addIcon: {
+        marginLeft: screenWidth * 0.03,
+        width: screenWidth * 0.11,
+        height: screenHeight * 0.05,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: screenWidth * 0.08,
+    },
+    searchIcon: {
+        marginLeft: screenWidth * 0.03,
+        width: screenWidth * 0.09,
+        height: screenHeight * 0.04,
+        backgroundColor: '#fff',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: screenWidth * 0.08,
+    },
+    earnings: {
+        width: screenWidth * 0.35,
+        height: screenHeight * 0.04,
+        backgroundColor: '#4b0082',
+        marginLeft: screenWidth * 0.3,
+        borderRadius: screenWidth * 0.07,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    earningsText: {
+        color: '#fff',
+        fontSize: screenHeight * 0.020,
+        marginLeft: screenWidth * 0.01,
+    },
+    flatListContainer: {
+        flex: 1,
+        marginTop: screenHeight * 0.01,
+    },
+    newsItemContainer: {
+        flex: 1,
+    },
+    newsItemContent: {
+        padding: screenHeight * 0.01,
+        backgroundColor: '#ffffff',
+        width: '95%',
+        height: 'auto',
+        alignSelf: 'center',
+        borderRadius: screenWidth * 0.02,
+        marginBottom: screenHeight * 0.015,
+    },
+    imageContainer: {
+        width: '100%',
+        height: screenHeight * 0.25,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: screenHeight * 0.01,
+        marginBottom: screenHeight * 0.01,
+        gap: screenWidth * 0.01,
+    },
+    newsPicture1: {
+        width: '48%',
+        borderTopLeftRadius: screenHeight * 0.006, 
+        borderBottomLeftRadius: screenHeight * 0.006,
+        height: '100%',
+    },
+    newsPicture2: {
+        width: '48%',
+        borderTopRightRadius: screenHeight * 0.006, 
+        borderBottomRightRadius: screenHeight * 0.006,
+        height: '100%',
+    },
+    userImage: {
+        width: screenHeight * 0.06,
+        height: screenHeight * 0.06,
+        borderRadius: screenHeight * 0.03,
+        marginTop: screenHeight * 0.25,
+        marginLeft: screenWidth * 0.02,
+        borderWidth: 1,
+        borderColor: '#ffffff',
+        shadowOpacity: 0.3,
+        elevation: 2,
+        position: 'absolute',
+    },
+    newsUsername: {
+        fontSize: screenHeight * 0.02,
+        fontWeight: 'bold',
+        marginTop: screenHeight * -0.01,
+        marginLeft: screenWidth * 0.13,
+        color: '#4B0082',
+        marginBottom: screenHeight * 0.02,
+    },
+    newsDescription: {
+        fontSize: screenHeight * 0.018,
+        marginLeft: screenWidth * 0.02,
+        marginBottom: screenHeight * 0.02,
+    },
+    newsReactions: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        width: '100%',
+        height: screenHeight * 0.05,
+        marginTop: screenHeight * 0.01,
+        
+    },
+    downloadContainer: {
+        width: screenWidth * 0.11,
+        height: '100%',
+        justifyContent: 'center',
+        backgroundColor: '#4c008227',
+        borderRadius: screenWidth * 0.02,
+        marginLeft: screenWidth * 0.02,
+    },
+    likeContainer: {
+        width: screenWidth * 0.20,
+        height: '100%',
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#4c008250',
+        borderRadius: screenWidth * 0.02,
+        marginLeft: screenWidth * 0.03,
+    },
+    unlikeContainer: {
+        width: screenWidth * 0.20,
+        height: '100%',
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#4c008250',
+        borderRadius: screenWidth * 0.02,
+        marginLeft: screenWidth * 0.03,
+    },
+    downloadIcon: {
+        width: '100%',
+        height: '100%',
+        justifyContent: 'center',
+        marginLeft: screenWidth * 0.02,
+    },
+    likeIcon: {
+        height: '100%',
+        justifyContent: 'center',
+        marginLeft: screenWidth * 0.02,
+    },
+    newsReaction: {
+        fontSize: screenHeight * 0.019,
+        marginLeft: screenWidth * 0.02,
+    },
+    newsTimestamp: {
+        fontSize: screenHeight * 0.012,
+        right: screenWidth *0.02,
+        bottom: screenHeight * 0.02,
+        position: 'absolute',
+    }
+});
+
+export default styles;

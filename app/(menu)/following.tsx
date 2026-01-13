@@ -1,12 +1,12 @@
 import { useAuthStore } from '@/store/authStore';
 import { API_URL } from '@/store/postStore';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { MaterialIcons } from "@expo/vector-icons";
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, FlatList, Text, TouchableOpacity, View } from 'react-native';
-import styles from '../../assets/styles/followers';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import styles from '../../assets/styles/followers';
 
 type Following ={
     _id: string;
@@ -51,9 +51,13 @@ export default function Followers() {
     const renderFollowing = ({ item }: { item: any} ) =>(
         <TouchableOpacity onPress={() => handleProfilePress(item._id)} style={styles.container}>
             <View style={styles.containerClick}>
-                <Image style={styles.image} contentFit='cover' source={{ uri: item.profilePicture}}/>
-                <Text style={styles.text}>{item.username}</Text>
-                <Text style={styles.text}>{item.hobbies}</Text>
+                <View style={styles.imageContainer}>
+                    <Image style={styles.image} contentFit='cover' source={{ uri: item.profilePicture}}/>
+                </View>
+                <Text style={styles.followersusername}>{item.username}</Text>
+                {/* <View style={styles.hobbiesContainer}>
+                    <Text >{item.location}</Text>
+                </View> */}
             </View>
    
         </TouchableOpacity>
@@ -62,7 +66,7 @@ export default function Followers() {
         <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
             <View style={styles.flatList}>
                 <TouchableOpacity onPress={() => router.back()} style={styles.username}>
-                    <Ionicons name='arrow-back' size={30} color={'#4B0082'}/>
+                    <MaterialIcons name='arrow-back-ios' size={30} color={'#4B0082'} style={styles.backIcon}  />
                     <Text style={styles.text}>{user?.username}</Text>
                 </TouchableOpacity>
                 <FlatList

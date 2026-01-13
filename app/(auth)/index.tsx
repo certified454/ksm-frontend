@@ -1,23 +1,21 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Link, router } from "expo-router";
-import { useEffect, useState } from "react";
-import { useLocalSearchParams } from "expo-router";
-import { API_URL } from "../../store/postStore";
+import { Link, router, useLocalSearchParams } from "expo-router";
+import { useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
+import Toast from "react-native-toast-message";
 
+import { useNotification } from "@/context/NotificationContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import styles from "../../assets/styles/login";
 import { useAuthStore } from "../../store/authStore";
-import { useNotification } from "@/context/NotificationContext";
 
 export default function Index() {
   const [email, setEmail] = useState("");
@@ -29,11 +27,25 @@ export default function Index() {
   const { userId } = useLocalSearchParams();
   const { token } = useAuthStore();
 
-  const handleLogin = async () => {
-    const result = await login(email, password, router);
+ const handleLogin = async () => {
+  const result = await login(email, password);
 
-    if (!result.success) Alert.alert("Message", result.error);
-  };
+  if (!result.success) {
+    Toast.show({ type: "error", text1: "Login Failed", text2: result.error });
+    return;
+  }
+
+  const username = result.user?.username || email;
+  Toast.show({ 
+    type: "success", 
+    text1: "Login Successful", 
+    text2: `Welcome back, ${username}!`, 
+    visibilityTime: 3500 
+  });
+  setTimeout(() => {
+    router.push({ pathname: "/(tabs)" });
+  }, 3500);
+};
   
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -103,6 +115,7 @@ export default function Index() {
           </View>
         </View>
       </KeyboardAvoidingView>
+      <Toast />
     </SafeAreaView>
   );
 }

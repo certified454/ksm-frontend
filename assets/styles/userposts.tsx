@@ -1,4 +1,5 @@
-import { StyleSheet } from "react-native";
+import { Dimensions, StyleSheet } from "react-native";
+const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
     container: {
@@ -20,13 +21,47 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%'
     },
+    modalOverlay: { 
+        flex: 1, 
+        backgroundColor: 'rgba(0,0,0,0.4)', 
+        justifyContent: 'flex-end' 
+    },
+    modelDetailsContainer: { 
+        backgroundColor: '#fff', 
+        borderTopLeftRadius: 12, 
+        borderTopRightRadius: 12, 
+        maxHeight: '80%' 
+    },
+    searchCountryContainer: { 
+        padding: 12, 
+        borderBottomWidth: 1, 
+        borderColor: '#eee'
+    },
+    countryItem: { padding: 12,
+        borderBottomWidth: 1, 
+        borderColor: '#eee', 
+        flexDirection: 'row', 
+        alignItems: 'center' 
+    },
+    searchCountry: {
+        padding: 10, 
+        backgroundColor: '#f5f5f5', 
+        borderRadius: 8 
+    },
+    itemtext: {  
+        marginRight: screenWidth * -0.03, 
+    },
     userDetailsContainer: {
         width: '90%',
-        height: 250,
+        height: screenHeight * 1,
         position: 'absolute',
         top: 150,
         overflow: 'hidden',
         backgroundColor: '#ffffff',
+    },
+    closeModal: { 
+        padding: 16, 
+        alignItems: 'center' 
     },
     itemProp: {
         flexDirection: 'row',
@@ -36,19 +71,21 @@ const styles = StyleSheet.create({
         objectFit: 'contain'
     },
     itemPropTextUsername: {
-        fontSize: 20,
+        fontSize: screenHeight * 0.022,
         fontWeight: 'bold',
+        fontFamily: 'serif',
         color: '#4B0092'
     },
     itemPropTextGender: {
-        fontSize: 15,
+        fontSize: screenHeight * 0.018,
         fontWeight: 'bold',
+        fontFamily: 'monospace',
         color: '#000000',
         top: 4
     },
     editAccountButtonContainer: {
-        width: '43%',
-        height: 35,
+        width: '38%',
+        height: screenHeight * 0.045,
     },
     editAccount: {
         width: '100%',
@@ -61,7 +98,7 @@ const styles = StyleSheet.create({
         gap: 5
     },
     editProfileText: {
-        fontSize: 18,
+        fontSize: screenHeight * 0.018,
         color: '#ffffff'
     },
     icon: {
@@ -103,7 +140,7 @@ const styles = StyleSheet.create({
         borderRadius: 10
     },
     itemCallText: {
-        fontSize: 18,
+        fontSize: screenHeight * 0.020,
         fontWeight: 'bold',
         color: '#000000',
     },
@@ -118,7 +155,7 @@ const styles = StyleSheet.create({
         
     },
     callText:{
-        fontSize: 16,
+        fontSize:screenHeight * 0.018,
         color: '#ffffff',
         left: 3
     },
@@ -133,11 +170,11 @@ const styles = StyleSheet.create({
         width: '50%',
         height: '100%',
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'center'  
     },
     itemLocationText: {
         color: '#4B0082',
-        fontSize: 17,
+        fontSize: screenHeight * 0.020,
     },
     itemBio: {
         width: '90%',
@@ -145,7 +182,7 @@ const styles = StyleSheet.create({
         left: 15
     },
     itemBioText: {
-        fontSize: 16
+        fontSize: screenHeight * 0.019,
     },
     itemTitle: {
         width: '100%',
@@ -164,7 +201,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     itemTitleText: {
-        fontSize: 18,
+        fontSize: screenHeight * 0.018,
         fontFamily: 'sans-serif'
     },
     flatListContainer: {
@@ -195,16 +232,11 @@ const styles = StyleSheet.create({
         right: 10
     }, 
     displayOption: {
-        flexDirection:'row',
-        justifyContent:'space-between',
-        alignItems: 'center',
-        paddingHorizontal: 20
+        alignItems: 'flex-end',
+        marginTop: screenHeight * -0.06,
     },
-    displayUsername: {
-        color: '#ffffff',
-        fontSize: 16,
-        left: 50,
-        bottom: 5
+    iconDownload: {
+        marginRight: screenWidth * 0.05,
     },
     postImage: {
         width: 360,
@@ -213,18 +245,19 @@ const styles = StyleSheet.create({
         objectFit: 'contain',
     },
     updateContainer: {
-        width: '100%',
-        height: 40,
-        justifyContent: 'center',
-        left: 17,
-        gap: 5,
+        width: screenWidth * 0.95,
+        height: screenHeight * 0.06,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        overflow: 'hidden',
     },
     updateText: {
-        fontSize: 18
+        fontSize: screenHeight * 0.017
     },
     updateInputContainer: {
-        width: '90%',
-        height: 38,
+        width: '65%',
+        height: screenHeight * 0.05,
         borderColor: '#4B0082',
         borderBottomWidth: 1.5,
         borderRadius: 5,
@@ -233,39 +266,68 @@ const styles = StyleSheet.create({
     },
     updateOpacityContainer: {
         width: '90%',
-        height: 38,
+        height: screenHeight * 0.05,
         backgroundColor: '#4B0082',
         borderRadius: 5,
-        bottom: 30,
-        paddingLeft: 2,
         justifyContent: 'center',
-        alignContent: 'center'
+        alignItems: 'center'
     },
     textInput: {
-        minHeight: 50,
+        borderBottomWidth: 0.5,
+        borderLeftWidth: 0.5,
+        borderBottomColor: '#4B0082',
+        borderLeftColor: '#4B0082',
+        borderRadius: 5,
+        backgroundColor: "#fff",
+        padding: 10,
+        marginBottom: 0,
+        width: '65%',
+        minHeight: 10,
         maxHeight: 100,
-        bottom: 5,
+        fontSize: screenHeight * 0.016,
+    },
+    createpostContainer: {
+        width: '100%',
+        height: 'auto',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        // backgroundColor: 'green'
+    },
+    createpost: {
+        width: screenWidth * 0.5,
+        height: screenHeight * 0.3
+    },
+    createpostText: {
+        fontSize: screenHeight * 0.023,
+        fontWeight: 'bold',
+        color: '#000000',
+        textAlign: 'center',
+        marginTop: screenHeight * -0.07
+    },
+    createpostext: {
+        fontSize: screenHeight * 0.017,
+        color: '#000000a6',
+        marginTop: screenHeight * 0.001,     
     },
     text: {
-        fontSize: 20,
+        fontSize: screenHeight * 0.019,
         fontWeight: 'bold',
-        color: '#ffffff',
-        left: '40%'
+        color: '#ffffff'
     },
     warinigContainer: {
         width: '90%',
         height: 'auto',
-       
         padding: 6,
         backgroundColor: 'rgba(255, 238, 0, 0.26)'
     },
     warning: {
-     fontSize: 15,
+     fontSize: screenHeight * 0.018,
      color: '#fa0101bb',
      fontWeight: 'bold'  
     },
     notice: {
      color: '#0f0f0fbb',
+        fontSize: screenHeight * 0.016,
     },
     userInfo: {
         width: '100%',
@@ -278,17 +340,17 @@ const styles = StyleSheet.create({
         height: 300
     },
     userText: {
-        fontSize: 20,
+        fontSize: screenHeight * 0.022,
         color: '#4B0082',
         fontWeight: 'bold',
-        left: 10
+        marginLeft: screenWidth * 0.02, 
     },
     userTextGender: {
-        fontSize: 16,
+        fontSize: screenHeight * 0.017,
         color: '#000',
     },
     userTextLocation: {
-        fontSize: 20,
+        fontSize: screenHeight * 0.017,
         color: '#000',
     },
     userDetailsInfo: {
@@ -306,9 +368,10 @@ const styles = StyleSheet.create({
         gap: 5
     },
     userTextPlaceHolder: {
-        fontSize: 17,
+        fontSize: screenHeight * 0.017,
         color: '#000000a6',
     },
+    
     
 })
 export default styles;
