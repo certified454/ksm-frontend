@@ -1,96 +1,106 @@
-import { Dimensions, StyleSheet } from "react-native";
-const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
+import { StyleSheet } from "react-native";
+import { normalizeFont, scale, vScale } from "./responsive";
 
-const styles = StyleSheet.create({
+/**
+ * Create styles using current screen dimensions.
+ * Usage in component:
+ *   const { width, height } = useWindowDimensions();
+ *   const styles = createAddNewsStyles(width, height);
+ */
+const createAddNewsStyles = (screenWidth: number, screenHeight: number) =>
+  StyleSheet.create({
     container: {
-        flex: 1,
-        padding:  screenHeight * 0.02,
-        backgroundColor: '#fff',
-        gap: screenHeight * 0.02,
+      flex: 1,
+      padding: vScale(16, screenHeight), // example: prefer vScale or scale
+      backgroundColor: "#fff",
+      gap: vScale(16, screenHeight),
     },
     header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
     },
     backIcon: {
-        marginTop: screenHeight * 0.01,
-        width: screenWidth * 0.11,
-        height: screenHeight * 0.05,
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingLeft: screenWidth * 0.025,
-        borderRadius: screenWidth * 0.02,
-        borderWidth: 1,
-        borderColor: '#cccccc',
+      marginTop: vScale(8, screenHeight),
+      width: scale(43, screenWidth),
+      height: vScale(42, screenHeight),
+      justifyContent: "center",
+      alignItems: "center",
+      paddingLeft: scale(10, screenWidth),
+      borderRadius: Math.round(scale(8, screenWidth)),
+      borderWidth: 1,
+      borderColor: "#cccccc",
     },
     title: {
-        fontSize: screenHeight * 0.022,
-        fontWeight: 'bold',
-        marginTop: screenHeight * 0.01,
+      fontSize: normalizeFont(16, screenWidth, screenHeight),
+      fontWeight: "bold",
+      marginTop: vScale(8, screenHeight),
     },
-    deiscriptionContainer:{
-        marginTop: screenHeight * 0.02,
-        padding: screenHeight * 0.0015,
-        backgroundColor: '#ffffff',
-        borderRadius: screenWidth * 0.02,
-        width: '97%',
-        height: screenHeight * 0.2,
-        textAlignVertical: 'top',
-        borderWidth: 1,
-        borderColor: '#cccccc',
+    descriptionContainer: {
+      marginTop: vScale(16, screenHeight),
+      padding: vScale(2, screenHeight),
+      backgroundColor: "#ffffff",
+      borderRadius: Math.round(scale(8, screenWidth)),
+      width: "97%",
+      height: vScale(160, screenHeight),
+      textAlignVertical: "top",
+      borderWidth: 1,
+      borderColor: "#cccccc",
     },
-    deiscriptionTextInput : {
-        width: '100%',
-        height: '85%',
-        textAlignVertical: 'top',
+    descriptionTextInput: {
+      width: "100%",
+      height: "85%",
+      textAlignVertical: "top",
+      fontSize: normalizeFont(12, screenWidth, screenHeight),
     },
     picture1Container: {
-        width: '47%',
-        height: screenHeight * 0.2,
-        marginTop: screenHeight * 0.02,
+      width: "47%",
+      height: vScale(160, screenHeight),
+      marginTop: vScale(16, screenHeight),
     },
-    picture1 : {
-        width: '100%',
-        height: screenHeight * 0.2,
-        borderWidth: 1,
-        borderColor: '#cccccc',
-        borderRadius: screenWidth * 0.02,
+    picture1: {
+      width: "100%",
+      height: vScale(160, screenHeight),
+      borderWidth: 1,
+      borderColor: "#cccccc",
+      borderRadius: Math.round(scale(8, screenWidth)),
     },
-    picture2: {
-        width: '100%',
-        height: screenHeight * 0.2,
-        borderWidth: 1,
-        borderColor: '#cccccc',
-        borderRadius: screenWidth * 0.02,
-    },
-    text: {
-        marginBottom: screenHeight * 0.01,
-    },
-    imagesContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    selectImageText: {
-        marginTop: screenHeight * 0.08,
-        marginLeft: screenWidth * 0.06,
-        color: '#888888',
-    },
+    // ...other styles converted similarly...
     submitButton: {
-        width: '100%',
-        height: screenHeight * 0.06,
-        backgroundColor: '#4B0082',
-        marginTop: screenHeight * 0.09,
-        borderRadius: screenWidth * 0.01,
-        justifyContent: 'center'
+      width: "100%",
+      height: vScale(48, screenHeight),
+      backgroundColor: "#4B0082",
+      marginTop: vScale(72, screenHeight),
+      borderRadius: Math.round(scale(6, screenWidth)),
+      justifyContent: "center",
     },
     submitButtonText: {
-        color: '#ffffff', 
-        fontSize: screenHeight * 0.020, 
-        fontWeight: 'bold', 
-        textAlign: 'center'
-    }
-});
-export default styles;
+      color: "#ffffff",
+      fontSize: normalizeFont(16, screenWidth, screenHeight),
+      fontWeight: "bold",
+      textAlign: "center",
+    },
+    imagesContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      gap: scale(8, screenWidth),
+    },
+    text: {
+      fontSize: normalizeFont(12, screenWidth, screenHeight),
+    },
+    picture2: {
+      width: "100%",
+      height: vScale(160, screenHeight),
+      borderWidth: 1,
+      borderColor: "#cccccc",
+      borderRadius: Math.round(scale(8, screenWidth)),
+    },
+    selectImageText: {
+      textAlign: "center",
+      marginTop: vScale(60, screenHeight),
+      fontSize: normalizeFont(12, screenWidth, screenHeight),
+      color: "#888888",
+    },
+  });
+
+export default createAddNewsStyles;

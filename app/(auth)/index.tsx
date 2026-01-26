@@ -8,16 +8,19 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
+  useWindowDimensions,
 } from "react-native";
 import Toast from "react-native-toast-message";
 
 import { useNotification } from "@/context/NotificationContext";
 import { SafeAreaView } from "react-native-safe-area-context";
-import styles from "../../assets/styles/login";
+import loginStylesScreen from "../../assets/styles/login";
 import { useAuthStore } from "../../store/authStore";
 
 export default function Index() {
+  const { width, height } = useWindowDimensions();
+  const styles = loginStylesScreen(width, height);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -27,26 +30,26 @@ export default function Index() {
   const { userId } = useLocalSearchParams();
   const { token } = useAuthStore();
 
- const handleLogin = async () => {
-  const result = await login(email, password);
+  const handleLogin = async () => {
+    const result = await login(email, password);
 
-  if (!result.success) {
-    Toast.show({ type: "error", text1: "Login Failed", text2: result.error });
-    return;
-  }
+    if (!result.success) {
+      Toast.show({ type: "error", text1: "Login Failed", text2: result.error });
+      return;
+    }
 
-  const username = result.user?.username || email;
-  Toast.show({ 
-    type: "success", 
-    text1: "Login Successful", 
-    text2: `Welcome back, ${username}!`, 
-    visibilityTime: 3500 
-  });
-  setTimeout(() => {
-    router.push({ pathname: "/(tabs)" });
-  }, 3500);
-};
-  
+    const username = result.user?.username || email;
+    Toast.show({
+      type: "success",
+      text1: "Login Successful",
+      text2: `Welcome back, ${username}!`,
+      visibilityTime: 3500,
+    });
+    setTimeout(() => {
+      router.push({ pathname: "/(tabs)" });
+    }, 3500);
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
@@ -54,11 +57,9 @@ export default function Index() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <View style={styles.container}>
-          <Text style={styles.textWelcome}>
-            Welcome Back {}
-          </Text>     
+          <Text style={styles.textWelcome}>Welcome Back {}</Text>
           <View style={styles.cardformContainer}>
-            <Text style={styles.textinput}>Email {}</Text>
+            <Text style={styles.textinput}>* Email {}</Text>
             <TextInput
               style={styles.inputform}
               placeholder="enter your email"
@@ -68,7 +69,7 @@ export default function Index() {
               keyboardType="email-address"
             />
 
-            <Text style={styles.textinputItem}>Password {}</Text>
+            <Text style={styles.textinputItem}>* Password {}</Text>
             <TextInput
               style={styles.inputform}
               placeholder="enter your password"
@@ -93,13 +94,15 @@ export default function Index() {
               Forgot Password? {}
             </Link>
             <View style={styles.card}>
-              <TouchableOpacity style={styles.buttonInside} onPress={handleLogin} disabled={isLoading}>
+              <TouchableOpacity
+                style={styles.buttonInside}
+                onPress={handleLogin}
+                disabled={isLoading}
+              >
                 {isLoading ? (
                   <ActivityIndicator color="#ffffff" size={"small"} />
                 ) : (
-                  <Text style={styles.login}>
-                    Login {}
-                  </Text>
+                  <Text style={styles.login}>Login {}</Text>
                 )}
               </TouchableOpacity>
 

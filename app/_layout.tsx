@@ -1,13 +1,13 @@
 import SafeScreen from "@/components/safescreen";
 import { NotificationProvider } from "@/context/NotificationContext";
 import { useAuthStore } from "@/store/authStore";
-import { Image } from 'expo-image';
-import * as Notifications from 'expo-notifications';
+import { Image } from "expo-image";
+import * as Notifications from "expo-notifications";
 import { Stack, useRouter } from "expo-router";
-import * as SplashScreen from 'expo-splash-screen';
+import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useState } from "react";
-import { ActivityIndicator, View, } from 'react-native';
+import { useEffect, useRef, useState } from "react";
+import { Animated, Text, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 SplashScreen.preventAutoHideAsync();
@@ -18,23 +18,51 @@ Notifications.setNotificationHandler({
     shouldPlaySound: true,
     shouldSetBadge: true,
     shouldShowBanner: true,
-    shouldShowList: true  
-  })
-})
+    shouldShowList: true,
+  }),
+});
 
 export default function RootLayout() {
   const [loaded, setLoaded] = useState(false);
+  const [displayedText, setDisplayedText] = useState("");
   const router = useRouter();
   const { token, user, checkAuth } = useAuthStore();
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const charIndexAnim = useRef(new Animated.Value(0)).current;
+  const textToDisplay = "    Kismet KSM";
 
   useEffect(() => {
     SplashScreen.preventAutoHideAsync();
   }, []);
-  
+
   useEffect(() => {
     const init = async () => {
       await checkAuth?.();
+
+      // Add listener to charIndexAnim to update displayed text
+      const listener = charIndexAnim.addListener(({ value }) => {
+        const index = Math.floor(value);
+        setDisplayedText(textToDisplay.substring(0, index));
+      });
+
+      // Animate character by character
+      Animated.timing(charIndexAnim, {
+        toValue: textToDisplay.length,
+        duration: 1500,
+        useNativeDriver: false,
+      }).start();
+
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 1500,
+        useNativeDriver: true,
+      }).start();
+
       setTimeout(() => setLoaded(true), 3000);
+
+      return () => {
+        charIndexAnim.removeListener(listener);
+      };
     };
     init();
   }, []);
@@ -43,24 +71,66 @@ export default function RootLayout() {
     if (loaded) {
       SplashScreen.hideAsync();
       if (token && user) {
-        router.replace('/(tabs)');
+        router.replace("/(tabs)");
       } else {
-        router.replace('/(auth)');
+        router.replace("/(auth)");
       }
     }
   }, [loaded, token, user]);
 
   if (!loaded) {
     return (
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#4B0082" }}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#4B0082",
+        }}
+      >
         <Image
-          source={require('../assets/images/logo.png')}
-          style={{ width: 230, height: 230, top: 15 }}
+          source={require("../assets/images/logo.png")}
+          style={{ width: 230, height: 230, bottom: 15 }}
         />
-        <ActivityIndicator size="large" color="#fff" style={{ top: -118, left: 5 }} />
+        <Animated.Text
+          style={{
+            position: "absolute",
+            justifyContent: "center",
+            alignItems: "center",
+            bottom: 320,
+            color: "#fff",
+            fontSize: 18,
+            fontWeight: "bold",
+            fontFamily: "serif",
+            opacity: fadeAnim,
+            minWidth: 150,
+          }}
+        >
+          {displayedText}
+        </Animated.Text>
+        <Text
+          style={{
+            position: "absolute",
+            bottom: 80,
+            color: "#ffffff9c",
+            fontSize: 12,
+          }}
+        >
+          Powered By
+        </Text>
+        <Text
+          style={{
+            position: "absolute",
+            bottom: 55,
+            color: "#ffffff9c",
+            fontSize: 12,
+          }}
+        >
+          SighterTech
+        </Text>
       </View>
     );
-  };
+  }
   return (
     <SafeAreaProvider>
       <SafeScreen>
