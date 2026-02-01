@@ -65,7 +65,7 @@ const loginStylesScreen = (screenWidth: number, screenHeight: number) =>
       color: "#000",
       alignSelf: "flex-start",
       fontSize: normalizeFont(18, screenWidth, screenHeight),
-      marginTop: 20,
+      marginTop: scale(15, screenHeight),
     },
     eyeicon: {
       bottom: screenHeight * 0.05,
@@ -120,7 +120,7 @@ const loginStylesScreen = (screenWidth: number, screenHeight: number) =>
     inputform: {
       height: 45,
       width: scale(340, screenWidth),
-      color: "#14179b",
+      color: "#000",
       backgroundColor: "white",
       borderColor: "#00000031",
       borderWidth: 1,

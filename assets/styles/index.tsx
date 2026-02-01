@@ -9,6 +9,7 @@ import { normalizeFont, scale, vScale } from "./responsive";
  */
 const indexScreenStyles = (screenWidth: number, screenHeight: number) =>
   StyleSheet.create({
+    generaltext: {},
     safeArea: {
       flex: 1,
       backgroundColor: "#fff",
@@ -36,7 +37,6 @@ const indexScreenStyles = (screenWidth: number, screenHeight: number) =>
       overflow: "hidden",
       alignItems: "center",
       justifyContent: "center",
-      gap: vScale(5, screenHeight),
     },
     profileItems: {
       width: "100%",
@@ -58,9 +58,9 @@ const indexScreenStyles = (screenWidth: number, screenHeight: number) =>
       alignItems: "center",
     },
     profileImage: {
-      width: scale(screenWidth / 6.5, screenWidth),
-      height: vScale(screenHeight / 13.5, screenHeight),
-      borderRadius: Math.round(scale(100, screenWidth)),
+      width: scale(screenWidth / 7, screenWidth),
+      height: scale(screenWidth / 7, screenWidth),
+      borderRadius: scale(screenWidth / 13, screenWidth),
       justifyContent: "center",
       alignItems: "center",
       overflow: "hidden",
@@ -72,9 +72,9 @@ const indexScreenStyles = (screenWidth: number, screenHeight: number) =>
       elevation: 3.5,
     },
     posterPfrofile: {
-      width: scale(screenWidth / 7.5, screenWidth),
-      height: vScale(screenHeight / 15, screenHeight),
-      borderRadius: Math.round(scale(100, screenWidth)),
+      width: scale(screenWidth / 7, screenWidth),
+      height: scale(screenWidth / 7, screenWidth),
+      borderRadius: scale(screenWidth / 13, screenWidth),
       justifyContent: "center",
       alignItems: "center",
       overflow: "hidden",
@@ -84,7 +84,7 @@ const indexScreenStyles = (screenWidth: number, screenHeight: number) =>
       shadowColor: "#000",
       shadowOpacity: 0.05,
       elevation: 3.5,
-      marginLeft: scale(10, screenWidth),
+      marginLeft: scale(4, screenWidth),
     },
     profileImages: {
       width: "100%",
@@ -133,7 +133,7 @@ const indexScreenStyles = (screenWidth: number, screenHeight: number) =>
       alignItems: "center",
       justifyContent: "flex-start",
       width: "80%",
-      height: vScale(screenHeight / 15, screenHeight),
+      height: vScale(screenHeight / 16, screenHeight),
       gap: vScale(3, screenHeight),
       right: scale(screenWidth / 25, screenWidth),
       position: "absolute",
@@ -155,7 +155,9 @@ const indexScreenStyles = (screenWidth: number, screenHeight: number) =>
       borderWidth: 1,
       borderColor: "rgba(163, 162, 162, 0.56)",
       borderRadius: Math.round(scale(30, screenWidth)),
-      paddingLeft: scale(15, screenWidth),
+      paddingLeft: scale(12, screenWidth),
+      color: "#000",
+      fontSize: normalizeFont(16, screenWidth, screenHeight),
     },
     card: {
       width: "100%",
@@ -237,10 +239,12 @@ const indexScreenStyles = (screenWidth: number, screenHeight: number) =>
     },
     logo: {
       width: scale(screenWidth / 10, screenWidth),
-      height: vScale(screenHeight / 20, screenHeight),
-      borderRadius: Math.round(scale(100, screenWidth)),
+      height: vScale(screenWidth / 10, screenHeight),
+      borderRadius: Math.round(scale(18, screenWidth)),
       shadowOpacity: 0.05,
       elevation: 3,
+      borderColor: "#cccccc",
+      borderWidth: 0.5,
       backgroundColor: "#fff",
     },
     teamName: {
@@ -323,7 +327,7 @@ const indexScreenStyles = (screenWidth: number, screenHeight: number) =>
       fontWeight: "bold",
       position: "absolute",
       marginLeft: -scale(screenWidth / 1.6, screenWidth),
-      marginTop: vScale((screenHeight / 100) * -7.5, screenHeight),
+      marginTop: vScale((screenHeight / 100) * -8.5, screenHeight),
     },
     adsbannerChallenge: {
       position: "absolute",
@@ -373,7 +377,7 @@ const indexScreenStyles = (screenWidth: number, screenHeight: number) =>
       alignSelf: "flex-end",
       marginTop: vScale(screenHeight / 20, screenHeight),
       position: screenWidth > 400 ? "relative" : "absolute",
-      marginRight: scale(-3.5, screenWidth),
+      marginRight: scale(14, screenWidth),
       backgroundColor: "#fff",
       borderRadius: Math.round(scale(8, screenWidth)),
       elevation: 4,
@@ -389,7 +393,6 @@ const indexScreenStyles = (screenWidth: number, screenHeight: number) =>
       alignSelf: "flex-end",
       marginTop: vScale(screenHeight / 20, screenHeight),
       position: screenWidth > 400 ? "relative" : "absolute",
-      marginRight: scale(-3.5, screenWidth),
       backgroundColor: "#fff",
       borderRadius: Math.round(scale(8, screenWidth)),
       elevation: 4,
@@ -663,9 +666,9 @@ const indexScreenStyles = (screenWidth: number, screenHeight: number) =>
     },
     animationPress: {
       width: scale(screenWidth / 7, screenWidth),
-      height: vScale(screenHeight / 13, screenHeight),
+      height: scale(screenWidth / 7, screenWidth),
       backgroundColor: "#4c008250",
-      borderRadius: Math.round(scale(screenWidth / 5, screenWidth)),
+      borderRadius: scale(screenWidth / 14, screenWidth),
       padding: scale(10, screenWidth),
       alignItems: "center",
       justifyContent: "center",
@@ -675,8 +678,8 @@ const indexScreenStyles = (screenWidth: number, screenHeight: number) =>
     },
     animated: {
       width: scale(screenWidth / 6, screenWidth),
-      height: vScale(screenHeight / 12, screenHeight),
-      overflow: "hidden",
+      height: scale(screenWidth / 7, screenWidth),
+      overflow: "visible",
       right: 16,
       zIndex: 9999,
       position: "absolute",

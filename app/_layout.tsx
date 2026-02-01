@@ -1,4 +1,3 @@
-import SafeScreen from "@/components/safescreen";
 import { NotificationProvider } from "@/context/NotificationContext";
 import { useAuthStore } from "@/store/authStore";
 import { Image } from "expo-image";
@@ -38,14 +37,11 @@ export default function RootLayout() {
   useEffect(() => {
     const init = async () => {
       await checkAuth?.();
-
-      // Add listener to charIndexAnim to update displayed text
       const listener = charIndexAnim.addListener(({ value }) => {
         const index = Math.floor(value);
         setDisplayedText(textToDisplay.substring(0, index));
       });
 
-      // Animate character by character
       Animated.timing(charIndexAnim, {
         toValue: textToDisplay.length,
         duration: 1500,
@@ -133,23 +129,22 @@ export default function RootLayout() {
   }
   return (
     <SafeAreaProvider>
-      <SafeScreen>
-        <NotificationProvider>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(auth)" />
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="(postdetail)" />
-            <Stack.Screen name="(profile)" />
-            <Stack.Screen name="(menu)" />
-            <Stack.Screen name="(videos)" />
-            <Stack.Screen name="(challenge)" />
-            <Stack.Screen name="(tag)" />
-            <Stack.Screen name="(respond)" />
-            <Stack.Screen name="(news)" />
-            <Stack.Screen name="(contest)" />
-          </Stack>
-        </NotificationProvider>
-      </SafeScreen>
+      <NotificationProvider>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(auth)" />
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="(postdetail)" />
+          <Stack.Screen name="(profile)" />
+          <Stack.Screen name="(menu)" />
+          <Stack.Screen name="(videos)" />
+          <Stack.Screen name="(challenge)" />
+          <Stack.Screen name="(tag)" />
+          <Stack.Screen name="(respond)" />
+          <Stack.Screen name="(news)" />
+          <Stack.Screen name="(contest)" />
+        </Stack>
+      </NotificationProvider>
+
       <StatusBar style="dark" />
       <Toast />
     </SafeAreaProvider>

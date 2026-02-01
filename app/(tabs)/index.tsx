@@ -2,9 +2,9 @@ import EditPost from "@/components/caption";
 import Match from "@/components/match";
 import Search from "@/components/search";
 import { useAuthStore } from "@/store/authStore";
+import { useNewPostStore } from "@/store/newPostStore";
 import { API_URL } from "@/store/postStore";
 import { userProfilePictureStore } from "@/store/profileStore";
-import { useNewPostStore } from "@/store/newPostStore";
 import { formatComments, formatTimeAgo } from "@/store/util";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -446,6 +446,12 @@ export default function Index() {
     // getUpcomingFixtures();
     const socket = io("https://kismit-official.onrender.com/");
 
+    // Remove any existing listeners to prevent duplicates
+    socket.off("new post created");
+    socket.off("new like created");
+    socket.off("new match created");
+    socket.off("new comment created");
+
     socket.on("new post created", (newPost) => {
       setPosts((posts) => {
         const exits = posts.some((post) => post._id === newPost._id);
@@ -489,6 +495,10 @@ export default function Index() {
     userProfilePictureStore.getState().fetchProfilePicture();
 
     return () => {
+      socket.off("new post created");
+      socket.off("new like created");
+      socket.off("new match created");
+      socket.off("new comment created");
       socket.disconnect();
     };
   }, []);
@@ -859,10 +869,6 @@ export default function Index() {
               {formatMatchDate(item.matchDate)}
             </Text>
           </View>
-          {/* Button to open YouTube link */}
-          <TouchableOpacity
-            onPress={() => Linking.openURL("https://www.youtube.com/")}
-          ></TouchableOpacity>
         </View>
       </TouchableOpacity>
     </View>
@@ -911,7 +917,7 @@ export default function Index() {
     return null;
   };
   return (
-    <SafeAreaView style={[styles.safeArea]}>
+    <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
         style={styles.safeArea}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -1291,8 +1297,8 @@ export default function Index() {
                     showsHorizontalScrollIndicator={false}
                     horizontal
                     contentContainerStyle={{
-                      paddingBottom: insets.bottom + 8,
-                      marginTop: insets.top + 15,
+                      marginTop: insets.top - 11,
+                      backgroundColor: "red",
                       minHeight: 144,
                     }}
                   />
