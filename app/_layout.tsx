@@ -1,3 +1,4 @@
+import SafeScreen from "@/components/safescreen";
 import { NotificationProvider } from "@/context/NotificationContext";
 import { useAuthStore } from "@/store/authStore";
 import { Image } from "expo-image";
@@ -9,8 +10,6 @@ import { useEffect, useRef, useState } from "react";
 import { Animated, Text, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
-SplashScreen.preventAutoHideAsync();
-
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -31,17 +30,20 @@ export default function RootLayout() {
   const textToDisplay = "    Kismet KSM";
 
   useEffect(() => {
-    SplashScreen.preventAutoHideAsync();
-  }, []);
-
-  useEffect(() => {
     const init = async () => {
-      await checkAuth?.();
+      // Ensure the native splash screen stays visible until we finish setup
+      try {
+        await SplashScreen.preventAutoHideAsync();
+      } catch (e) {
+        // ignore if already prevented
+      }
+
       const listener = charIndexAnim.addListener(({ value }) => {
         const index = Math.floor(value);
         setDisplayedText(textToDisplay.substring(0, index));
       });
 
+      // start the intro animations immediately
       Animated.timing(charIndexAnim, {
         toValue: textToDisplay.length,
         duration: 1500,
@@ -54,6 +56,14 @@ export default function RootLayout() {
         useNativeDriver: true,
       }).start();
 
+      // run auth check in background but don't block the intro animation
+      try {
+        await checkAuth?.();
+      } catch (e) {
+        /* ignore auth errors here */
+      }
+
+      // show the React splash view after the intro completes
       setTimeout(() => setLoaded(true), 3000);
 
       return () => {
@@ -100,6 +110,7 @@ export default function RootLayout() {
             fontFamily: "serif",
             opacity: fadeAnim,
             minWidth: 150,
+            marginLeft: 40,
           }}
         >
           {displayedText}
@@ -129,22 +140,23 @@ export default function RootLayout() {
   }
   return (
     <SafeAreaProvider>
-      <NotificationProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(auth)" />
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="(postdetail)" />
-          <Stack.Screen name="(profile)" />
-          <Stack.Screen name="(menu)" />
-          <Stack.Screen name="(videos)" />
-          <Stack.Screen name="(challenge)" />
-          <Stack.Screen name="(tag)" />
-          <Stack.Screen name="(respond)" />
-          <Stack.Screen name="(news)" />
-          <Stack.Screen name="(contest)" />
-        </Stack>
-      </NotificationProvider>
-
+      <SafeScreen>
+        <NotificationProvider>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(auth)" />
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="(postdetail)" />
+            <Stack.Screen name="(profile)" />
+            <Stack.Screen name="(menu)" />
+            <Stack.Screen name="(videos)" />
+            <Stack.Screen name="(challenge)" />
+            <Stack.Screen name="(tag)" />
+            <Stack.Screen name="(respond)" />
+            <Stack.Screen name="(news)" />
+            <Stack.Screen name="(contest)" />
+          </Stack>
+        </NotificationProvider>
+      </SafeScreen>
       <StatusBar style="dark" />
       <Toast />
     </SafeAreaProvider>

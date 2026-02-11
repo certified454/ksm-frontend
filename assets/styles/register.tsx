@@ -185,6 +185,7 @@ const registerScreenStylesindexScreenStyles = (
       backgroundColor: "transparent",
       borderRadius: 5,
       padding: scale(10, screenWidth),
+      fontSize: normalizeFont(16, screenWidth, screenHeight),
     },
     button: {
       backgroundColor: "#4B0082",

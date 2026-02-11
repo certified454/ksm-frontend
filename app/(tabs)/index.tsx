@@ -7,7 +7,6 @@ import { API_URL } from "@/store/postStore";
 import { userProfilePictureStore } from "@/store/profileStore";
 import { formatComments, formatTimeAgo } from "@/store/util";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { LinearGradient } from "expo-linear-gradient";
@@ -869,6 +868,10 @@ export default function Index() {
               {formatMatchDate(item.matchDate)}
             </Text>
           </View>
+          {/* Button to open YouTube link */}
+          <TouchableOpacity
+            onPress={() => Linking.openURL("https://www.youtube.com/")}
+          ></TouchableOpacity>
         </View>
       </TouchableOpacity>
     </View>
@@ -917,486 +920,271 @@ export default function Index() {
     return null;
   };
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea]}>
       <KeyboardAvoidingView
         style={styles.safeArea}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <View style={styles.main}>
           <View style={styles.containerItem}>
-            {user && user.isOwner ? (
-              <>
-                <View style={[styles.card, { zIndex: 1, paddingVertical: 0 }]}>
-                  <LinearGradient
-                    colors={["#4c008241", "#fff"]}
-                    style={styles.profileItems}
-                  >
-                    <TouchableOpacity
-                      onPress={handleProfilePress}
-                      style={styles.profileButton}
+            <View style={styles.itemCard}>
+              <View style={styles.profileItems}>
+                {user.isOwner ? (
+                  <>
+                    <LinearGradient
+                      colors={["#4c008241", "#fff"]}
+                      style={styles.profileItems}
                     >
-                      <Image
-                        source={{
-                          uri:
-                            profilePicture ||
-                            "https://api.dicebear.com/9.x/miniavs/svg?seed=George&backgroundType=gradientLinear&backgroundColor=b6e3f4,c0aede,ffdfbf",
-                        }}
-                        style={styles.profileImage}
-                      />
-                    </TouchableOpacity>
-                    <View style={styles.hotmatchContainer}>
-                      {submiting ? (
-                        <ActivityIndicator size="small" color="#4B0082" />
+                      <TouchableOpacity
+                        onPress={handleProfilePress}
+                        style={styles.profileButton}
+                      >
+                        <Image
+                          source={{
+                            uri:
+                              profilePicture ||
+                              "https://api.dicebear.com/9.x/miniavs/svg?seed=George&backgroundType=gradientLinear&backgroundColor=b6e3f4,c0aede,ffdfbf",
+                          }}
+                          style={styles.profileImage}
+                        />
+                      </TouchableOpacity>
+                      <View style={styles.hotmatchContainer}>
+                        {submiting ? (
+                          <ActivityIndicator size="small" color="#4B0082" />
+                        ) : (
+                          <TouchableOpacity
+                            onPress={() =>
+                              modalVisible
+                                ? setModalVisible(false)
+                                : setModalVisible(true)
+                            }
+                          >
+                            <Ionicons
+                              name="add-circle"
+                              size={34}
+                              color="#000"
+                            />
+                          </TouchableOpacity>
+                        )}
+                      </View>
+                      <View style={styles.searchcontaiiner}>
+                        <TextInput
+                          style={styles.textsearchInput}
+                          placeholder="Search"
+                          value={query}
+                          editable={!searchLoading}
+                          onChangeText={(text) => {
+                            setQuery(text);
+                            debounceSearch(text);
+                          }}
+                        />
+                        {searchLoading ? (
+                          <></>
+                        ) : (
+                          <View style={styles.searchContainer}>
+                            <View style={styles.searchBar}>
+                              <TouchableOpacity
+                                onPress={() => {
+                                  (SearchUsers(query, token),
+                                    setSearchVisible(true));
+                                }}
+                                style={styles.searchBar}
+                              >
+                                <Ionicons
+                                  name="search"
+                                  size={24}
+                                  color="#9b9b9bff"
+                                />
+                              </TouchableOpacity>
+                            </View>
+                          </View>
+                        )}
+                        <Ionicons
+                          name="notifications-outline"
+                          size={21}
+                          color="#4B0082"
+                          style={styles.notification}
+                        />
+                      </View>
+                    </LinearGradient>
+                  </>
+                ) : (
+                  <>
+                    <LinearGradient
+                      colors={["#4c008250", "transparent"]}
+                      style={{
+                        ...styles.profileItems,
+                      }}
+                    >
+                      {/* join contest button moved to top-level so it's not clipped by overflow */}
+                      <TouchableOpacity
+                        onPress={handleProfilePress}
+                        style={styles.profileButton}
+                      >
+                        <Image
+                          source={{
+                            uri:
+                              profilePicture ||
+                              "https://api.dicebear.com/9.x/miniavs/svg?seed=George&backgroundType=gradientLinear&backgroundColor=b6e3f4,c0aede,ffdfbf",
+                          }}
+                          style={[styles.profileImage, {}]}
+                        />
+                      </TouchableOpacity>
+                      <View style={styles.searchcontaiiner}>
+                        <TextInput
+                          style={styles.textsearchInput}
+                          placeholder="Search"
+                          value={query}
+                          editable={!searchLoading}
+                          onChangeText={(text) => {
+                            setQuery(text);
+                            debounceSearch(text);
+                          }}
+                        />
+                        {searchLoading ? (
+                          <></>
+                        ) : (
+                          <View style={styles.searchContainer}>
+                            <View style={styles.searchBar}>
+                              <TouchableOpacity
+                                onPress={() => {
+                                  (SearchUsers(query, token),
+                                    setSearchVisible(true));
+                                }}
+                                style={styles.searchBar}
+                              >
+                                <Ionicons
+                                  name="search"
+                                  size={24}
+                                  color="#9b9b9bff"
+                                />
+                              </TouchableOpacity>
+                            </View>
+                          </View>
+                        )}
+
+                        <Ionicons
+                          name="notifications-outline"
+                          size={21}
+                          color="#4B0082"
+                          style={styles.notification}
+                        />
+                      </View>
+                    </LinearGradient>
+                  </>
+                )}
+              </View>
+
+              <Text style={styles.generaltext}>Hot Match</Text>
+
+              {/* <View style={styles.adsbannerChallenge}></View> */}
+              <FlatList
+                data={matches}
+                renderItem={renderMatch}
+                keyExtractor={(item) => item._id}
+                showsHorizontalScrollIndicator={false}
+                horizontal
+                contentContainerStyle={{
+                  paddingBottom: insets.bottom + 8,
+                  paddingLeft: insets.bottom + 15,
+                  marginTop: insets.top + 15,
+                  minHeight: 144,
+                }}
+              />
+              <View style={styles.sepration}></View>
+            </View>
+            <FlatList
+              data={posts}
+              renderItem={renderPost}
+              keyExtractor={(item) => item._id}
+              showsVerticalScrollIndicator={false}
+              onEndReached={handleLoadMorePost}
+              contentContainerStyle={[
+                styles.container,
+                {
+                  paddingLeft: insets.bottom + 15,
+                  marginTop: insets.bottom + 15,
+                },
+              ]}
+              refreshControl={
+                <RefreshControl
+                  refreshing={refresh}
+                  onRefresh={() => fetchPosts(1, true)}
+                />
+              }
+            />
+            <Search isVisible={searchVisible} onClose={handleSearchClose}>
+              <TextInput
+                placeholder="Search"
+                value={query}
+                editable={!searchLoading}
+                multiline
+                style={styles.searchTextInput}
+                onChangeText={(text) => {
+                  setQuery(text);
+                  debounceSearch(text);
+                }}
+              />
+              {searchLoading ? (
+                <View>
+                  <Text>Searching....</Text>
+                </View>
+              ) : (
+                <>
+                  <FlatList
+                    data={combinedResults}
+                    renderItem={renderCombinedSearch}
+                    keyExtractor={(item) => item._id + item.type}
+                    contentContainerStyle={styles.container}
+                    ListEmptyComponent={
+                      <Text style={{ textAlign: "center", marginTop: 20 }}>
+                        No user or tag found
+                      </Text>
+                    }
+                  />
+                  {!searchResults.users?.length &&
+                    !searchResults.tags?.length && (
+                      <Text style={{ textAlign: "center", marginTop: 20 }}>
+                        No user or tag found
+                      </Text>
+                    )}
+                </>
+              )}
+            </Search>
+            <EditPost
+              isVisible={editVisible}
+              onClose={() => setEditVisible(false)}
+            >
+              <SafeAreaProvider>
+                <KeyboardAvoidingView
+                  style={{ flex: 1 }}
+                  behavior="padding"
+                  keyboardVerticalOffset={80}
+                >
+                  <View style={styles.captionContainer1}>
+                    <TextInput
+                      style={styles.input}
+                      value={caption}
+                      onChangeText={setCaption}
+                      multiline
+                      editable={!isLoading}
+                    />
+                    <View style={styles.updatePostButtonContainer}>
+                      {isUpdatingPost ? (
+                        <ActivityIndicator size="small" color="#fff" />
                       ) : (
                         <TouchableOpacity
-                          onPress={() =>
-                            modalVisible
-                              ? setModalVisible(false)
-                              : setModalVisible(true)
-                          }
+                          style={styles.updatePostButton}
+                          onPress={() => handleEditPost(editingPostId)}
                         >
-                          <Ionicons name="add-circle" size={34} color="#000" />
+                          <Text style={styles.saveText}>Update Post</Text>
                         </TouchableOpacity>
                       )}
                     </View>
-                    <View style={styles.searchcontaiiner}>
-                      <TextInput
-                        style={styles.textsearchInput}
-                        placeholder="Search"
-                        value={query}
-                        editable={!searchLoading}
-                        onChangeText={(text) => {
-                          setQuery(text);
-                          debounceSearch(text);
-                        }}
-                      />
-                      {searchLoading ? (
-                        <></>
-                      ) : (
-                        <View style={styles.searchContainer}>
-                          <View style={styles.searchBar}>
-                            <TouchableOpacity
-                              onPress={() => {
-                                (SearchUsers(query, token),
-                                  setSearchVisible(true));
-                              }}
-                              style={styles.searchBar}
-                            >
-                              <Ionicons
-                                name="search"
-                                size={24}
-                                color="#9b9b9bff"
-                              />
-                            </TouchableOpacity>
-                          </View>
-                        </View>
-                      )}
-                      <Ionicons
-                        name="notifications-outline"
-                        size={21}
-                        color="#4B0082"
-                        style={styles.notification}
-                      />
-                    </View>
-                  </LinearGradient>
-
-                  <Text style={styles.generaltext}>Hot Match</Text>
-
-                  {/* <View style={styles.adsbannerChallenge}></View> */}
-                  <FlatList
-                    data={matches}
-                    renderItem={renderMatch}
-                    keyExtractor={(item) => item._id}
-                    showsHorizontalScrollIndicator={false}
-                    horizontal
-                    contentContainerStyle={{ top: 60, gap: 5, maxHeight: 144 }}
-                  />
-                  <View style={styles.sepration}></View>
-                </View>
-                <FlatList
-                  data={posts}
-                  renderItem={renderPost}
-                  keyExtractor={(item) => item._id}
-                  showsVerticalScrollIndicator={false}
-                  onEndReached={handleLoadMorePost}
-                  contentContainerStyle={[
-                    styles.container,
-                    { paddingBottom: insets.bottom + 80 },
-                  ]}
-                  refreshControl={
-                    <RefreshControl
-                      refreshing={refresh}
-                      onRefresh={() => fetchPosts(1, true)}
-                    />
-                  }
-                />
-                <Search isVisible={searchVisible} onClose={handleSearchClose}>
-                  <TextInput
-                    placeholder="Search"
-                    value={query}
-                    editable={!searchLoading}
-                    multiline
-                    style={styles.searchTextInput}
-                    onChangeText={(text) => {
-                      setQuery(text);
-                      debounceSearch(text);
-                    }}
-                  />
-                  {searchLoading ? (
-                    <View>
-                      <Text>Searching....</Text>
-                    </View>
-                  ) : (
-                    <>
-                      <FlatList
-                        data={combinedResults}
-                        renderItem={renderCombinedSearch}
-                        keyExtractor={(item) => item._id + item.type}
-                        contentContainerStyle={styles.container}
-                        ListEmptyComponent={
-                          <Text style={{ textAlign: "center", marginTop: 20 }}>
-                            No user or tag found
-                          </Text>
-                        }
-                      />
-                      {!searchResults.users?.length &&
-                        !searchResults.tags?.length && (
-                          <Text style={{ textAlign: "center", marginTop: 20 }}>
-                            No user or tag found
-                          </Text>
-                        )}
-                    </>
-                  )}
-                </Search>
-                <EditPost
-                  isVisible={editVisible}
-                  onClose={() => setEditVisible(false)}
-                >
-                  <SafeAreaProvider>
-                    <KeyboardAvoidingView
-                      style={{ flex: 1 }}
-                      behavior="padding"
-                      keyboardVerticalOffset={80}
-                    >
-                      <View style={styles.captionContainer1}>
-                        <TextInput
-                          style={styles.input}
-                          value={caption}
-                          onChangeText={setCaption}
-                          multiline
-                          editable={!isLoading}
-                        />
-                        <View style={styles.updatePostButtonContainer}>
-                          {isUpdatingPost ? (
-                            <ActivityIndicator size="small" color="#fff" />
-                          ) : (
-                            <TouchableOpacity
-                              style={styles.updatePostButton}
-                              onPress={() => handleEditPost(editingPostId)}
-                            >
-                              <Text style={styles.saveText}>Update Post</Text>
-                            </TouchableOpacity>
-                          )}
-                        </View>
-                      </View>
-                    </KeyboardAvoidingView>
-                  </SafeAreaProvider>
-                </EditPost>
-                <Match
-                  isVisible={modalVisible}
-                  onClose={() => setModalVisible(false)}
-                >
-                  <View style={styles.matchContainer}>
-                    <Text>League Name</Text>
-                    <TextInput
-                      placeholder="League Name"
-                      value={leagueName}
-                      onChangeText={setLeagueName}
-                      style={styles.textinput}
-                    />
-                    <TextInput
-                      placeholder="Match Date (YYYY-MM-DD)"
-                      value={matchDate}
-                      onChangeText={setMatchDate}
-                      style={styles.input}
-                    />
-                    <TouchableOpacity onPress={() => setShowTime(true)}>
-                      <Ionicons
-                        name={time ? "time" : "time-outline"}
-                        size={24}
-                        color="#4B0082"
-                      />
-                      <Text>
-                        {time.toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </Text>
-                    </TouchableOpacity>
-                    {showTime && Platform.OS === "android" && (
-                      <DateTimePicker
-                        value={time}
-                        mode="time"
-                        display="default"
-                        onChange={timePicker}
-                      />
-                    )}
-                    <TextInput
-                      placeholder="Location"
-                      value={location}
-                      onChangeText={setLocation}
-                      style={styles.input}
-                    />
-                    <TextInput
-                      placeholder="Home Team Name"
-                      value={homeTeamName}
-                      onChangeText={setHomeTeamName}
-                      style={styles.input}
-                    />
-                    <TextInput
-                      placeholder="Away Team Name"
-                      value={awayTeamName}
-                      onChangeText={setAwayTeamName}
-                      style={styles.input}
-                    />
-                    <View>
-                      <TouchableOpacity onPress={pickHomeTeamLogo}>
-                        {homeTeamBase64 ? (
-                          <View>
-                            <Image
-                              source={{ uri: homeTeamBase64 }}
-                              style={{
-                                width: 100,
-                                height: 100,
-                                borderRadius: 50,
-                                left: "15%",
-                              }}
-                            />
-                          </View>
-                        ) : (
-                          <View>
-                            <Ionicons
-                              name="camera"
-                              size={30}
-                              color={"#4B0082"}
-                            />
-                            <Text style={styles.text}> Choose a file </Text>
-                          </View>
-                        )}
-                      </TouchableOpacity>
-                    </View>
-                    <View>
-                      <TouchableOpacity onPress={pickAwayTeamLogo}>
-                        {awayTeamBase64 ? (
-                          <View>
-                            <Image
-                              source={{ uri: awayTeamBase64 }}
-                              style={{
-                                width: 100,
-                                height: 100,
-                                borderRadius: 50,
-                                left: "15%",
-                              }}
-                            />
-                          </View>
-                        ) : (
-                          <View>
-                            <Ionicons
-                              name="camera"
-                              size={30}
-                              color={"#4B0082"}
-                            />
-                            <Text style={styles.text}> Choose a file </Text>
-                          </View>
-                        )}
-                      </TouchableOpacity>
-                    </View>
-                    <TouchableOpacity
-                      onPress={createMatch}
-                      style={styles.updatePostButtonContainer}
-                    >
-                      {submiting ? (
-                        <ActivityIndicator size="small" color="#fff" />
-                      ) : (
-                        <Text style={styles.saveText}>Create Match</Text>
-                      )}
-                    </TouchableOpacity>
                   </View>
-                </Match>
-              </>
-            ) : (
-              <>
-                <View style={styles.itemCard}>
-                  <View style={styles.profileItems}>
-                    {/* join contest button moved to top-level so it's not clipped by overflow */}
-                    <TouchableOpacity
-                      onPress={handleProfilePress}
-                      style={styles.profileButton}
-                    >
-                      <Image
-                        source={{
-                          uri:
-                            profilePicture ||
-                            "https://api.dicebear.com/9.x/miniavs/svg?seed=George&backgroundType=gradientLinear&backgroundColor=b6e3f4,c0aede,ffdfbf",
-                        }}
-                        style={[
-                          styles.profileImage,
-                          { marginRight: insets.bottom + 14 },
-                        ]}
-                      />
-                    </TouchableOpacity>
-                    <View style={styles.searchcontaiiner}>
-                      <TextInput
-                        style={styles.textsearchInput}
-                        placeholder="Search"
-                        value={query}
-                        editable={!searchLoading}
-                        onChangeText={(text) => {
-                          setQuery(text);
-                          debounceSearch(text);
-                        }}
-                      />
-                      {searchLoading ? (
-                        <></>
-                      ) : (
-                        <View style={styles.searchContainer}>
-                          <View style={styles.searchBar}>
-                            <TouchableOpacity
-                              onPress={() => {
-                                (SearchUsers(query, token),
-                                  setSearchVisible(true));
-                              }}
-                              style={styles.searchBar}
-                            >
-                              <Ionicons
-                                name="search"
-                                size={24}
-                                color="#9b9b9bff"
-                              />
-                            </TouchableOpacity>
-                          </View>
-                        </View>
-                      )}
-
-                      <Ionicons
-                        name="notifications-outline"
-                        size={21}
-                        color="#4B0082"
-                        style={styles.notification}
-                      />
-                    </View>
-                  </View>
-
-                  <Text style={styles.generaltext}>Hot Match</Text>
-
-                  {/* <View style={styles.adsbannerChallenge}></View> */}
-                  <FlatList
-                    data={matches}
-                    renderItem={renderMatch}
-                    keyExtractor={(item) => item._id}
-                    showsHorizontalScrollIndicator={false}
-                    horizontal
-                    contentContainerStyle={{
-                      marginTop: insets.top - 11,
-                      backgroundColor: "red",
-                      minHeight: 144,
-                    }}
-                  />
-                  <View style={styles.sepration}></View>
-                </View>
-                <FlatList
-                  data={posts}
-                  renderItem={renderPost}
-                  keyExtractor={(item) => item._id}
-                  showsVerticalScrollIndicator={false}
-                  onEndReached={handleLoadMorePost}
-                  contentContainerStyle={[
-                    styles.container,
-                    {
-                      marginTop: insets.bottom + 15,
-                    },
-                  ]}
-                  refreshControl={
-                    <RefreshControl
-                      refreshing={refresh}
-                      onRefresh={() => fetchPosts(1, true)}
-                    />
-                  }
-                />
-                <Search isVisible={searchVisible} onClose={handleSearchClose}>
-                  <TextInput
-                    placeholder="Search"
-                    value={query}
-                    editable={!searchLoading}
-                    multiline
-                    style={styles.searchTextInput}
-                    onChangeText={(text) => {
-                      setQuery(text);
-                      debounceSearch(text);
-                    }}
-                  />
-                  {searchLoading ? (
-                    <View>
-                      <Text>Searching....</Text>
-                    </View>
-                  ) : (
-                    <>
-                      <FlatList
-                        data={combinedResults}
-                        renderItem={renderCombinedSearch}
-                        keyExtractor={(item) => item._id + item.type}
-                        contentContainerStyle={styles.container}
-                        ListEmptyComponent={
-                          <Text style={{ textAlign: "center", marginTop: 20 }}>
-                            No user or tag found
-                          </Text>
-                        }
-                      />
-                      {!searchResults.users?.length &&
-                        !searchResults.tags?.length && (
-                          <Text style={{ textAlign: "center", marginTop: 20 }}>
-                            No user or tag found
-                          </Text>
-                        )}
-                    </>
-                  )}
-                </Search>
-                <EditPost
-                  isVisible={editVisible}
-                  onClose={() => setEditVisible(false)}
-                >
-                  <SafeAreaProvider>
-                    <KeyboardAvoidingView
-                      style={{ flex: 1 }}
-                      behavior="padding"
-                      keyboardVerticalOffset={80}
-                    >
-                      <View style={styles.captionContainer1}>
-                        <TextInput
-                          style={styles.input}
-                          value={caption}
-                          onChangeText={setCaption}
-                          multiline
-                          editable={!isLoading}
-                        />
-                        <View style={styles.updatePostButtonContainer}>
-                          {isUpdatingPost ? (
-                            <ActivityIndicator size="small" color="#fff" />
-                          ) : (
-                            <TouchableOpacity
-                              style={styles.updatePostButton}
-                              onPress={() => handleEditPost(editingPostId)}
-                            >
-                              <Text style={styles.saveText}>Update Post</Text>
-                            </TouchableOpacity>
-                          )}
-                        </View>
-                      </View>
-                    </KeyboardAvoidingView>
-                  </SafeAreaProvider>
-                </EditPost>
-              </>
-            )}
+                </KeyboardAvoidingView>
+              </SafeAreaProvider>
+            </EditPost>
           </View>
           {/* Top-level animated Join Contest button (not clipped by parents) */}
           <Animated.View

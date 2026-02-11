@@ -86,7 +86,7 @@ export default function Index() {
             >
               <Ionicons
                 name={showPassword ? "eye-off" : "eye"}
-                size={20}
+                size={24}
                 color="#4B0082"
               />
             </TouchableOpacity>

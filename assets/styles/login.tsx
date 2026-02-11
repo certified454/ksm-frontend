@@ -68,7 +68,7 @@ const loginStylesScreen = (screenWidth: number, screenHeight: number) =>
       marginTop: scale(15, screenHeight),
     },
     eyeicon: {
-      bottom: screenHeight * 0.05,
+      bottom: screenHeight * 0.044,
       right: screenWidth * 0.05,
       alignSelf: "flex-end",
     },
@@ -126,6 +126,7 @@ const loginStylesScreen = (screenWidth: number, screenHeight: number) =>
       borderWidth: 1,
       borderRadius: scale(5, screenWidth),
       padding: scale(10, screenWidth),
+      fontSize: normalizeFont(16, screenWidth, screenHeight),
     },
     button: {
       backgroundColor: "#4B0082",
